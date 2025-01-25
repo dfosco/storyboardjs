@@ -1,0 +1,50 @@
+/* === === === Draggable Styles === === === */
+
+body { cursor: url(../images/cursor-arrow.svg), auto }
+body:not([is-locked="true"]) *:not(body):not(section):not(main):not(canvas):not(aside):hover { cursor: url(../images/cursor-arrow.svg), pointer }
+body:not([is-locked="true"]) *:not(body):not(section):not(main):not(canvas):not(aside):active { cursor: url(../images/cursor-hand.png), pointer }
+body:not([is-locked="true"]).canvas-cursor #canvas:hover { cursor: url(../images/cursor-pen.svg), auto }
+
+/* Fix pan-on-drag for touchscreens */
+body .draggable:not(:active) {
+    touch-action: none;
+}
+
+.draggable {
+    position: relative;
+    z-index: 200;
+    width: fit-content;
+}
+
+.draggable:active,
+.draggable:hover {
+    border-radius: 6;
+    outline: 3px solid rgba(127, 156, 245, 0.80);
+    outline-offset: 4px;
+    background-color: rgba(127, 156, 245, 0.35);
+    transition: background-color ease-in 150ms;
+}
+
+.draggable:hover::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--grid-gap-small) * -1);
+    top: calc(var(--grid-gap-small) * -1);
+    width: var(--grid-gap-small);
+    height: var(--grid-gap-small);
+    background: var(--active);
+    border-radius: 2px;
+    z-index: 1;
+}
+
+.draggable:hover::before {
+    content: '';
+    position: absolute;
+    right: calc(var(--grid-gap-small) * -1);
+    bottom: calc(var(--grid-gap-small) * -1);
+    width: var(--grid-gap-small);
+    height: var(--grid-gap-small);
+    background: var(--active);
+    border-radius: 2px;
+    z-index: 1;
+}
