@@ -1,48 +1,17 @@
-import { useRef, Children, cloneElement } from 'react';
-import { useDraggable } from '@neodrag/react';
-import "../css/canvas.css";
+import { Children } from 'react';
+import Draggable from '../components/draggable';
+import styles from "./canvas.module.css";
 
-function DraggableWrapper({ children }) {
-  const draggableRef = useRef(null);
-  const { isDragging } = useDraggable(draggableRef, {
-    axis: 'both',
-    // grid: [10, 10],
-    bounds: 'body',
-    threshold: { delay: 30, distance: 4 },
-    defaultClass: 'drag',
-    defaultClassDragging: 'on',
-    defaultPosition: { x: 0, y: 0 },
-    onDragStart: (data) => {
-      console.log('Started dragging:', data);
-    },
-    onDragEnd: (data) => {
-      console.log('Finished dragging:', data);
-    }
-  });
+function Canvas({ children, centered = true }) {
 
-  // const rotation = Math.random() * 4 - 2;;
-  const rotationVariations = useRef(Math.random() * 4 - 2).current;
-  const rotation = isDragging ? `${rotationVariations}deg` : '0deg';
-  
+  const centeredMode = centered ? {display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center'} : '';
+
   return (
-    <article 
-      ref={draggableRef} 
-      style={{  cursor: isDragging ? 'grabbing' : 'grab' }}
-    >
-      <div className="draggable" style={{ transform: isDragging && `rotate(${rotation})`, transition: 'transform ease-in-out 150ms' }}>
-        {children}
-      </div>
-    </article>
-  );
-}
-
-function Canvas({ children }) {
-  return (
-    <main className="canvas">
+    <main className={styles.canvas} style={centeredMode}>
           {Children.map(children, (child, index) => (
-            <DraggableWrapper key={index}>
+            <Draggable key={index}>
               {child}
-            </DraggableWrapper>
+            </Draggable>
           ))}
     </main>
   );

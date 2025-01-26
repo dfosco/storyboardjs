@@ -1,0 +1,42 @@
+/* === === === Draggable Styles === === === */
+
+/* Fix pan-on-drag for touchscreens */
+
+:global(body .draggable:not(:active)) {
+  touch-action: none;
+} 
+
+:global(.drag) {
+  position: relative;
+  width: fit-content;
+}
+
+.draggable {
+    position: relative;
+    width: fit-content;
+    border-radius: var(--borderRadius-large);
+    box-shadow: var(--shadow-resting-small);
+}
+
+.draggable::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  border-radius: var(--borderRadius-large);
+  box-shadow: var(--shadow-floating-small);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.draggable:active::after,
+.draggable:hover::after {
+  opacity: 1;
+}
+
+.draggable:active > :where(h1,h2,h3,h4,h5,h6,p,span,div,article) {
+  user-select: none;
+}
+
