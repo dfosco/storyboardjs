@@ -2,6 +2,10 @@
 
 /* Fix pan-on-drag for touchscreens */
 
+:global(.on-transition) {
+  transition: transform 0.15 ease-in-out
+}
+
 :global(body .draggable:not(:active)) {
   touch-action: none;
 } 

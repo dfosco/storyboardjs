@@ -1,8 +1,10 @@
 import Canvas from '../templates/canvas.jsx'
 import { Box, Button } from '@primer/react'
 
-<Canvas>
-  <Box sx={{ 
+<Canvas centered={false}>
+  <Box 
+  id="box1"
+  sx={{ 
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: 'var(--bgColor-muted)',
@@ -10,15 +12,24 @@ import { Box, Button } from '@primer/react'
     border: '1px solid',
     borderColor: 'border.default',
     borderRadius: 'var(--borderRadius-large)',
-    padding: 4
+    padding: 4,
+    minWidth: '300px'
   }}>
-  # Welcome Board
-
-  This is a markdown board that will be accessible at `/board/welcome`.
-
-  You can use React components inline:
-
-  <h1>Hello from Canvas!</h1>
-  <Button variant="primary">Edit</Button>
+  <Button variant="primary">Save</Button>
   </Box>
+  <Box 
+  id="box2"
+  sx={{ 
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: 'var(--bgColor-muted)',
+    mb: 2,
+    border: '1px solid',
+    borderColor: 'border.default',
+    borderRadius: 'var(--borderRadius-large)',
+    padding: 4,
+    minWidth: '300px'
+  }}>
+  <Button variant="primary">Save</Button>
+  </Box>  
 </Canvas>

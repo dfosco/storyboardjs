@@ -4,7 +4,7 @@ import styles from "./canvas.module.css";
 
 function Canvas({ children, centered = true }) {
 
-  const centeredMode = centered ? {display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center'} : '';
+  const centeredMode = centered ? {display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center'} : null;
 
   return (
     <main className={styles.canvas} style={centeredMode}>
