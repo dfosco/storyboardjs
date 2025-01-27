@@ -14,6 +14,9 @@ function Draggable({ children }) {
   const dragId = useRef(findDragId(children)).current;
   const queue = useRef(getQueue(dragId)).current;
 
+  // Function to check if element has a valid dragId
+  const hasValidId = (id) => id !== null && id !== undefined;
+  
   // Add new effect for on-translation class
   const translation_ms = 250;
   const [onTranslation, setOnTranslation] = useState(false);
@@ -22,7 +25,9 @@ function Draggable({ children }) {
   useEffect(() => {
     document.documentElement.style.setProperty('--translation_ms', `${translation_ms}ms`);
     const draggableEl = draggableRef.current;
-    if (draggableEl) {
+
+    // Only apply transition if dragId exists and has saved coordinates
+    if (draggableEl && hasValidId(dragId) && queue && (queue.x !== 0 || queue.y !== 0)) {
       draggableEl.classList.add('on-translation');
       setOnTranslation(true);
 
@@ -64,9 +69,12 @@ function Draggable({ children }) {
     position: { x: position.x, y: position.y },
     onDrag: ({ offsetX, offsetY }) => setPosition({ x: offsetX, y: offsetY }),
     onDragEnd: (data) => {
-      setPosition({ x: data.offsetX, y: data.offsetY }); 
-      saveDrag(dragId, data.offsetX, data.offsetY);
-      console.log('DragEnd to:', position);
+      if (dragId === null) { return } 
+      else {
+        setPosition({ x: data.offsetX, y: data.offsetY }); 
+        saveDrag(dragId, data.offsetX, data.offsetY);
+        console.log('DragEnd to:', position);
+      }
     }
   });
 
@@ -84,7 +92,6 @@ function Draggable({ children }) {
     <article 
       ref={draggableRef} 
       style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-      className="on-translation"
     >
       <div className="draggable" style={{ transform: (isDragging || onTranslation) && `rotate(${rotation})`, translation: 'transform ease-in-out 150ms' }}>
         {children}
