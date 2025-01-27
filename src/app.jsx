@@ -7,11 +7,20 @@ import { routes } from '@generouted/react-router'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { ThemeProvider, BaseStyles } from '@primer/react'
 
+const getInitialTheme = () => {
+  try {
+    const storedTheme = localStorage.getItem('theme')
+    return storedTheme || 'light'
+  } catch {
+    return 'light'
+  }
+}
+
 const Routes = () => <RouterProvider router={createBrowserRouter(routes, { basename: '/storyboard' })} />
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ThemeProvider colorMode="light">
+    <ThemeProvider colorMode={getInitialTheme()} preventSSRMismatch>
       <BaseStyles>
         <Routes />
       </BaseStyles>
