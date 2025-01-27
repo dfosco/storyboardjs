@@ -83,7 +83,7 @@ export const saveDrag = (dragId, x, y) => {
 export const boxStyles = {
   display: 'flex',
   flexDirection: 'column',
-  backgroundColor: 'var(--bgColor-muted)',
+  backgroundColor: 'var(--bgColor-default)',
   border: '1px solid',
   borderColor: 'border.default',
   borderRadius: 'var(--borderRadius-large)',

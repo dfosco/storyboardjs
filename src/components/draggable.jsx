@@ -61,7 +61,7 @@ function Draggable({ children }) {
     axis: 'both',
     grid: hasGrid, // Use grid only if data-hasGrid is present
     bounds: 'body',
-    threshold: { delay: 30, distance: 4 },
+    threshold: { delay: 50, distance: 30 },
     defaultClass: 'drag',
     defaultClassDragging: 'on',
     defaultClassDragged: 'off',
