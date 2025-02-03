@@ -16,7 +16,7 @@ const getInitialTheme = () => {
   }
 }
 
-const Routes = () => <RouterProvider router={createBrowserRouter(routes, { basename: '/storyboard' })} />
+const Routes = () => <RouterProvider router={createBrowserRouter(routes, { basename: '/storyboardjs' })} />
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
