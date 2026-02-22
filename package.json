@@ -12,5 +12,8 @@
     "dev": "npm run dev --workspace=demo",
     "build": "npm run build --workspace=packages/tiny-canvas",
     "build:demo": "npm run build --workspace=demo"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.8"
   }
 }
