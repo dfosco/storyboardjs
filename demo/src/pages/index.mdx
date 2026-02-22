@@ -1,9 +1,20 @@
-import Canvas from '../templates/canvas.jsx'
+import { Canvas } from 'tiny-canvas'
+import 'tiny-canvas/style.css'
 import { Box, Button } from '@primer/react'
-import { DownloadIcon } from '@primer/octicons-react'
-import {boxStyles} from '../templates/utils.js'
 import { ThemeToggle } from '../components/ThemeToggle.jsx'
 import { StateToggle } from '../components/StateToggle.jsx'
+
+export const boxStyles = {
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: 'var(--bgColor-default)',
+  border: '1px solid',
+  borderColor: 'border.default',
+  borderRadius: 'var(--borderRadius-large)',
+  padding: 4,
+  minWidth: '300px',
+  gap: 2,
+}
 
 <Canvas grid={false}>
 
