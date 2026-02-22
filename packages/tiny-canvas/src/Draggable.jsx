@@ -1,15 +1,12 @@
 import { useRef, useEffect, useState } from 'react';
 import { useDraggable } from '@neodrag/react';
-import { findDragId, refreshStorage, getQueue, saveDrag } from './utils';
+import { refreshStorage, getQueue, saveDrag } from './utils';
 
 const TRANSLATION_MS = 250;
 
-function Draggable({ children, gridSize }) {
+function Draggable({ children, gridSize, dragId }) {
   const draggableRef = useRef(null);
-  const dragId = useRef(findDragId(children)).current;
   const queue = useRef(getQueue(dragId)).current;
-
-  const hasValidId = (id) => id !== null && id !== undefined;
 
   const [onTranslation, setOnTranslation] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -20,7 +17,7 @@ function Draggable({ children, gridSize }) {
   // Animate elements with saved positions on mount
   useEffect(() => {
     const el = draggableRef.current;
-    if (el && hasValidId(dragId) && queue && (queue.x !== 0 || queue.y !== 0)) {
+    if (el && dragId && queue && (queue.x !== 0 || queue.y !== 0)) {
       el.classList.add('tc-on-translation');
       setOnTranslation(true);
 

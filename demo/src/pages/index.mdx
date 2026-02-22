@@ -16,17 +16,17 @@ export const boxStyles = {
   gap: 2,
 }
 
-<Canvas grid={false}>
+<Canvas dotted={true} grid={false}>
 
-<Box id="box4" sx={boxStyles}>
+<Box sx={boxStyles}>
   <ThemeToggle />
 </Box>
-  <Box id="box1" sx={boxStyles}>
+  <Box sx={boxStyles}>
     <Button size="large" variant="primary">Save</Button>
     <Button size="large" variant="secondary">Edit</Button>
     <Button size="large" variant="danger">Delete</Button>
   </Box>
-<Box id="box3">
+<Box>
   <StateToggle />
 </Box>
 </Canvas>

@@ -22,6 +22,50 @@ export const findDragId = (children) => {
   return dragId;
 };
 
+/** djb2 string hash → 8-char hex */
+function hash(str) {
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) + h + str.charCodeAt(i)) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
+}
+
+/** Build a structural signature from a React element tree (types + shape only). */
+function signature(node) {
+  if (node == null || typeof node === 'boolean') return '';
+  if (typeof node === 'string' || typeof node === 'number') return '#text';
+
+  const type = node.type;
+  const name =
+    typeof type === 'function'
+      ? type.displayName || type.name || 'Anonymous'
+      : typeof type === 'string'
+        ? type
+        : 'Fragment';
+
+  const kids = node.props?.children;
+  if (kids == null) return name;
+
+  const childSigs = [];
+  React.Children.forEach(kids, (child) => {
+    const s = signature(child);
+    if (s) childSigs.push(s);
+  });
+
+  return childSigs.length ? `${name}(${childSigs.join(',')})` : name;
+}
+
+/**
+ * Generate a stable drag ID from a React element's structural shape.
+ * Uses only component type names and nesting structure — immune to
+ * prop/value/content changes. The index suffix disambiguates identical siblings.
+ */
+export const generateDragId = (element, index) => {
+  const sig = signature(element);
+  return `tc-${hash(sig)}-${index}`;
+};
+
 /**
  * Gets stored coordinates for a specific dragId from localStorage.
  * Returns coords object with x,y or default {x:0, y:0} if not found.
