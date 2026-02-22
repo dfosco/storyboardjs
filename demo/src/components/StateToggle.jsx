@@ -1,17 +1,15 @@
 import { Button } from '@primer/react-brand'
 import { IssueReopenedIcon } from '@primer/octicons-react'
+import { useResetCanvas } from 'tiny-canvas'
 
 export function StateToggle() {
-  const handleReset = () => {
-    localStorage.clear()
-    window.location.reload()
-  }
+  const resetCanvas = useResetCanvas({ reload: true })
 
   return (
     <Button 
       variant="primary"
       leadingVisual={<IssueReopenedIcon/>} 
-      onClick={handleReset}
+      onClick={resetCanvas}
       hasArrow={false}
     >
       Reset all changes
