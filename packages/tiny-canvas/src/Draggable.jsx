@@ -1,12 +1,8 @@
-import { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useDraggable } from '@neodrag/react';
 import { refreshStorage, getQueue, saveDrag } from './utils';
 
 const TRANSLATION_MS = 250;
-
-function snapToGrid(value, gridSize) {
-  return Math.round(value / gridSize) * gridSize;
-}
 
 function Draggable({ children, gridSize, dragId }) {
   const draggableRef = useRef(null);
@@ -54,16 +50,9 @@ function Draggable({ children, gridSize, dragId }) {
     position: { x: position.x, y: position.y },
     onDrag: ({ offsetX, offsetY }) => setPosition({ x: offsetX, y: offsetY }),
     onDragEnd: (data) => {
-      // Snap to grid on drop if gridSize is set
-      let finalX = data.offsetX;
-      let finalY = data.offsetY;
-      if (gridSize !== undefined) {
-        finalX = snapToGrid(finalX, gridSize);
-        finalY = snapToGrid(finalY, gridSize);
-      }
-      setPosition({ x: finalX, y: finalY });
+      setPosition({ x: data.offsetX, y: data.offsetY });
       if (dragId !== null) {
-        saveDrag(dragId, finalX, finalY);
+        saveDrag(dragId, data.offsetX, data.offsetY);
       }
     },
   });
