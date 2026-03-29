@@ -1,8 +1,12 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import { useDraggable } from '@neodrag/react';
 import { refreshStorage, getQueue, saveDrag } from './utils';
 
 const TRANSLATION_MS = 250;
+
+function snapToGrid(value, gridSize) {
+  return Math.round(value / gridSize) * gridSize;
+}
 
 function Draggable({ children, gridSize, dragId }) {
   const draggableRef = useRef(null);
@@ -11,7 +15,7 @@ function Draggable({ children, gridSize, dragId }) {
   const [onTranslation, setOnTranslation] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [rotationVariation, setRotationVariation] = useState(
-    Math.random() < 0.5 ? -2 : 2
+    Math.random() < 0.5 ? -0.5 : 0.5
   );
 
   // Animate elements with saved positions on mount
@@ -38,11 +42,9 @@ function Draggable({ children, gridSize, dragId }) {
     }
   }, [queue]);
 
-  const snapGrid = gridSize !== undefined ? [gridSize, gridSize] : undefined;
-
+  // Free-drag during drag, snap to grid on drop
   const { isDragging } = useDraggable(draggableRef, {
     axis: 'both',
-    grid: snapGrid,
     bounds: 'body',
     threshold: { delay: 50, distance: 30 },
     defaultClass: 'tc-drag',
@@ -52,9 +54,17 @@ function Draggable({ children, gridSize, dragId }) {
     position: { x: position.x, y: position.y },
     onDrag: ({ offsetX, offsetY }) => setPosition({ x: offsetX, y: offsetY }),
     onDragEnd: (data) => {
-      if (dragId === null) return;
-      setPosition({ x: data.offsetX, y: data.offsetY });
-      saveDrag(dragId, data.offsetX, data.offsetY);
+      // Snap to grid on drop if gridSize is set
+      let finalX = data.offsetX;
+      let finalY = data.offsetY;
+      if (gridSize !== undefined) {
+        finalX = snapToGrid(finalX, gridSize);
+        finalY = snapToGrid(finalY, gridSize);
+      }
+      setPosition({ x: finalX, y: finalY });
+      if (dragId !== null) {
+        saveDrag(dragId, finalX, finalY);
+      }
     },
   });
 
@@ -62,7 +72,7 @@ function Draggable({ children, gridSize, dragId }) {
     isDragging || onTranslation ? `${rotationVariation}deg` : '0deg';
 
   useEffect(() => {
-    setRotationVariation(Math.random() < 0.5 ? -2 : 2);
+    setRotationVariation(Math.random() < 0.5 ? -0.5 : 0.5);
   }, [isDragging]);
 
   return (
