@@ -75,7 +75,7 @@ body .tc-draggable-inner:not(:active) {
 }
 
 .tc-drag {
-  position: relative;
+  position: absolute;
   width: fit-content;
 }
 
