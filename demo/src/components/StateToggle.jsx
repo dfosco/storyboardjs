@@ -1,6 +1,6 @@
 import { Button } from '@primer/react-brand'
 import { IssueReopenedIcon } from '@primer/octicons-react'
-import { useResetCanvas } from 'tiny-canvas'
+import { useResetCanvas } from '@dfosco/tiny-canvas'
 
 export function StateToggle() {
   const resetCanvas = useResetCanvas({ reload: true })
