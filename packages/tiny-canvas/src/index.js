@@ -1,6 +1,5 @@
 import './style.css';
 
 export { default as Canvas } from './Canvas';
-export { default as Draggable } from './Draggable';
+export { default as Block } from './Block';
 export { useResetCanvas } from './useResetCanvas';
-export { findDragId, generateDragId, getQueue, refreshStorage, saveDrag } from './utils';

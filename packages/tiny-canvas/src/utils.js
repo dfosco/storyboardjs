@@ -1,26 +1,6 @@
-import React from 'react';
+import { Children, isValidElement } from 'react';
 
-/**
- * Recursively searches through React component children.
- * Returns the id prop value if found, null if not.
- */
-export const findDragId = (children) => {
-  if (!children) return null;
-
-  let dragId = null;
-  const checkProps = (element) => {
-    if (element.props && element.props.id) {
-      dragId = element.props.id;
-      return;
-    }
-    if (element.props && element.props.children) {
-      React.Children.forEach(element.props.children, checkProps);
-    }
-  };
-
-  checkProps(children);
-  return dragId;
-};
+const STORAGE_KEY = 'tiny-canvas-queue';
 
 /** djb2 string hash → 8-char hex */
 function hash(str) {
@@ -48,7 +28,7 @@ function signature(node) {
   if (kids == null) return name;
 
   const childSigs = [];
-  React.Children.forEach(kids, (child) => {
+  Children.forEach(kids, (child) => {
     const s = signature(child);
     if (s) childSigs.push(s);
   });
@@ -57,23 +37,43 @@ function signature(node) {
 }
 
 /**
- * Generate a stable drag ID from a React element's structural shape.
- * Uses only component type names and nesting structure — immune to
- * prop/value/content changes. The index suffix disambiguates identical siblings.
+ * Generates a stable block ID from an explicit React key when available,
+ * otherwise from the element structure and sibling index.
  */
-export const generateDragId = (element, index) => {
-  const sig = signature(element);
-  return `tc-${hash(sig)}-${index}`;
+export const generateBlockId = (element, index) => {
+  const identity =
+    isValidElement(element) && element.key !== null
+      ? `key:${element.key}`
+      : `${signature(element)}:${index}`;
+
+  return `tc-block-${hash(identity)}`;
 };
 
 /**
- * Gets stored coordinates for a specific dragId from localStorage.
+ * Gets stored coordinates for a specific block ID from localStorage.
  * Returns null when the dragId has no saved position.
  */
-export const getSavedPosition = (dragId) => {
+export const getSavedPosition = (blockId) => {
+  if (typeof localStorage === 'undefined') {
+    return null;
+  }
+
   try {
-    const queue = JSON.parse(localStorage.getItem('tiny-canvas-queue')) || [];
-    return queue.find((item) => item.id === dragId) ?? null;
+    const queue = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    if (!Array.isArray(queue)) {
+      throw new TypeError('Stored canvas positions must be an array.');
+    }
+
+    const saved = queue.find((item) => item.id === blockId);
+    if (
+      !saved ||
+      !Number.isFinite(saved.x) ||
+      !Number.isFinite(saved.y)
+    ) {
+      return null;
+    }
+
+    return { x: saved.x, y: saved.y };
   } catch (error) {
     console.error('Error getting saved coordinates:', error);
     return null;
@@ -81,44 +81,35 @@ export const getSavedPosition = (dragId) => {
 };
 
 /**
- * Gets stored coordinates or the origin when no saved position exists.
+ * Saves position data for a block.
  */
-export const getQueue = (dragId) =>
-  getSavedPosition(dragId) ?? { x: 0, y: 0 };
-
-/**
- * Initializes localStorage queue if it doesn't exist.
- */
-export const refreshStorage = () => {
-  try {
-    const queue = localStorage.getItem('tiny-canvas-queue');
-    if (!queue) {
-      localStorage.setItem('tiny-canvas-queue', JSON.stringify([]));
-    }
-  } catch (error) {
-    console.error('LocalStorage is not available:', error);
+export const savePosition = (blockId, position) => {
+  if (typeof localStorage === 'undefined') {
+    return;
   }
-};
 
-/**
- * Saves position data for a draggable element to localStorage.
- */
-export const saveDrag = (dragId, x, y) => {
   try {
-    const queue = JSON.parse(localStorage.getItem('tiny-canvas-queue')) || [];
+    const queue = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    if (!Array.isArray(queue)) {
+      throw new TypeError('Stored canvas positions must be an array.');
+    }
     const now = new Date().toISOString().replace(/[:.]/g, '-');
-
-    const dragData = { id: dragId, x, y, time: now };
-    const existingIndex = queue.findIndex((item) => item.id === dragId);
+    const blockData = {
+      id: blockId,
+      x: position.x,
+      y: position.y,
+      time: now,
+    };
+    const existingIndex = queue.findIndex((item) => item.id === blockId);
 
     if (existingIndex >= 0) {
-      queue[existingIndex] = dragData;
+      queue[existingIndex] = blockData;
     } else {
-      queue.push(dragData);
+      queue.push(blockData);
     }
 
-    localStorage.setItem('tiny-canvas-queue', JSON.stringify(queue));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
   } catch (error) {
-    console.error('Error saving drag position:', error);
+    console.error('Error saving block position:', error);
   }
 };

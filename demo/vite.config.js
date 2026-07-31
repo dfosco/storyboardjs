@@ -2,9 +2,26 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import generouted from '@generouted/react-router/plugin'
 import mdx from '@mdx-js/rollup'
+import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({ 
   base: '/tiny-canvas/',
+  resolve: {
+    alias: [
+      {
+        find: '@dfosco/tiny-canvas/style.css',
+        replacement: fileURLToPath(
+          new URL('../packages/tiny-canvas/src/style.css', import.meta.url)
+        )
+      },
+      {
+        find: '@dfosco/tiny-canvas',
+        replacement: fileURLToPath(
+          new URL('../packages/tiny-canvas/src/index.js', import.meta.url)
+        )
+      }
+    ]
+  },
   plugins: [
     react(),
     mdx(),

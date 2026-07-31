@@ -1,36 +1,53 @@
 {
   "name": "@dfosco/tiny-canvas",
-  "version": "1.1.0",
+  "version": "0.1.0",
   "type": "module",
   "license": "MIT",
   "description": "A lightweight React canvas with draggable elements and persistent positions",
-  "main": "./src/index.js",
-  "module": "./src/index.js",
+  "keywords": [
+    "canvas",
+    "drag-and-drop",
+    "draggable",
+    "react",
+    "whiteboard"
+  ],
+  "homepage": "https://dfosco.github.io/tiny-canvas/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dfosco/tiny-canvas.git",
+    "directory": "packages/tiny-canvas"
+  },
+  "bugs": {
+    "url": "https://github.com/dfosco/tiny-canvas/issues"
+  },
+  "main": "./dist/tiny-canvas.js",
+  "module": "./dist/tiny-canvas.js",
   "types": "./src/index.d.ts",
+  "style": "./dist/tiny-canvas.css",
   "exports": {
     ".": {
-      "import": "./src/index.js",
-      "types": "./src/index.d.ts"
+      "types": "./src/index.d.ts",
+      "import": "./dist/tiny-canvas.js",
+      "default": "./dist/tiny-canvas.js"
     },
-    "./style.css": "./src/style.css"
+    "./style.css": "./dist/tiny-canvas.css",
+    "./package.json": "./package.json"
   },
   "publishConfig": {
-    "main": "./dist/tiny-canvas.js",
-    "module": "./dist/tiny-canvas.js",
-    "exports": {
-      ".": {
-        "import": "./dist/tiny-canvas.js",
-        "types": "./src/index.d.ts"
-      },
-      "./style.css": "./dist/tiny-canvas.css"
-    }
+    "access": "public"
   },
   "files": [
     "dist",
-    "src/index.d.ts"
+    "src/index.d.ts",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
   ],
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "prepack": "npm run build"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

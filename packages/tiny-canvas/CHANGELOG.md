@@ -1,7 +1,12 @@
 # @dfosco/tiny-canvas
 
-## 1.1.0
+## 0.1.0
 
-### Minor Changes
+### Initial release
 
-- Add dotted background and colorMode props, auto-generate drag IDs from structural signatures
+- Add `Canvas` as the strict board container for authorized canvas components.
+- Add `Block` with `x` and `y` placement, dragging, persisted positions, and
+  selection state.
+- Add generated block identities so explicit IDs are optional.
+- Add dotted backgrounds, light and dark color modes, and customizable styles.
+- Add `useResetCanvas` for clearing persisted positions.
