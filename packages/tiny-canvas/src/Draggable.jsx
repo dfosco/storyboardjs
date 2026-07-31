@@ -1,15 +1,17 @@
 import { useRef, useEffect, useState } from 'react';
 import { useDraggable } from '@neodrag/react';
-import { refreshStorage, getQueue, saveDrag } from './utils';
+import { refreshStorage, getSavedPosition, saveDrag } from './utils';
 
 const TRANSLATION_MS = 250;
+const ORIGIN = { x: 0, y: 0 };
 
-function Draggable({ children, gridSize, dragId }) {
+function Draggable({ children, gridSize, dragId, defaultPosition = ORIGIN }) {
   const draggableRef = useRef(null);
-  const queue = useRef(getQueue(dragId)).current;
+  const savedPosition = useRef(getSavedPosition(dragId)).current;
+  const initialPosition = defaultPosition ?? ORIGIN;
 
   const [onTranslation, setOnTranslation] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState(initialPosition);
   const [rotationVariation, setRotationVariation] = useState(
     Math.random() < 0.5 ? -0.5 : 0.5
   );
@@ -17,7 +19,12 @@ function Draggable({ children, gridSize, dragId }) {
   // Animate elements with saved positions on mount
   useEffect(() => {
     const el = draggableRef.current;
-    if (el && dragId && queue && (queue.x !== 0 || queue.y !== 0)) {
+    if (
+      el &&
+      dragId &&
+      savedPosition &&
+      (savedPosition.x !== 0 || savedPosition.y !== 0)
+    ) {
       el.classList.add('tc-on-translation');
       setOnTranslation(true);
 
@@ -28,15 +35,15 @@ function Draggable({ children, gridSize, dragId }) {
 
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [dragId, savedPosition]);
 
   // Restore saved positions from localStorage
   useEffect(() => {
     refreshStorage();
-    if (draggableRef.current && queue) {
-      setPosition({ x: queue.x, y: queue.y });
+    if (draggableRef.current && savedPosition) {
+      setPosition({ x: savedPosition.x, y: savedPosition.y });
     }
-  }, [queue]);
+  }, [savedPosition]);
 
   // Free-drag during drag, snap to grid on drop
   const { isDragging } = useDraggable(draggableRef, {

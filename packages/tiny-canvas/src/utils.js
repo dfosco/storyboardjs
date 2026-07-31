@@ -68,21 +68,23 @@ export const generateDragId = (element, index) => {
 
 /**
  * Gets stored coordinates for a specific dragId from localStorage.
- * Returns coords object with x,y or default {x:0, y:0} if not found.
+ * Returns null when the dragId has no saved position.
  */
-export const getQueue = (dragId) => {
+export const getSavedPosition = (dragId) => {
   try {
     const queue = JSON.parse(localStorage.getItem('tiny-canvas-queue')) || [];
-    const coordsMap = queue.reduce((map, item) => {
-      map[item.id] = { id: item.id, x: item.x, y: item.y };
-      return map;
-    }, {});
-    return coordsMap[dragId] || { x: 0, y: 0 };
+    return queue.find((item) => item.id === dragId) ?? null;
   } catch (error) {
     console.error('Error getting saved coordinates:', error);
-    return { x: 0, y: 0 };
+    return null;
   }
 };
+
+/**
+ * Gets stored coordinates or the origin when no saved position exists.
+ */
+export const getQueue = (dragId) =>
+  getSavedPosition(dragId) ?? { x: 0, y: 0 };
 
 /**
  * Initializes localStorage queue if it doesn't exist.

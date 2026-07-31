@@ -17,16 +17,23 @@ export const boxStyles = {
 }
 
 <Canvas dotted={true} grid={false}>
-
-<Box sx={boxStyles}>
-  <ThemeToggle />
-</Box>
-  <Box sx={boxStyles}>
+  <Box
+    id="theme-controls"
+    defaultPosition={{ x: 36, y: 36 }}
+    sx={boxStyles}
+  >
+    <ThemeToggle />
+  </Box>
+  <Box
+    id="action-controls"
+    defaultPosition={{ x: 396, y: 180 }}
+    sx={boxStyles}
+  >
     <Button size="large" variant="primary">Save</Button>
     <Button size="large" variant="secondary">Edit</Button>
     <Button size="large" variant="danger">Delete</Button>
   </Box>
-<Box>
-  <StateToggle />
-</Box>
+  <Box id="reset-controls" defaultPosition={{ x: 180, y: 360 }}>
+    <StateToggle />
+  </Box>
 </Canvas>

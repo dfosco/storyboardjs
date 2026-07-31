@@ -1,4 +1,4 @@
-import { Children } from 'react';
+import { Children, cloneElement, isValidElement } from 'react';
 import Draggable from './Draggable';
 import { findDragId, generateDragId } from './utils';
 
@@ -20,9 +20,22 @@ function Canvas({
     >
       {Children.map(children, (child, index) => {
         const dragId = findDragId(child) ?? generateDragId(child, index);
+        const defaultPosition = isValidElement(child)
+          ? child.props.defaultPosition
+          : undefined;
+        const renderedChild =
+          defaultPosition === undefined
+            ? child
+            : cloneElement(child, { defaultPosition: undefined });
+
         return (
-          <Draggable key={index} gridSize={gridSize} dragId={dragId}>
-            {child}
+          <Draggable
+            key={dragId}
+            gridSize={gridSize}
+            dragId={dragId}
+            defaultPosition={defaultPosition}
+          >
+            {renderedChild}
           </Draggable>
         );
       })}
