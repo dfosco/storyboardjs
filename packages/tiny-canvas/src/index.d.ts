@@ -29,7 +29,8 @@ type CanvasChild =
   | ReactElement<BlockProps, typeof Block>
   | ReactElement<FrameProps, typeof Frame>
   | ReactElement<NoteProps, typeof Note>
-  | ReactElement<MarkProps, typeof Mark>;
+  | ReactElement<MarkProps, typeof Mark>
+  | ReactElement<LinkProps, typeof Link>;
 
 export interface CanvasProps
   extends Omit<HTMLAttributes<HTMLElement>, 'onSelectionChange'> {
@@ -139,6 +140,26 @@ export interface MarkProps extends Omit<BlockProps, 'children'> {
 }
 
 export declare function Mark(props: MarkProps): ReactElement;
+
+export interface LinkProps extends Omit<BlockProps, 'children'> {
+  /** Absolute HTTP(S) destination. Its origin supplies /favicon.ico. */
+  url: string | URL;
+  /** Link title shown in the card. */
+  title: string;
+  /** URL text shown under the title. */
+  displayUrl: string;
+  /** Initial width in pixels. Saved width takes precedence. Default: 320 */
+  width?: number;
+  /** Initial height in pixels. Saved height takes precedence. */
+  height?: number;
+  /** Minimum resizable width in pixels. Default: 240 */
+  minWidth?: number;
+  /** Minimum resizable height in pixels. Default: 72 */
+  minHeight?: number;
+  onSizeChange?: (size: Size) => void;
+}
+
+export declare function Link(props: LinkProps): ReactElement;
 
 export interface UseResetCanvasOptions {
   /** Reload the page after clearing state. Default: false */

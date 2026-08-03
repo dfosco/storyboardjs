@@ -1,4 +1,4 @@
-import { Block, Canvas, Frame, Mark, Note } from '@dfosco/tiny-canvas'
+import { Block, Canvas, Frame, Link, Mark, Note } from '@dfosco/tiny-canvas'
 import '@dfosco/tiny-canvas/style.css'
 import { Button } from '@primer/react'
 import { ThemeToggle } from '../components/ThemeToggle.jsx'
@@ -26,6 +26,14 @@ export const isEmbeddedView =
   <Mark key="markdown-example" x={760} y={300} width={420}>
     {'### Markdown\n\n- Safe rendering\n- Draggable\n- Resizable'}
   </Mark>
+  <Link
+    key="tiny-canvas-link"
+    url="https://github.com/dfosco/tiny-canvas"
+    title="Tiny Canvas on GitHub"
+    displayUrl="github.com/dfosco/tiny-canvas"
+    x={760}
+    y={500}
+  />
   {!isEmbeddedView && (
     <Frame
       key="tiny-canvas-preview"

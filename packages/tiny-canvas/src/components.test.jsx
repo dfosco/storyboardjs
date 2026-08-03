@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Canvas from './Canvas.jsx';
+import Link from './Link.jsx';
 import Mark from './Mark.jsx';
 import Note from './Note.jsx';
 
@@ -56,5 +57,28 @@ describe('Canvas components', () => {
     expect(writeText.mock.calls[0][0]).toContain('"width": 300');
     expect(writeText.mock.calls[0][0]).not.toContain('stale');
     expect(screen.getByRole('button', { name: 'Copied' })).toBeTruthy();
+  });
+
+  it('renders a resizable Link with an origin favicon', () => {
+    const { container } = render(
+      <Canvas>
+        <Link
+          id="repo"
+          url="https://github.com/dfosco/tiny-canvas?tab=readme"
+          title="Tiny Canvas"
+          displayUrl="github.com/dfosco/tiny-canvas"
+        />
+      </Canvas>
+    );
+
+    const link = screen.getByRole('link', { name: 'Tiny Canvas' });
+    expect(link.getAttribute('href')).toBe(
+      'https://github.com/dfosco/tiny-canvas?tab=readme'
+    );
+    expect(screen.getByText('github.com/dfosco/tiny-canvas')).toBeTruthy();
+    expect(container.querySelector('.tc-link-favicon img').src).toBe(
+      'https://github.com/favicon.ico'
+    );
+    expect(screen.getByLabelText('Resize link: Tiny Canvas')).toBeTruthy();
   });
 });

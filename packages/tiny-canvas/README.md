@@ -15,7 +15,7 @@ npm install @dfosco/tiny-canvas
 ## Quick start
 
 ```jsx
-import { Block, Canvas, Mark, Note } from '@dfosco/tiny-canvas'
+import { Block, Canvas, Link, Mark, Note } from '@dfosco/tiny-canvas'
 import '@dfosco/tiny-canvas/style.css'
 
 export function Board() {
@@ -36,14 +36,23 @@ export function Board() {
       <Mark x={400} y={320}>
         {'### Status\n\n- Built\n- Tested'}
       </Mark>
+
+      <Link
+        url="https://github.com/dfosco/tiny-canvas"
+        title="Tiny Canvas"
+        displayUrl="github.com/dfosco/tiny-canvas"
+        x={400}
+        y={480}
+      />
     </Canvas>
   )
 }
 ```
 
 `Canvas` only accepts authorized canvas components. Use `Block` for arbitrary
-content, `Frame` for same-origin route previews, `Note` for sticky notes, and
-`Mark` for Markdown. Passing a plain element produces a clear runtime error.
+content, `Frame` for same-origin route previews, `Note` for sticky notes,
+`Mark` for Markdown, and `Link` for favicon-backed link cards. Passing a plain
+element produces a clear runtime error.
 
 ## How it works
 
@@ -83,7 +92,7 @@ and persistence identifier, but it is not required.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `children` | `Block \| Frame \| Note \| Mark \| Array<…>` | — | Authorized canvas children. Plain elements are rejected. |
+| `children` | `Block \| Frame \| Note \| Mark \| Link \| Array<…>` | — | Authorized canvas children. Plain elements are rejected. |
 | `dotted` | `boolean` | `false` | Show the dotted canvas background. |
 | `grid` | `boolean` | `false` | Legacy alias that also enables the dotted background. |
 | `gridSize` | `number` | `36` | Dot-grid spacing in pixels. |
@@ -164,6 +173,24 @@ width and height.
 `Note` supports `yellow`, `blue`, `green`, `pink`, `purple`, and `orange`.
 `Mark` also accepts Markdown through its `content` prop; `Note` accepts `text`.
 
+### `Link`
+
+`Link` renders a draggable, resizable link card. It loads `/favicon.ico` from
+the destination origin; if that image fails, a neutral globe remains visible.
+The title and displayed URL are explicit so the component never needs to fetch
+cross-origin page metadata.
+
+```jsx
+<Link
+  url="https://github.com/dfosco/tiny-canvas"
+  title="Tiny Canvas"
+  displayUrl="github.com/dfosco/tiny-canvas"
+  x={48}
+  y={48}
+  width={320}
+/>
+```
+
 ### `useResetCanvas`
 
 Clear all persisted block positions and frame sizes:
@@ -207,6 +234,8 @@ Override CSS custom properties to fit your application:
   --tc-frame-title-bg: #f6f8fa;
   --tc-mark-bg: #fff;
   --tc-mark-border-color: rgb(0 0 0 / 15%);
+  --tc-link-bg: #fff;
+  --tc-link-border-color: rgb(0 0 0 / 15%);
   --tc-grid-size: 36px;
 }
 ```

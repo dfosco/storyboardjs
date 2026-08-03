@@ -1,5 +1,12 @@
 # @dfosco/tiny-canvas
 
+## 0.6.0
+
+### Minor Changes
+
+- Add a draggable, resizable `Link` component with explicit title/display URL,
+  automatic origin favicon loading, and a built-in fallback icon.
+
 ## 0.5.0
 
 ### Minor Changes

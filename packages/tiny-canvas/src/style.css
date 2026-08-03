@@ -298,7 +298,8 @@ body .tc-block {
 /* Note and Markdown */
 
 .tc-note-block > .tc-block-content,
-.tc-mark-block > .tc-block-content {
+.tc-mark-block > .tc-block-content,
+.tc-link-block > .tc-block-content {
   gap: 0;
   padding: 0;
   background: transparent;
@@ -453,4 +454,90 @@ body .tc-block {
   padding: 0.3em 0.55em;
   text-align: start;
   border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+}
+
+/* Link */
+
+.tc-link {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--base-size-12, 12px);
+  min-inline-size: 240px;
+  min-block-size: 72px;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: var(--base-size-12, 12px) var(--base-size-16, 16px);
+  overflow: hidden;
+  color: var(--fgColor-default, CanvasText);
+  background: var(--tc-link-bg, var(--bgColor-default, Canvas));
+  border: var(--borderWidth-thin, 1px) solid
+    var(--tc-link-border-color, var(--borderColor-default, var(--tc-border-color)));
+  border-radius: var(--tc-border-radius);
+  box-shadow: var(--tc-shadow-rest);
+}
+
+.tc-link-favicon {
+  position: relative;
+  display: grid;
+  flex: 0 0 32px;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  overflow: hidden;
+  color: var(--fgColor-muted, GrayText);
+  background: var(--bgColor-muted, var(--tc-bg-muted-default));
+  border-radius: var(--borderRadius-medium, 6px);
+}
+
+.tc-link-favicon > :is(svg, img) {
+  grid-area: 1 / 1;
+}
+
+.tc-link-favicon svg {
+  inline-size: 18px;
+  block-size: 18px;
+}
+
+.tc-link-favicon img {
+  position: relative;
+  z-index: 1;
+  inline-size: 32px;
+  block-size: 32px;
+  object-fit: contain;
+  background: var(--tc-link-bg, var(--bgColor-default, Canvas));
+}
+
+.tc-link-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 3px;
+  min-inline-size: 0;
+}
+
+.tc-link-title,
+.tc-link-url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tc-link-title {
+  font-size: var(--text-body-size-medium, 14px);
+  font-weight: var(--base-text-weight-semibold, 600);
+  line-height: 1.35;
+  color: inherit;
+  text-decoration: none;
+}
+
+.tc-link-title:hover {
+  color: var(--fgColor-accent, var(--tc-selection-color));
+  text-decoration: underline;
+}
+
+.tc-link-url {
+  font-size: var(--text-body-size-small, 12px);
+  line-height: 1.4;
+  color: var(--fgColor-muted, GrayText);
 }

@@ -63,7 +63,7 @@ function Canvas({
 
     if (!isValidElement(child) || !isAuthorizedCanvasChild(child)) {
       throw new TypeError(
-        'Canvas only accepts authorized canvas components such as <Block> and <Frame>.'
+        'Canvas only accepts authorized canvas components such as <Block>, <Frame>, <Note>, <Mark>, and <Link>.'
       );
     }
 
