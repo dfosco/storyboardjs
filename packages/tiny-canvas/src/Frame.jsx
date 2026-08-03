@@ -97,74 +97,74 @@ function Frame({
           src={buildFrameHref(route)}
           title={title}
         />
-        <button
-          type="button"
-          className="tc-frame-resize-handle tc-no-drag"
-          aria-label={`Resize ${title}`}
-          title="Drag to resize. Use arrow keys for precise resizing."
-          onPointerDown={(event) => {
-            if (!frameRef.current) {
-              return;
-            }
-
-            event.preventDefault();
-            event.stopPropagation();
-            const rect = frameRef.current.getBoundingClientRect();
-            const startingSize = { width: rect.width, height: rect.height };
-            resizeStartRef.current = {
-              pointerId: event.pointerId,
-              clientX: event.clientX,
-              clientY: event.clientY,
-              ...startingSize,
-            };
-            currentSizeRef.current = startingSize;
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }}
-          onPointerMove={(event) => {
-            const resizeStart = resizeStartRef.current;
-            if (!resizeStart || resizeStart.pointerId !== event.pointerId) {
-              return;
-            }
-
-            event.preventDefault();
-            updateSize({
-              width: Math.max(
-                minimumWidth,
-                resizeStart.width + event.clientX - resizeStart.clientX
-              ),
-              height: Math.max(
-                minimumHeight,
-                resizeStart.height + event.clientY - resizeStart.clientY
-              ),
-            });
-          }}
-          onPointerUp={finishResize}
-          onPointerCancel={finishResize}
-          onKeyDown={(event) => {
-            const deltas = {
-              ArrowLeft: [-10, 0],
-              ArrowRight: [10, 0],
-              ArrowUp: [0, -10],
-              ArrowDown: [0, 10],
-            };
-            const delta = deltas[event.key];
-            if (!delta || !frameRef.current) {
-              return;
-            }
-
-            event.preventDefault();
-            event.stopPropagation();
-            const rect = frameRef.current.getBoundingClientRect();
-            updateSize(
-              {
-                width: Math.max(minimumWidth, rect.width + delta[0]),
-                height: Math.max(minimumHeight, rect.height + delta[1]),
-              },
-              true
-            );
-          }}
-        />
       </section>
+      <button
+        type="button"
+        className="tc-frame-resize-handle tc-no-drag"
+        aria-label={`Resize ${title}`}
+        title="Drag to resize. Use arrow keys for precise resizing."
+        onPointerDown={(event) => {
+          if (!frameRef.current) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+          const rect = frameRef.current.getBoundingClientRect();
+          const startingSize = { width: rect.width, height: rect.height };
+          resizeStartRef.current = {
+            pointerId: event.pointerId,
+            clientX: event.clientX,
+            clientY: event.clientY,
+            ...startingSize,
+          };
+          currentSizeRef.current = startingSize;
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerMove={(event) => {
+          const resizeStart = resizeStartRef.current;
+          if (!resizeStart || resizeStart.pointerId !== event.pointerId) {
+            return;
+          }
+
+          event.preventDefault();
+          updateSize({
+            width: Math.max(
+              minimumWidth,
+              resizeStart.width + event.clientX - resizeStart.clientX
+            ),
+            height: Math.max(
+              minimumHeight,
+              resizeStart.height + event.clientY - resizeStart.clientY
+            ),
+          });
+        }}
+        onPointerUp={finishResize}
+        onPointerCancel={finishResize}
+        onKeyDown={(event) => {
+          const deltas = {
+            ArrowLeft: [-10, 0],
+            ArrowRight: [10, 0],
+            ArrowUp: [0, -10],
+            ArrowDown: [0, 10],
+          };
+          const delta = deltas[event.key];
+          if (!delta || !frameRef.current) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+          const rect = frameRef.current.getBoundingClientRect();
+          updateSize(
+            {
+              width: Math.max(minimumWidth, rect.width + delta[0]),
+              height: Math.max(minimumHeight, rect.height + delta[1]),
+            },
+            true
+          );
+        }}
+      />
     </Block>
   );
 }
