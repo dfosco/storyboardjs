@@ -1,5 +1,11 @@
 # @dfosco/tiny-canvas
 
+## 0.3.0
+
+### Minor Changes
+
+- 5bbec33: Add persistent Frame resizing, non-negative dragging, and an optional Canvas reset button.
+
 ## 0.2.0
 
 ### Minor Changes
