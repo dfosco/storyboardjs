@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 /**
- * Hook that returns a function to clear all saved canvas positions.
+ * Hook that returns a function to clear all saved canvas layout state.
  */
 export function useResetCanvas({ reload = false } = {}) {
   return useCallback(() => {

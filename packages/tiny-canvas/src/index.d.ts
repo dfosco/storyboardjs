@@ -9,6 +9,11 @@ export interface Position {
   y: number;
 }
 
+export interface Size {
+  width: number;
+  height: number;
+}
+
 export interface CanvasProps
   extends Omit<HTMLAttributes<HTMLElement>, 'onSelectionChange'> {
   children?:
@@ -26,6 +31,10 @@ export interface CanvasProps
   gridSize?: number;
   /** Color mode: 'auto' follows system preference, 'light' or 'dark' to override. Default: 'auto' */
   colorMode?: 'auto' | 'light' | 'dark';
+  /** Show the built-in Reset board button. Default: false */
+  resettable?: boolean;
+  /** Reset button content. Default: 'Reset board' */
+  resetLabel?: ReactNode;
   /** Called when selection changes. Null means the canvas background is selected. */
   onSelectionChange?: (blockId: string | null) => void;
 }
@@ -54,6 +63,16 @@ export interface FrameProps extends Omit<BlockProps, 'children'> {
   route: `#/${string}` | '#/';
   /** Accessible frame title shown in the title bar. */
   title: string;
+  /** Initial frame width in pixels. A saved width takes precedence. Default: 640 */
+  width?: number;
+  /** Initial frame height in pixels. A saved height takes precedence. Default: 480 */
+  height?: number;
+  /** Minimum resizable width in pixels. Default: 320 */
+  minWidth?: number;
+  /** Minimum resizable height in pixels. Default: 240 */
+  minHeight?: number;
+  /** Called while the frame is resized. */
+  onSizeChange?: (size: Size) => void;
 }
 
 export declare function Frame(props: FrameProps): ReactElement;
@@ -63,5 +82,5 @@ export interface UseResetCanvasOptions {
   reload?: boolean;
 }
 
-/** Returns a function that clears all saved canvas positions from localStorage. */
+/** Returns a function that clears all saved canvas layout state from localStorage. */
 export declare function useResetCanvas(options?: UseResetCanvasOptions): () => void;

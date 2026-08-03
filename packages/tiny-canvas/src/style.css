@@ -51,6 +51,32 @@
   background-position: var(--tc-grid-offset) var(--tc-grid-offset);
 }
 
+.tc-canvas-reset {
+  position: fixed;
+  z-index: 10;
+  inset-block-start: var(--base-size-16, 16px);
+  inset-inline-end: var(--base-size-16, 16px);
+  padding: var(--base-size-8, 8px) var(--base-size-12, 12px);
+  font: inherit;
+  font-weight: var(--base-text-weight-semibold, 600);
+  color: var(--fgColor-default, CanvasText);
+  cursor: pointer;
+  background: var(--bgColor-default, Canvas);
+  border: var(--borderWidth-thin, 1px) solid
+    var(--borderColor-default, var(--tc-border-color));
+  border-radius: var(--borderRadius-medium, 6px);
+  box-shadow: var(--tc-shadow-rest);
+}
+
+.tc-canvas-reset:hover {
+  background: var(--bgColor-muted, var(--tc-bg-muted-default));
+}
+
+.tc-canvas-reset:focus-visible {
+  outline: 2px solid var(--tc-selection-color);
+  outline-offset: 2px;
+}
+
 /* Dark mode — system preference (auto) */
 
 @media (prefers-color-scheme: dark) {
@@ -83,7 +109,7 @@
 
 /* Block */
 
-body .tc-block:not(:active) {
+body .tc-block {
   touch-action: none;
 }
 
@@ -152,10 +178,16 @@ body .tc-block:not(:active) {
 
 /* Frame */
 
+.tc-frame-block {
+  inline-size: min(var(--tc-frame-width, 640px), calc(100vw - 72px));
+  block-size: var(--tc-frame-height, 480px);
+}
+
 .tc-frame-block > .tc-block-content {
   gap: 0;
   min-inline-size: 0;
   inline-size: 100%;
+  block-size: 100%;
   padding: 0;
   background: transparent;
   border: 0;
@@ -163,8 +195,12 @@ body .tc-block:not(:active) {
 
 .tc-frame {
   box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   inline-size: 100%;
+  block-size: 100%;
   background-color: var(--tc-frame-bg, var(--bgColor-default, Canvas));
   border: var(--borderWidth-thin, 1px) solid
     var(--tc-frame-border-color, var(--borderColor-default, var(--tc-border-color)));
@@ -199,15 +235,45 @@ body .tc-block:not(:active) {
 
 .tc-frame-viewport {
   display: block;
+  flex: 1 1 auto;
   inline-size: 100%;
-  block-size: 100%;
-  min-block-size: var(
-    --tc-frame-min-height,
-    calc(
-      var(--base-size-128, 128px) + var(--base-size-128, 128px) +
-        var(--base-size-128, 128px) + var(--base-size-64, 64px)
-    )
-  );
+  min-block-size: 0;
   background-color: var(--tc-frame-bg, var(--bgColor-default, Canvas));
   border: 0;
+}
+
+.tc-frame-resize-handle {
+  position: absolute;
+  z-index: 2;
+  inset-inline-end: 0;
+  inset-block-end: 0;
+  inline-size: 28px;
+  block-size: 28px;
+  padding: 0;
+  color: var(--fgColor-muted, GrayText);
+  cursor: nwse-resize;
+  touch-action: none;
+  background:
+    linear-gradient(
+      135deg,
+      transparent 0 52%,
+      currentColor 53% 57%,
+      transparent 58% 66%,
+      currentColor 67% 71%,
+      transparent 72%
+    );
+  border: 0;
+  border-end-end-radius: var(--tc-border-radius);
+  opacity: 0;
+  transition: opacity 120ms ease-in-out;
+}
+
+.tc-frame-block[data-selected] .tc-frame-resize-handle,
+.tc-frame-resize-handle:focus-visible {
+  opacity: 1;
+}
+
+.tc-frame-resize-handle:focus-visible {
+  outline: 2px solid var(--tc-selection-color);
+  outline-offset: -4px;
 }

@@ -2,6 +2,34 @@ import { Children, isValidElement } from 'react';
 
 const STORAGE_KEY = 'tiny-canvas-queue';
 
+function getStoredBlocks() {
+  const queue = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  if (!Array.isArray(queue)) {
+    throw new TypeError('Stored canvas state must be an array.');
+  }
+
+  return queue;
+}
+
+function saveBlockState(blockId, state) {
+  const queue = getStoredBlocks();
+  const existingIndex = queue.findIndex((item) => item.id === blockId);
+  const blockData = {
+    ...(existingIndex >= 0 ? queue[existingIndex] : {}),
+    ...state,
+    id: blockId,
+    time: new Date().toISOString().replace(/[:.]/g, '-'),
+  };
+
+  if (existingIndex >= 0) {
+    queue[existingIndex] = blockData;
+  } else {
+    queue.push(blockData);
+  }
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
+}
+
 /** djb2 string hash → 8-char hex */
 function hash(str) {
   let h = 5381;
@@ -59,11 +87,7 @@ export const getSavedPosition = (blockId) => {
   }
 
   try {
-    const queue = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    if (!Array.isArray(queue)) {
-      throw new TypeError('Stored canvas positions must be an array.');
-    }
-
+    const queue = getStoredBlocks();
     const saved = queue.find((item) => item.id === blockId);
     if (
       !saved ||
@@ -89,27 +113,55 @@ export const savePosition = (blockId, position) => {
   }
 
   try {
-    const queue = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    if (!Array.isArray(queue)) {
-      throw new TypeError('Stored canvas positions must be an array.');
-    }
-    const now = new Date().toISOString().replace(/[:.]/g, '-');
-    const blockData = {
-      id: blockId,
+    saveBlockState(blockId, {
       x: position.x,
       y: position.y,
-      time: now,
-    };
-    const existingIndex = queue.findIndex((item) => item.id === blockId);
-
-    if (existingIndex >= 0) {
-      queue[existingIndex] = blockData;
-    } else {
-      queue.push(blockData);
-    }
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
+    });
   } catch (error) {
     console.error('Error saving block position:', error);
+  }
+};
+
+/**
+ * Gets a stored frame size from localStorage.
+ */
+export const getSavedSize = (blockId) => {
+  if (typeof localStorage === 'undefined') {
+    return null;
+  }
+
+  try {
+    const queue = getStoredBlocks();
+    const saved = queue.find((item) => item.id === blockId);
+    if (
+      !saved ||
+      !Number.isFinite(saved.width) ||
+      !Number.isFinite(saved.height)
+    ) {
+      return null;
+    }
+
+    return { width: saved.width, height: saved.height };
+  } catch (error) {
+    console.error('Error getting saved size:', error);
+    return null;
+  }
+};
+
+/**
+ * Saves size data without discarding a block's stored position.
+ */
+export const saveSize = (blockId, size) => {
+  if (typeof localStorage === 'undefined') {
+    return;
+  }
+
+  try {
+    saveBlockState(blockId, {
+      width: size.width,
+      height: size.height,
+    });
+  } catch (error) {
+    console.error('Error saving frame size:', error);
   }
 };

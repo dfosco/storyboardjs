@@ -42,8 +42,8 @@ produces a clear runtime error.
 - **No explicit IDs required.** `Canvas` tags each `Block` with a generated
   persistence ID.
 - **Position with props.** Set initial placement directly with `x` and `y`.
-- **Persistent movement.** Dragged coordinates are restored from localStorage
-  and take precedence over the initial `x` and `y`.
+- **Persistent layout.** Dragged coordinates and resized frame dimensions are
+  restored from localStorage and take precedence over initial props.
 - **Built-in selection.** Clicking or focusing a block selects it. Clicking the
   canvas background or pressing Escape clears selection.
 - **Same-origin previews.** `Frame` preserves the current path, adds
@@ -78,6 +78,8 @@ and persistence identifier, but it is not required.
 | `grid` | `boolean` | `false` | Legacy alias that also enables the dotted background. |
 | `gridSize` | `number` | `36` | Dot-grid spacing in pixels. |
 | `colorMode` | `'auto' \| 'light' \| 'dark'` | `'auto'` | Canvas color-scheme behavior. |
+| `resettable` | `boolean` | `false` | Show a built-in **Reset board** button that clears saved layout state and reloads. |
+| `resetLabel` | `ReactNode` | `'Reset board'` | Customize the reset button content. |
 | `onSelectionChange` | `(blockId: string \| null) => void` | — | Observe selected block identity. |
 
 Standard `<main>` attributes are forwarded to the canvas.
@@ -108,7 +110,8 @@ current application:
     title="Security overview"
     x={48}
     y={48}
-    style={{ width: 640 }}
+    width={640}
+    height={480}
   />
 </Canvas>
 ```
@@ -117,14 +120,20 @@ current application:
 | --- | --- | --- | --- |
 | `route` | `` `#/${string}` `` | — | Same-origin hash route loaded by the iframe. |
 | `title` | `string` | — | Accessible iframe title shown in the frame header. |
+| `width` | `number` | `640` | Initial width in pixels. Saved width takes precedence. |
+| `height` | `number` | `480` | Initial height in pixels. Saved height takes precedence. |
+| `minWidth` | `number` | `320` | Minimum width while resizing. |
+| `minHeight` | `number` | `240` | Minimum height while resizing. |
+| `onSizeChange` | `({ width, height }) => void` | — | Observe live resize updates. |
 | `x`, `y`, selection, and position props | `BlockProps` | — | Frame movement and selection use the same contract as `Block`. |
 
-The embedded application can use the `embedView` query parameter to suppress
-redirects or chrome that should not appear inside the preview.
+Select a frame, then drag its lower-right handle or use the handle's arrow keys
+to resize it. The embedded application can use the `embedView` query parameter
+to suppress redirects or chrome that should not appear inside the preview.
 
 ### `useResetCanvas`
 
-Clear all persisted block positions:
+Clear all persisted block positions and frame sizes:
 
 ```jsx
 import { useResetCanvas } from '@dfosco/tiny-canvas'
@@ -160,7 +169,8 @@ Override CSS custom properties to fit your application:
   --tc-block-padding: 24px;
   --tc-frame-bg: #fff;
   --tc-frame-border-color: rgb(0 0 0 / 15%);
-  --tc-frame-min-height: 448px;
+  --tc-frame-width: 640px;
+  --tc-frame-height: 480px;
   --tc-frame-title-bg: #f6f8fa;
   --tc-grid-size: 36px;
 }

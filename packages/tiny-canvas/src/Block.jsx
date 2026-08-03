@@ -17,8 +17,13 @@ function coordinate(value, propName) {
     throw new TypeError(`Block ${propName} must be a finite number.`);
   }
 
-  return value;
+  return Math.max(0, value);
 }
+
+const normalizePosition = ({ x, y }) => ({
+  x: Math.max(0, x),
+  y: Math.max(0, y),
+});
 
 function Block({
   children,
@@ -47,10 +52,12 @@ function Block({
   const [onTranslation, setOnTranslation] = useState(false);
   const [position, setPosition] = useState(
     () =>
-      savedPosition ?? {
-        x: initialX,
-        y: initialY,
-      }
+      savedPosition
+        ? normalizePosition(savedPosition)
+        : {
+            x: initialX,
+            y: initialY,
+          }
   );
   const [rotationVariation, setRotationVariation] = useState(
     Math.random() < 0.5 ? -0.5 : 0.5
@@ -99,20 +106,22 @@ function Block({
 
   const { isDragging } = useDraggable(blockRef, {
     axis: 'both',
-    bounds: 'body',
-    threshold: { delay: 50, distance: 30 },
+    threshold: { distance: 30 },
+    cancel: '.tc-no-drag',
     defaultClass: 'tc-block-draggable',
     defaultClassDragging: 'tc-block-dragging',
     defaultClassDragged: 'tc-block-dragged',
     applyUserSelectHack: true,
     position,
+    transform: ({ offsetX, offsetY }) =>
+      `translate3d(${Math.max(0, offsetX)}px, ${Math.max(0, offsetY)}px, 0)`,
     onDrag: ({ offsetX, offsetY }) => {
-      const nextPosition = { x: offsetX, y: offsetY };
+      const nextPosition = normalizePosition({ x: offsetX, y: offsetY });
       setPosition(nextPosition);
       onPositionChange?.(nextPosition);
     },
     onDragEnd: ({ offsetX, offsetY }) => {
-      const nextPosition = { x: offsetX, y: offsetY };
+      const nextPosition = normalizePosition({ x: offsetX, y: offsetY });
       setPosition(nextPosition);
       savePosition(resolvedId, nextPosition);
       onPositionChange?.(nextPosition);

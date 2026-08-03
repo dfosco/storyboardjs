@@ -8,7 +8,7 @@ export const isEmbeddedView =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).has('embedView')
 
-<Canvas dotted={true} grid={false}>
+<Canvas dotted={true} grid={false} resettable>
   <Block x={36} y={36}>
     <ThemeToggle />
   </Block>
@@ -27,7 +27,8 @@ export const isEmbeddedView =
       title="Tiny Canvas preview"
       x={36}
       y={520}
-      style={{width: 'min(704px, calc(100vw - 72px))'}}
+      width={704}
+      height={480}
     />
   )}
 </Canvas>

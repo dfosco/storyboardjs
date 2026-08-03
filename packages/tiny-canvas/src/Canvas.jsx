@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { CanvasContext } from './CanvasContext';
 import { isAuthorizedCanvasChild } from './canvasChild';
+import { useResetCanvas } from './useResetCanvas';
 import { generateBlockId } from './utils';
 
 function Canvas({
@@ -15,6 +16,8 @@ function Canvas({
   grid = false,
   gridSize = 36,
   colorMode = 'auto',
+  resettable = false,
+  resetLabel = 'Reset board',
   className,
   style,
   onPointerDown,
@@ -22,6 +25,7 @@ function Canvas({
   ...rest
 }) {
   const [selectedBlockId, setSelectedBlockId] = useState(null);
+  const resetCanvas = useResetCanvas({ reload: true });
   const showDots = dotted || grid;
   const blockIds = new Set();
   const contextValue = useMemo(
@@ -76,6 +80,15 @@ function Canvas({
         }}
       >
         {renderedChildren}
+        {resettable ? (
+          <button
+            type="button"
+            className="tc-canvas-reset"
+            onClick={resetCanvas}
+          >
+            {resetLabel}
+          </button>
+        ) : null}
       </main>
     </CanvasContext.Provider>
   );
