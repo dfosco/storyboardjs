@@ -1,37 +1,19 @@
 import { Block, Canvas } from '@dfosco/tiny-canvas'
 import '@dfosco/tiny-canvas/style.css'
-import { Box, Button } from '@primer/react'
+import { Button } from '@primer/react'
 import { ThemeToggle } from '../components/ThemeToggle.jsx'
 import { StateToggle } from '../components/StateToggle.jsx'
 
-export const boxStyles = {
-  display: 'flex',
-  flexDirection: 'column',
-  backgroundColor: 'var(--bgColor-default)',
-  border: '1px solid',
-  borderColor: 'border.default',
-  borderRadius: 'var(--borderRadius-large)',
-  padding: 4,
-  minWidth: '300px',
-  gap: 2,
-}
-
 <Canvas dotted={true} grid={false}>
   <Block x={36} y={36}>
-    <Box sx={boxStyles}>
-      <ThemeToggle />
-    </Box>
+    <ThemeToggle />
   </Block>
   <Block x={396} y={180}>
-    <Box sx={boxStyles}>
-      <Button size="large" variant="primary">Save</Button>
-      <Button size="large" variant="secondary">Edit</Button>
-      <Button size="large" variant="danger">Delete</Button>
-    </Box>
+    <Button size="large" variant="primary">Save</Button>
+    <Button size="large" variant="secondary">Edit</Button>
+    <Button size="large" variant="danger">Delete</Button>
   </Block>
   <Block x={180} y={360}>
-    <Box>
-      <StateToggle />
-    </Box>
+    <StateToggle />
   </Block>
 </Canvas>

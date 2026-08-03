@@ -106,9 +106,19 @@ body .tc-block:not(:active) {
 }
 
 .tc-block-content {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-block-gap, var(--base-size-8, 8px));
   position: relative;
+  min-width: var(--tc-block-min-width, 300px);
   width: fit-content;
   height: min-content;
+  padding: var(--tc-block-padding, var(--base-size-24, 24px));
+  background-color: var(--tc-block-bg, var(--bgColor-default, Canvas));
+  border: var(--borderWidth-thin, 1px) solid
+    var(--tc-block-border-color, var(--borderColor-default, var(--tc-border-color)));
+  border-radius: var(--tc-border-radius);
 }
 
 .tc-block[data-selected] .tc-block-content {

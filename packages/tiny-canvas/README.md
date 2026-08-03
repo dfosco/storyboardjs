@@ -22,11 +22,11 @@ export function Board() {
   return (
     <Canvas dotted>
       <Block x={48} y={48}>
-        <article>Project summary</article>
+        Project summary
       </Block>
 
       <Block x={360} y={180}>
-        <article>Release checklist</article>
+        Release checklist
       </Block>
     </Canvas>
   )
@@ -125,10 +125,16 @@ Override CSS custom properties to fit your application:
   --tc-dot-color: rgb(0 0 0 / 8%);
   --tc-selection-color: #0969da;
   --tc-border-radius: 12px;
+  --tc-block-bg: #fff;
+  --tc-block-border-color: rgb(0 0 0 / 15%);
+  --tc-block-gap: 8px;
+  --tc-block-min-width: 300px;
+  --tc-block-padding: 24px;
   --tc-grid-size: 36px;
 }
 ```
 
+`Block` owns its panel layout, background, border, spacing, and minimum width.
 Primer design tokens are used automatically when available.
 
 ## Requirements
