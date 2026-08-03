@@ -1,17 +1,8 @@
 import { useId, useRef, useState } from 'react';
 import Block from './Block';
 import { authorizeCanvasChild } from './canvasChild';
+import { buildFrameHref } from './frameUrl';
 import { getSavedSize, saveSize } from './utils';
-
-const DEFAULT_MIN_WIDTH = 320;
-const DEFAULT_MIN_HEIGHT = 240;
-
-function buildFrameHref(route) {
-  const url = new URL(window.location.href);
-  url.searchParams.set('embedView', '1');
-  url.hash = route;
-  return `${url.pathname}${url.search}${url.hash}`;
-}
 
 function dimension(value, propName) {
   if (value === undefined) {
@@ -99,7 +90,7 @@ function Frame({
       <section ref={frameRef} className="tc-frame">
         <div className="tc-frame-title-bar">
           <span className="tc-frame-title">{title}</span>
-          <span className="tc-frame-route">{route}</span>
+          <span className="tc-frame-route">{String(route)}</span>
         </div>
         <iframe
           className="tc-frame-viewport"

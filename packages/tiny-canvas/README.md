@@ -46,8 +46,8 @@ produces a clear runtime error.
   restored from localStorage and take precedence over initial props.
 - **Built-in selection.** Clicking or focusing a block selects it. Clicking the
   canvas background or pressing Escape clears selection.
-- **Same-origin previews.** `Frame` preserves the current path, adds
-  `embedView=1`, and loads the requested hash route in a titled viewport.
+- **Same-origin previews.** `Frame` accepts relative paths, query strings,
+  hash routes, or same-origin absolute URLs and adds `embedView=1`.
 - **Stable across content edits.** Generated IDs use a React key when supplied,
   otherwise the block structure and sibling position.
 
@@ -100,13 +100,13 @@ Standard `<article>` attributes are forwarded to the block.
 
 ### `Frame`
 
-`Frame` is a draggable canvas item for previewing another hash route from the
-current application:
+`Frame` is a draggable canvas item for previewing another same-origin URL from
+the current application:
 
 ```jsx
 <Canvas>
   <Frame
-    route="#/orgs/cli/security"
+    route="/?urlstate=security#/orgs/cli/security"
     title="Security overview"
     x={48}
     y={48}
@@ -118,7 +118,7 @@ current application:
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `route` | `` `#/${string}` `` | — | Same-origin hash route loaded by the iframe. |
+| `route` | `string \| URL` | — | Same-origin URL, path, query, or hash route loaded by the iframe. |
 | `title` | `string` | — | Accessible iframe title shown in the frame header. |
 | `width` | `number` | `640` | Initial width in pixels. Saved width takes precedence. |
 | `height` | `number` | `480` | Initial height in pixels. Saved height takes precedence. |
