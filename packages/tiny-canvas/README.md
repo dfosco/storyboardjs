@@ -1,8 +1,8 @@
 # Tiny Canvas
 
 A small React canvas for arranging interactive blocks. Tiny Canvas gives every
-block a stable generated identity, persists dragged positions in localStorage,
-and keeps movement and selection behavior inside a reusable `<Block>`.
+block a stable generated identity, persists dragged positions and sizes in
+localStorage, and can copy layout changes as agent-readable JSON.
 
 [View the live demo](https://dfosco.github.io/tiny-canvas/)
 
@@ -15,12 +15,12 @@ npm install @dfosco/tiny-canvas
 ## Quick start
 
 ```jsx
-import { Block, Canvas } from '@dfosco/tiny-canvas'
+import { Block, Canvas, Mark, Note } from '@dfosco/tiny-canvas'
 import '@dfosco/tiny-canvas/style.css'
 
 export function Board() {
   return (
-    <Canvas dotted>
+    <Canvas dotted resettable>
       <Block x={48} y={48}>
         Project summary
       </Block>
@@ -28,14 +28,22 @@ export function Board() {
       <Block x={360} y={180}>
         Release checklist
       </Block>
+
+      <Note x={48} y={240} color="yellow">
+        {'## Remember\nShip the smallest useful thing.'}
+      </Note>
+
+      <Mark x={400} y={320}>
+        {'### Status\n\n- Built\n- Tested'}
+      </Mark>
     </Canvas>
   )
 }
 ```
 
 `Canvas` only accepts authorized canvas components. Use `Block` for arbitrary
-content and `Frame` for same-origin route previews; passing a plain element
-produces a clear runtime error.
+content, `Frame` for same-origin route previews, `Note` for sticky notes, and
+`Mark` for Markdown. Passing a plain element produces a clear runtime error.
 
 ## How it works
 
@@ -44,6 +52,8 @@ produces a clear runtime error.
 - **Position with props.** Set initial placement directly with `x` and `y`.
 - **Persistent layout.** Dragged coordinates and resized frame dimensions are
   restored from localStorage and take precedence over initial props.
+- **Agent handoff.** **Copy changes** copies changed coordinates and sizes as
+  JSON with component, key/index, and persistence identity.
 - **Built-in selection.** Clicking or focusing a block selects it. Clicking the
   canvas background or pressing Escape clears selection.
 - **Same-origin previews.** `Frame` accepts relative paths, query strings,
@@ -73,13 +83,17 @@ and persistence identifier, but it is not required.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `children` | `Block \| Frame \| Array<Block \| Frame>` | — | Authorized canvas children. Plain elements are rejected. |
+| `children` | `Block \| Frame \| Note \| Mark \| Array<…>` | — | Authorized canvas children. Plain elements are rejected. |
 | `dotted` | `boolean` | `false` | Show the dotted canvas background. |
 | `grid` | `boolean` | `false` | Legacy alias that also enables the dotted background. |
 | `gridSize` | `number` | `36` | Dot-grid spacing in pixels. |
 | `colorMode` | `'auto' \| 'light' \| 'dark'` | `'auto'` | Canvas color-scheme behavior. |
 | `resettable` | `boolean` | `false` | Show a built-in **Reset board** button that clears saved layout state and reloads. |
 | `resetLabel` | `ReactNode` | `'Reset board'` | Customize the reset button content. |
+| `copyable` | `boolean` | value of `resettable` | Show a built-in **Copy changes** button. |
+| `copyLabel` | `ReactNode` | `'Copy changes'` | Customize the copy button content. |
+| `copiedLabel` | `ReactNode` | `'Copied'` | Customize the temporary success content. |
+| `onCopyChanges` | `(changes, text) => void` | — | Observe a successful clipboard copy. |
 | `onSelectionChange` | `(blockId: string \| null) => void` | — | Observe selected block identity. |
 
 Standard `<main>` attributes are forwarded to the canvas.
@@ -131,6 +145,25 @@ Select a frame, then drag its lower-right handle or use the handle's arrow keys
 to resize it. The embedded application can use the `embedView` query parameter
 to suppress redirects or chrome that should not appear inside the preview.
 
+### `Note` and `Mark`
+
+Both components accept Markdown string children, the movement props from
+`Block`, and the size props from `Frame`. Both are resizable and persist their
+width and height.
+
+```jsx
+<Note color="pink" x={48} y={48} width={270} height={170}>
+  {'## Review\nCheck empty and loading states.'}
+</Note>
+
+<Mark x={360} y={48} width={530}>
+  {'# Release plan\n\n1. Test\n2. Publish'}
+</Mark>
+```
+
+`Note` supports `yellow`, `blue`, `green`, `pink`, `purple`, and `orange`.
+`Mark` also accepts Markdown through its `content` prop; `Note` accepts `text`.
+
 ### `useResetCanvas`
 
 Clear all persisted block positions and frame sizes:
@@ -172,6 +205,8 @@ Override CSS custom properties to fit your application:
   --tc-frame-width: 640px;
   --tc-frame-height: 480px;
   --tc-frame-title-bg: #f6f8fa;
+  --tc-mark-bg: #fff;
+  --tc-mark-border-color: rgb(0 0 0 / 15%);
   --tc-grid-size: 36px;
 }
 ```

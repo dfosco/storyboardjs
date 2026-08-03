@@ -1,5 +1,15 @@
 # @dfosco/tiny-canvas
 
+## 0.5.0
+
+### Minor Changes
+
+- Add resizable, persistent `Note` sticky notes and `Mark` Markdown blocks.
+- Move Canvas controls to the bottom-left and add **Copy changes**, which copies
+  current-board position and size changes as agent-readable JSON.
+- Share resize behavior across `Frame`, `Note`, and `Mark`, and restore Frame's
+  default minimum dimensions.
+
 ## 0.4.0
 
 ### Minor Changes

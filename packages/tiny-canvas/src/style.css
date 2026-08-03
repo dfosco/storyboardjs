@@ -51,11 +51,16 @@
   background-position: var(--tc-grid-offset) var(--tc-grid-offset);
 }
 
-.tc-canvas-reset {
+.tc-canvas-controls {
   position: fixed;
   z-index: 10;
-  inset-block-start: var(--base-size-16, 16px);
-  inset-inline-end: var(--base-size-16, 16px);
+  inset-block-end: var(--base-size-16, 16px);
+  inset-inline-start: var(--base-size-16, 16px);
+  display: flex;
+  gap: var(--base-size-8, 8px);
+}
+
+.tc-canvas-control {
   padding: var(--base-size-8, 8px) var(--base-size-12, 12px);
   font: inherit;
   font-weight: var(--base-text-weight-semibold, 600);
@@ -68,11 +73,11 @@
   box-shadow: var(--tc-shadow-rest);
 }
 
-.tc-canvas-reset:hover {
+.tc-canvas-control:hover {
   background: var(--bgColor-muted, var(--tc-bg-muted-default));
 }
 
-.tc-canvas-reset:focus-visible {
+.tc-canvas-control:focus-visible {
   outline: 2px solid var(--tc-selection-color);
   outline-offset: 2px;
 }
@@ -178,6 +183,18 @@ body .tc-block {
 
 /* Frame */
 
+.tc-resizable-block > .tc-block-content {
+  min-inline-size: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.tc-resizable-surface {
+  min-inline-size: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
 .tc-frame-block {
   inline-size: min(var(--tc-frame-width, 640px), calc(100vw - 72px));
   block-size: var(--tc-frame-height, 480px);
@@ -242,7 +259,7 @@ body .tc-block {
   border: 0;
 }
 
-.tc-frame-resize-handle {
+.tc-resize-handle {
   position: absolute;
   z-index: 2;
   inset-inline-end: 0;
@@ -268,12 +285,172 @@ body .tc-block {
   transition: opacity 120ms ease-in-out;
 }
 
-.tc-frame-block[data-selected] .tc-frame-resize-handle,
-.tc-frame-resize-handle:focus-visible {
+.tc-resizable-block[data-selected] .tc-resize-handle,
+.tc-resize-handle:focus-visible {
   opacity: 1;
 }
 
-.tc-frame-resize-handle:focus-visible {
+.tc-resize-handle:focus-visible {
   outline: 2px solid var(--tc-selection-color);
   outline-offset: -4px;
+}
+
+/* Note and Markdown */
+
+.tc-note-block > .tc-block-content,
+.tc-mark-block > .tc-block-content {
+  gap: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.tc-note,
+.tc-mark {
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: auto;
+  color: var(--fgColor-default, #24292f);
+  border-radius: var(--tc-border-radius);
+}
+
+.tc-note {
+  --tc-note-bg: #fff8c5;
+  --tc-note-border: #d4a72c;
+  min-inline-size: 180px;
+  min-block-size: 60px;
+  background: var(--tc-note-bg);
+  border: 2px solid var(--tc-note-border);
+  box-shadow: 2px 3px 8px rgb(0 0 0 / 4%);
+}
+
+.tc-note[data-color="blue"] {
+  --tc-note-bg: #ddf4ff;
+  --tc-note-border: #54aeff;
+}
+
+.tc-note[data-color="green"] {
+  --tc-note-bg: #dafbe1;
+  --tc-note-border: #4ac26b;
+}
+
+.tc-note[data-color="pink"] {
+  --tc-note-bg: #ffebe9;
+  --tc-note-border: #ff8182;
+}
+
+.tc-note[data-color="purple"] {
+  --tc-note-bg: #fbefff;
+  --tc-note-border: #c297ff;
+}
+
+.tc-note[data-color="orange"] {
+  --tc-note-bg: #fff1e5;
+  --tc-note-border: #d18616;
+}
+
+.tc-mark {
+  min-inline-size: 200px;
+  min-block-size: 60px;
+  background: var(--tc-mark-bg, var(--bgColor-default, Canvas));
+  border: var(--borderWidth-thin, 1px) solid
+    var(--tc-mark-border-color, var(--borderColor-default, var(--tc-border-color)));
+  box-shadow: var(--tc-shadow-rest);
+}
+
+.tc-note-content {
+  padding: var(--base-size-16, 16px) var(--base-size-20, 20px);
+  font-size: var(--text-title-size-small, 18px);
+  line-height: 1.5;
+}
+
+.tc-mark-content {
+  padding: var(--base-size-24, 24px);
+  font-size: var(--text-body-size-medium, 14px);
+  line-height: 1.6;
+}
+
+.tc-note-content,
+.tc-mark-content {
+  overflow-wrap: anywhere;
+}
+
+.tc-note-content > :first-child,
+.tc-mark-content > :first-child {
+  margin-block-start: 0;
+}
+
+.tc-note-content > :last-child,
+.tc-mark-content > :last-child {
+  margin-block-end: 0;
+}
+
+.tc-note-content :is(h1, h2, h3, h4),
+.tc-mark-content :is(h1, h2, h3, h4) {
+  margin-block: 0 0.5em;
+  line-height: 1.25;
+}
+
+.tc-note-content h1 { font-size: 1.4em; }
+.tc-note-content h2 { font-size: 1.22em; }
+.tc-note-content h3 { font-size: 1.1em; }
+.tc-note-content h4 { font-size: 1em; }
+
+.tc-note-content :is(p, ul, ol, blockquote, pre, table),
+.tc-mark-content :is(p, ul, ol, blockquote, pre, table) {
+  margin-block: 0 0.65em;
+}
+
+.tc-note-content :is(ul, ol),
+.tc-mark-content :is(ul, ol) {
+  padding-inline-start: 1.4em;
+}
+
+.tc-note-content a,
+.tc-mark-content a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.tc-note-content code,
+.tc-mark-content code {
+  padding: 0.1em 0.3em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  background: rgb(0 0 0 / 9%);
+  border-radius: 0.25em;
+}
+
+.tc-note-content pre,
+.tc-mark-content pre {
+  padding: 0.65em 0.8em;
+  overflow-x: auto;
+  background: rgb(0 0 0 / 9%);
+  border-radius: 0.4em;
+}
+
+.tc-note-content pre code,
+.tc-mark-content pre code {
+  padding: 0;
+  background: none;
+}
+
+.tc-note-content blockquote,
+.tc-mark-content blockquote {
+  padding-inline-start: 0.7em;
+  color: color-mix(in srgb, currentColor 70%, transparent);
+  border-inline-start: 0.2em solid currentColor;
+}
+
+.tc-note-content table,
+.tc-mark-content table {
+  border-collapse: collapse;
+}
+
+.tc-note-content :is(th, td),
+.tc-mark-content :is(th, td) {
+  padding: 0.3em 0.55em;
+  text-align: start;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
 }

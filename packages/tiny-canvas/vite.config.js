@@ -11,7 +11,7 @@ export default defineConfig({
       fileName: 'tiny-canvas',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', 'react-markdown'],
     },
     outDir: 'dist',
     emptyOutDir: true,

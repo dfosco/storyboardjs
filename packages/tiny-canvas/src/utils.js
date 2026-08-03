@@ -162,6 +162,54 @@ export const saveSize = (blockId, size) => {
       height: size.height,
     });
   } catch (error) {
-    console.error('Error saving frame size:', error);
+    console.error('Error saving block size:', error);
   }
 };
+
+/**
+ * Returns persisted geometry for the supplied canvas children, without
+ * timestamps or stale entries from other boards.
+ */
+export const getCanvasChanges = (blocks) => {
+  if (typeof localStorage === 'undefined') {
+    return [];
+  }
+
+  try {
+    const queue = getStoredBlocks();
+    return queue.flatMap((saved) => {
+      const block = blocks.get(saved.id);
+      if (!block) {
+        return [];
+      }
+
+      const change = {
+        component: block.component,
+        ...(Number.isInteger(block.index) ? { index: block.index } : {}),
+        ...(block.key === undefined ? {} : { key: block.key }),
+        id: saved.id,
+      };
+
+      for (const property of ['x', 'y', 'width', 'height']) {
+        if (Number.isFinite(saved[property])) {
+          change[property] = saved[property];
+        }
+      }
+
+      return ['x', 'y', 'width', 'height'].some(
+        (property) => property in change
+      )
+        ? [change]
+        : [];
+    });
+  } catch (error) {
+    console.error('Error getting canvas changes:', error);
+    return [];
+  }
+};
+
+export const formatCanvasChanges = (changes) =>
+  [
+    'Apply these Tiny Canvas layout changes to the matching JSX components:',
+    JSON.stringify(changes, null, 2),
+  ].join('\n');

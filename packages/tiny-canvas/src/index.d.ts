@@ -14,15 +14,26 @@ export interface Size {
   height: number;
 }
 
+export interface CanvasChange {
+  component: string;
+  index?: number;
+  key?: string;
+  id: string;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+}
+
+type CanvasChild =
+  | ReactElement<BlockProps, typeof Block>
+  | ReactElement<FrameProps, typeof Frame>
+  | ReactElement<NoteProps, typeof Note>
+  | ReactElement<MarkProps, typeof Mark>;
+
 export interface CanvasProps
   extends Omit<HTMLAttributes<HTMLElement>, 'onSelectionChange'> {
-  children?:
-    | ReactElement<BlockProps, typeof Block>
-    | ReactElement<FrameProps, typeof Frame>
-    | readonly (
-        | ReactElement<BlockProps, typeof Block>
-        | ReactElement<FrameProps, typeof Frame>
-      )[];
+  children?: CanvasChild | readonly CanvasChild[];
   /** Show dot background. Default: false */
   dotted?: boolean;
   /** Legacy alias for dotted. Default: false */
@@ -35,6 +46,14 @@ export interface CanvasProps
   resettable?: boolean;
   /** Reset button content. Default: 'Reset board' */
   resetLabel?: ReactNode;
+  /** Show Copy changes. Defaults to the value of resettable. */
+  copyable?: boolean;
+  /** Copy button content. Default: 'Copy changes' */
+  copyLabel?: ReactNode;
+  /** Copy-success button content. Default: 'Copied' */
+  copiedLabel?: ReactNode;
+  /** Called after persisted layout changes are copied. */
+  onCopyChanges?: (changes: CanvasChange[], text: string) => void;
   /** Called when selection changes. Null means the canvas background is selected. */
   onSelectionChange?: (blockId: string | null) => void;
 }
@@ -76,6 +95,50 @@ export interface FrameProps extends Omit<BlockProps, 'children'> {
 }
 
 export declare function Frame(props: FrameProps): ReactElement;
+
+export type NoteColor =
+  | 'yellow'
+  | 'blue'
+  | 'green'
+  | 'pink'
+  | 'purple'
+  | 'orange';
+
+export interface NoteProps extends Omit<BlockProps, 'children'> {
+  /** Markdown text. May also be provided as string children. */
+  text?: string;
+  children?: string;
+  /** Sticky-note palette color. Default: 'yellow' */
+  color?: NoteColor;
+  /** Initial width in pixels. Saved width takes precedence. Default: 270 */
+  width?: number;
+  /** Initial height in pixels. Saved height takes precedence. Default: 170 */
+  height?: number;
+  /** Minimum resizable width in pixels. Default: 180 */
+  minWidth?: number;
+  /** Minimum resizable height in pixels. Default: 60 */
+  minHeight?: number;
+  onSizeChange?: (size: Size) => void;
+}
+
+export declare function Note(props: NoteProps): ReactElement;
+
+export interface MarkProps extends Omit<BlockProps, 'children'> {
+  /** Markdown text. May also be provided as string children. */
+  content?: string;
+  children?: string;
+  /** Initial width in pixels. Saved width takes precedence. Default: 530 */
+  width?: number;
+  /** Initial height in pixels. Saved height takes precedence. */
+  height?: number;
+  /** Minimum resizable width in pixels. Default: 200 */
+  minWidth?: number;
+  /** Minimum resizable height in pixels. Default: 60 */
+  minHeight?: number;
+  onSizeChange?: (size: Size) => void;
+}
+
+export declare function Mark(props: MarkProps): ReactElement;
 
 export interface UseResetCanvasOptions {
   /** Reload the page after clearing state. Default: false */
