@@ -41,7 +41,7 @@ function Canvas({
 
     if (!isValidElement(child) || !isAuthorizedCanvasChild(child)) {
       throw new TypeError(
-        'Canvas only accepts authorized canvas components. Wrap each child in <Block>.'
+        'Canvas only accepts authorized canvas components such as <Block> and <Frame>.'
       );
     }
 

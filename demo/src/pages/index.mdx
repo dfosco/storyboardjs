@@ -1,8 +1,12 @@
-import { Block, Canvas } from '@dfosco/tiny-canvas'
+import { Block, Canvas, Frame } from '@dfosco/tiny-canvas'
 import '@dfosco/tiny-canvas/style.css'
 import { Button } from '@primer/react'
 import { ThemeToggle } from '../components/ThemeToggle.jsx'
 import { StateToggle } from '../components/StateToggle.jsx'
+
+export const isEmbeddedView =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).has('embedView')
 
 <Canvas dotted={true} grid={false}>
   <Block x={36} y={36}>
@@ -16,4 +20,14 @@ import { StateToggle } from '../components/StateToggle.jsx'
   <Block x={180} y={360}>
     <StateToggle />
   </Block>
+  {!isEmbeddedView && (
+    <Frame
+      key="tiny-canvas-preview"
+      route="#/"
+      title="Tiny Canvas preview"
+      x={36}
+      y={520}
+      style={{width: 'min(704px, calc(100vw - 72px))'}}
+    />
+  )}
 </Canvas>

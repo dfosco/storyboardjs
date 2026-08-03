@@ -149,3 +149,65 @@ body .tc-block:not(:active) {
 .tc-block-translating .tc-block-content {
   outline: none;
 }
+
+/* Frame */
+
+.tc-frame-block > .tc-block-content {
+  gap: 0;
+  min-inline-size: 0;
+  inline-size: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.tc-frame {
+  box-sizing: border-box;
+  overflow: hidden;
+  inline-size: 100%;
+  background-color: var(--tc-frame-bg, var(--bgColor-default, Canvas));
+  border: var(--borderWidth-thin, 1px) solid
+    var(--tc-frame-border-color, var(--borderColor-default, var(--tc-border-color)));
+  border-radius: var(--tc-border-radius);
+  box-shadow: var(--tc-frame-shadow, var(--shadow-resting-medium, var(--tc-shadow-rest)));
+}
+
+.tc-frame-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--stack-gap-normal, var(--base-size-16, 16px));
+  padding: var(--stack-padding-condensed, var(--base-size-8, 8px))
+    var(--stack-padding-normal, var(--base-size-16, 16px));
+  color: var(--fgColor-default, CanvasText);
+  background-color: var(--tc-frame-title-bg, var(--bgColor-muted, var(--tc-bg-muted-default)));
+  border-bottom: var(--borderWidth-thin, 1px) solid
+    var(--tc-frame-border-color, var(--borderColor-default, var(--tc-border-color)));
+}
+
+.tc-frame-title {
+  font-weight: var(--base-text-weight-semibold, 600);
+}
+
+.tc-frame-route {
+  overflow: hidden;
+  font-size: var(--text-body-size-small, 12px);
+  color: var(--fgColor-muted, GrayText);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tc-frame-viewport {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: var(
+    --tc-frame-min-height,
+    calc(
+      var(--base-size-128, 128px) + var(--base-size-128, 128px) +
+        var(--base-size-128, 128px) + var(--base-size-64, 64px)
+    )
+  );
+  background-color: var(--tc-frame-bg, var(--bgColor-default, Canvas));
+  border: 0;
+}

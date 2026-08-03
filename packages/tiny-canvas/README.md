@@ -33,9 +33,9 @@ export function Board() {
 }
 ```
 
-`Canvas` only accepts authorized canvas components. Today that means every
-direct child must be a `Block`; passing a plain element produces a clear runtime
-error.
+`Canvas` only accepts authorized canvas components. Use `Block` for arbitrary
+content and `Frame` for same-origin route previews; passing a plain element
+produces a clear runtime error.
 
 ## How it works
 
@@ -46,6 +46,8 @@ error.
   and take precedence over the initial `x` and `y`.
 - **Built-in selection.** Clicking or focusing a block selects it. Clicking the
   canvas background or pressing Escape clears selection.
+- **Same-origin previews.** `Frame` preserves the current path, adds
+  `embedView=1`, and loads the requested hash route in a titled viewport.
 - **Stable across content edits.** Generated IDs use a React key when supplied,
   otherwise the block structure and sibling position.
 
@@ -71,7 +73,7 @@ and persistence identifier, but it is not required.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `children` | `Block \| Block[]` | — | Authorized canvas children. Plain elements are rejected. |
+| `children` | `Block \| Frame \| Array<Block \| Frame>` | — | Authorized canvas children. Plain elements are rejected. |
 | `dotted` | `boolean` | `false` | Show the dotted canvas background. |
 | `grid` | `boolean` | `false` | Legacy alias that also enables the dotted background. |
 | `gridSize` | `number` | `36` | Dot-grid spacing in pixels. |
@@ -93,6 +95,32 @@ Standard `<main>` attributes are forwarded to the canvas.
 | `onSelectionChange` | `(selected: boolean) => void` | — | Observe selection updates. |
 
 Standard `<article>` attributes are forwarded to the block.
+
+### `Frame`
+
+`Frame` is a draggable canvas item for previewing another hash route from the
+current application:
+
+```jsx
+<Canvas>
+  <Frame
+    route="#/orgs/cli/security"
+    title="Security overview"
+    x={48}
+    y={48}
+    style={{ width: 640 }}
+  />
+</Canvas>
+```
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `route` | `` `#/${string}` `` | — | Same-origin hash route loaded by the iframe. |
+| `title` | `string` | — | Accessible iframe title shown in the frame header. |
+| `x`, `y`, selection, and position props | `BlockProps` | — | Frame movement and selection use the same contract as `Block`. |
+
+The embedded application can use the `embedView` query parameter to suppress
+redirects or chrome that should not appear inside the preview.
 
 ### `useResetCanvas`
 
@@ -130,6 +158,10 @@ Override CSS custom properties to fit your application:
   --tc-block-gap: 8px;
   --tc-block-min-width: 300px;
   --tc-block-padding: 24px;
+  --tc-frame-bg: #fff;
+  --tc-frame-border-color: rgb(0 0 0 / 15%);
+  --tc-frame-min-height: 448px;
+  --tc-frame-title-bg: #f6f8fa;
   --tc-grid-size: 36px;
 }
 ```

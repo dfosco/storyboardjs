@@ -13,7 +13,11 @@ export interface CanvasProps
   extends Omit<HTMLAttributes<HTMLElement>, 'onSelectionChange'> {
   children?:
     | ReactElement<BlockProps, typeof Block>
-    | readonly ReactElement<BlockProps, typeof Block>[];
+    | ReactElement<FrameProps, typeof Frame>
+    | readonly (
+        | ReactElement<BlockProps, typeof Block>
+        | ReactElement<FrameProps, typeof Frame>
+      )[];
   /** Show dot background. Default: false */
   dotted?: boolean;
   /** Legacy alias for dotted. Default: false */
@@ -44,6 +48,15 @@ export interface BlockProps
 }
 
 export declare function Block(props: BlockProps): ReactElement;
+
+export interface FrameProps extends Omit<BlockProps, 'children'> {
+  /** Hash route rendered inside the same-origin frame. */
+  route: `#/${string}` | '#/';
+  /** Accessible frame title shown in the title bar. */
+  title: string;
+}
+
+export declare function Frame(props: FrameProps): ReactElement;
 
 export interface UseResetCanvasOptions {
   /** Reload the page after clearing state. Default: false */
