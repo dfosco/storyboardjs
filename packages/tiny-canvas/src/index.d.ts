@@ -59,8 +59,8 @@ export interface BlockProps
 export declare function Block(props: BlockProps): ReactElement;
 
 export interface FrameProps extends Omit<BlockProps, 'children'> {
-  /** Hash route rendered inside the same-origin frame. */
-  route: `#/${string}` | '#/';
+  /** Same-origin URL, path, query, or hash route rendered inside the frame. */
+  route: string | URL;
   /** Accessible frame title shown in the title bar. */
   title: string;
   /** Initial frame width in pixels. A saved width takes precedence. Default: 640 */

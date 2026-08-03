@@ -1,17 +1,8 @@
 import { useId, useRef, useState } from 'react';
 import Block from './Block';
 import { authorizeCanvasChild } from './canvasChild';
+import { buildFrameHref } from './frameUrl';
 import { getSavedSize, saveSize } from './utils';
-
-const DEFAULT_MIN_WIDTH = 320;
-const DEFAULT_MIN_HEIGHT = 240;
-
-function buildFrameHref(route) {
-  const url = new URL(window.location.href);
-  url.searchParams.set('embedView', '1');
-  url.hash = route;
-  return `${url.pathname}${url.search}${url.hash}`;
-}
 
 function dimension(value, propName) {
   if (value === undefined) {
@@ -99,81 +90,81 @@ function Frame({
       <section ref={frameRef} className="tc-frame">
         <div className="tc-frame-title-bar">
           <span className="tc-frame-title">{title}</span>
-          <span className="tc-frame-route">{route}</span>
+          <span className="tc-frame-route">{String(route)}</span>
         </div>
         <iframe
           className="tc-frame-viewport"
           src={buildFrameHref(route)}
           title={title}
         />
-        <button
-          type="button"
-          className="tc-frame-resize-handle tc-no-drag"
-          aria-label={`Resize ${title}`}
-          title="Drag to resize. Use arrow keys for precise resizing."
-          onPointerDown={(event) => {
-            if (!frameRef.current) {
-              return;
-            }
-
-            event.preventDefault();
-            event.stopPropagation();
-            const rect = frameRef.current.getBoundingClientRect();
-            const startingSize = { width: rect.width, height: rect.height };
-            resizeStartRef.current = {
-              pointerId: event.pointerId,
-              clientX: event.clientX,
-              clientY: event.clientY,
-              ...startingSize,
-            };
-            currentSizeRef.current = startingSize;
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }}
-          onPointerMove={(event) => {
-            const resizeStart = resizeStartRef.current;
-            if (!resizeStart || resizeStart.pointerId !== event.pointerId) {
-              return;
-            }
-
-            event.preventDefault();
-            updateSize({
-              width: Math.max(
-                minimumWidth,
-                resizeStart.width + event.clientX - resizeStart.clientX
-              ),
-              height: Math.max(
-                minimumHeight,
-                resizeStart.height + event.clientY - resizeStart.clientY
-              ),
-            });
-          }}
-          onPointerUp={finishResize}
-          onPointerCancel={finishResize}
-          onKeyDown={(event) => {
-            const deltas = {
-              ArrowLeft: [-10, 0],
-              ArrowRight: [10, 0],
-              ArrowUp: [0, -10],
-              ArrowDown: [0, 10],
-            };
-            const delta = deltas[event.key];
-            if (!delta || !frameRef.current) {
-              return;
-            }
-
-            event.preventDefault();
-            event.stopPropagation();
-            const rect = frameRef.current.getBoundingClientRect();
-            updateSize(
-              {
-                width: Math.max(minimumWidth, rect.width + delta[0]),
-                height: Math.max(minimumHeight, rect.height + delta[1]),
-              },
-              true
-            );
-          }}
-        />
       </section>
+      <button
+        type="button"
+        className="tc-frame-resize-handle tc-no-drag"
+        aria-label={`Resize ${title}`}
+        title="Drag to resize. Use arrow keys for precise resizing."
+        onPointerDown={(event) => {
+          if (!frameRef.current) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+          const rect = frameRef.current.getBoundingClientRect();
+          const startingSize = { width: rect.width, height: rect.height };
+          resizeStartRef.current = {
+            pointerId: event.pointerId,
+            clientX: event.clientX,
+            clientY: event.clientY,
+            ...startingSize,
+          };
+          currentSizeRef.current = startingSize;
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerMove={(event) => {
+          const resizeStart = resizeStartRef.current;
+          if (!resizeStart || resizeStart.pointerId !== event.pointerId) {
+            return;
+          }
+
+          event.preventDefault();
+          updateSize({
+            width: Math.max(
+              minimumWidth,
+              resizeStart.width + event.clientX - resizeStart.clientX
+            ),
+            height: Math.max(
+              minimumHeight,
+              resizeStart.height + event.clientY - resizeStart.clientY
+            ),
+          });
+        }}
+        onPointerUp={finishResize}
+        onPointerCancel={finishResize}
+        onKeyDown={(event) => {
+          const deltas = {
+            ArrowLeft: [-10, 0],
+            ArrowRight: [10, 0],
+            ArrowUp: [0, -10],
+            ArrowDown: [0, 10],
+          };
+          const delta = deltas[event.key];
+          if (!delta || !frameRef.current) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+          const rect = frameRef.current.getBoundingClientRect();
+          updateSize(
+            {
+              width: Math.max(minimumWidth, rect.width + delta[0]),
+              height: Math.max(minimumHeight, rect.height + delta[1]),
+            },
+            true
+          );
+        }}
+      />
     </Block>
   );
 }
