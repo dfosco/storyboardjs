@@ -1,5 +1,11 @@
 # @dfosco/tiny-canvas
 
+## 0.2.0
+
+### Minor Changes
+
+- Add a draggable `Frame` component for same-origin route previews and make `Block` own its default panel presentation.
+
 ## 0.1.0
 
 ### Initial release
