@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 import { CanvasContext } from './CanvasContext';
+import PageSelector, { getCanvasPageContext } from './PageSelector';
 import { isAuthorizedCanvasChild } from './canvasChild';
 import { writeClipboardText } from './clipboard';
 import { useResetCanvas } from './useResetCanvas';
@@ -19,6 +20,7 @@ import {
 
 function Canvas({
   children,
+  title,
   dotted = false,
   grid = false,
   gridSize = 36,
@@ -44,6 +46,8 @@ function Canvas({
     []
   );
   const showDots = dotted || grid;
+  const pageContext = getCanvasPageContext();
+  const pageId = pageContext?.currentPage.id;
   const blockIds = new Set();
   const blocks = new Map();
   const contextValue = useMemo(
@@ -67,7 +71,10 @@ function Canvas({
       );
     }
 
-    const blockId = child.props.id || generateBlockId(child, index);
+    const sourceId = child.props.id || generateBlockId(child, index);
+    const blockId = pageId
+      ? `tc-page:${encodeURIComponent(pageId)}:${sourceId}`
+      : sourceId;
     if (blockIds.has(blockId)) {
       throw new TypeError(`Canvas block IDs must be unique: "${blockId}".`);
     }
@@ -76,6 +83,10 @@ function Canvas({
       component:
         child.type.displayName || child.type.name || 'Canvas component',
       index,
+      sourceId,
+      ...(pageId
+        ? { pageId, pageTitle: title || pageContext.currentPage.title }
+        : {}),
       ...(child.key === null ? {} : { key: String(child.key) }),
     });
 
@@ -103,6 +114,7 @@ function Canvas({
           onPointerDown?.(event);
         }}
       >
+        <PageSelector title={title} />
         {renderedChildren}
         {resettable || copyable ? (
           <div className="tc-canvas-controls tc-no-drag">

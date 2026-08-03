@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import generouted from '@generouted/react-router/plugin'
 import mdx from '@mdx-js/rollup'
+import tinyCanvas from '@dfosco/tiny-canvas/vite'
 import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({ 
@@ -25,10 +26,11 @@ export default defineConfig({
   plugins: [
     react(),
     mdx(),
+    tinyCanvas({ pagesDir: '/canvas' }),
     generouted({
       // Configure route generation for MDX files
       routesConfig: {
-        files: '**/*.{jsx,mdx}'
+        files: '**/*.{jsx,tsx,mdx}'
         // pathOverrides: {
           // 'src/boards/*.mdx': '/board/:path',
           // 'src/pages/*.jsx': '/:path'

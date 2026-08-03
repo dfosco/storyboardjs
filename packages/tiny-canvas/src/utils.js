@@ -187,7 +187,11 @@ export const getCanvasChanges = (blocks) => {
         component: block.component,
         ...(Number.isInteger(block.index) ? { index: block.index } : {}),
         ...(block.key === undefined ? {} : { key: block.key }),
-        id: saved.id,
+        ...(block.pageId === undefined ? {} : { pageId: block.pageId }),
+        ...(block.pageTitle === undefined
+          ? {}
+          : { pageTitle: block.pageTitle }),
+        id: block.sourceId ?? saved.id,
       };
 
       for (const property of ['x', 'y', 'width', 'height']) {

@@ -82,6 +82,101 @@
   outline-offset: 2px;
 }
 
+/* Canvas pages */
+
+.tc-canvas-pages {
+  position: fixed;
+  z-index: 10;
+  inset-block-start: var(--base-size-16, 16px);
+  inset-inline-start: var(--base-size-16, 16px);
+  font-size: var(--text-body-size-small, 13px);
+}
+
+.tc-canvas-pages-trigger {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--base-size-8, 8px);
+  min-block-size: 40px;
+  padding: var(--base-size-8, 8px) var(--base-size-12, 12px);
+  color: var(--fgColor-default, CanvasText);
+  cursor: pointer;
+  user-select: none;
+  background: var(--bgColor-default, Canvas);
+  border: var(--borderWidth-thin, 1px) solid
+    var(--borderColor-default, var(--tc-border-color));
+  border-radius: var(--borderRadius-medium, 6px);
+  box-shadow: var(--tc-shadow-rest);
+  list-style: none;
+}
+
+.tc-canvas-pages-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.tc-canvas-pages-trigger:hover {
+  background: var(--bgColor-muted, var(--tc-bg-muted-default));
+}
+
+.tc-canvas-pages-trigger:focus-visible {
+  outline: 2px solid var(--tc-selection-color);
+  outline-offset: 2px;
+}
+
+.tc-canvas-pages[open] .tc-canvas-pages-trigger svg {
+  transform: rotate(180deg);
+}
+
+.tc-canvas-pages-label {
+  max-inline-size: 200px;
+  overflow: hidden;
+  font-weight: var(--base-text-weight-semibold, 600);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tc-canvas-pages-count {
+  color: var(--fgColor-muted, GrayText);
+  font-variant-numeric: tabular-nums;
+}
+
+.tc-canvas-pages-menu {
+  box-sizing: border-box;
+  min-inline-size: 240px;
+  max-inline-size: 360px;
+  max-block-size: 320px;
+  padding: var(--base-size-8, 8px);
+  margin: var(--base-size-4, 4px) 0 0;
+  overflow: auto;
+  list-style: none;
+  background: var(--bgColor-default, Canvas);
+  border: var(--borderWidth-thin, 1px) solid
+    var(--borderColor-default, var(--tc-border-color));
+  border-radius: var(--borderRadius-medium, 8px);
+  box-shadow: var(--tc-shadow-float, var(--tc-shadow-float-default));
+}
+
+.tc-canvas-pages-link {
+  display: block;
+  padding: var(--base-size-8, 8px) var(--base-size-12, 12px);
+  overflow: hidden;
+  color: var(--fgColor-default, CanvasText);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: var(--borderRadius-small, 4px);
+}
+
+.tc-canvas-pages-link:hover {
+  background: var(--bgColor-muted, var(--tc-bg-muted-default));
+}
+
+.tc-canvas-pages-link[aria-current="page"] {
+  font-weight: var(--base-text-weight-semibold, 600);
+  color: var(--fgColor-accent, var(--tc-selection-color));
+  background: var(--bgColor-accent-muted, #ddf4ff);
+}
+
 /* Dark mode — system preference (auto) */
 
 @media (prefers-color-scheme: dark) {

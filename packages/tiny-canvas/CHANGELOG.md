@@ -1,5 +1,15 @@
 # @dfosco/tiny-canvas
 
+## 0.7.0
+
+### Minor Changes
+
+- Add filesystem-driven multi-page canvases. The new Vite plugin discovers
+  independent TSX Canvas routes under `src/pages/canvas` by default, supports a
+  configurable route directory, and injects a sibling page selector.
+- Scope persisted layout by page and component ID, and add a `Canvas` `title`
+  prop that overrides the filename-derived selector label.
+
 ## 0.6.0
 
 ### Minor Changes

@@ -18,6 +18,8 @@ export interface CanvasChange {
   component: string;
   index?: number;
   key?: string;
+  pageId?: string;
+  pageTitle?: string;
   id: string;
   x?: number;
   y?: number;
@@ -35,6 +37,8 @@ type CanvasChild =
 export interface CanvasProps
   extends Omit<HTMLAttributes<HTMLElement>, 'onSelectionChange'> {
   children?: CanvasChild | readonly CanvasChild[];
+  /** Canvas page title. Overrides its filename in the page selector. */
+  title?: string;
   /** Show dot background. Default: false */
   dotted?: boolean;
   /** Legacy alias for dotted. Default: false */

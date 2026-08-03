@@ -20,7 +20,7 @@ import '@dfosco/tiny-canvas/style.css'
 
 export function Board() {
   return (
-    <Canvas dotted resettable>
+    <Canvas title="Project board" dotted resettable>
       <Block x={48} y={48}>
         Project summary
       </Block>
@@ -49,6 +49,64 @@ export function Board() {
 }
 ```
 
+## Multiple canvas pages
+
+Each TSX route file owns one independent `<Canvas>`. The Vite plugin discovers
+sibling files and adds a Storyboard-style page selector to every canvas in the
+configured directory.
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tinyCanvas from '@dfosco/tiny-canvas/vite'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    tinyCanvas({ pagesDir: '/canvas' }),
+  ],
+})
+```
+
+`pagesDir` defaults to `/canvas` and maps to `src/pages/canvas`. For example:
+
+```text
+src/pages/canvas/index.tsx       → /canvas
+src/pages/canvas/details.tsx     → /canvas/details
+src/pages/canvas/review/index.tsx → /canvas/review
+```
+
+Each file renders its own Canvas:
+
+```tsx
+// src/pages/canvas/details.tsx
+import { Canvas, Note } from '@dfosco/tiny-canvas'
+
+export default function DetailsPage() {
+  return (
+    <Canvas title="Details" dotted resettable>
+      <Note x={48} y={72}>Details page</Note>
+    </Canvas>
+  )
+}
+```
+
+Configure another directory with `tinyCanvas({ pagesDir: '/tiny-board' })`.
+Static `.tsx` files are discovered recursively; dynamic route files and test
+files are skipped. A static `title` prop on `Canvas` overrides the filename in
+the selector. Plugin `titles` overrides take highest priority:
+
+```ts
+tinyCanvas({
+  pagesDir: '/tiny-board',
+  titles: {
+    '/tiny-board': 'Overview',
+    '/tiny-board/review': 'Review',
+  },
+})
+```
+
 `Canvas` only accepts authorized canvas components. Use `Block` for arbitrary
 content, `Frame` for same-origin route previews, `Note` for sticky notes,
 `Mark` for Markdown, and `Link` for favicon-backed link cards. Passing a plain
@@ -59,8 +117,8 @@ element produces a clear runtime error.
 - **No explicit IDs required.** `Canvas` tags each `Block` with a generated
   persistence ID.
 - **Position with props.** Set initial placement directly with `x` and `y`.
-- **Persistent layout.** Dragged coordinates and resized frame dimensions are
-  restored from localStorage and take precedence over initial props.
+- **Persistent layout.** Dragged coordinates and resized dimensions are scoped
+  by page and component ID in localStorage, then restored ahead of initial props.
 - **Agent handoff.** **Copy changes** copies changed coordinates and sizes as
   JSON with component, key/index, and persistence identity.
 - **Built-in selection.** Clicking or focusing a block selects it. Clicking the
@@ -93,6 +151,7 @@ and persistence identifier, but it is not required.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `children` | `Block \| Frame \| Note \| Mark \| Link \| Array<…>` | — | Authorized canvas children. Plain elements are rejected. |
+| `title` | `string` | filename | Override the page selector label. |
 | `dotted` | `boolean` | `false` | Show the dotted canvas background. |
 | `grid` | `boolean` | `false` | Legacy alias that also enables the dotted background. |
 | `gridSize` | `number` | `36` | Dot-grid spacing in pixels. |
@@ -106,6 +165,8 @@ and persistence identifier, but it is not required.
 | `onSelectionChange` | `(blockId: string \| null) => void` | — | Observe selected block identity. |
 
 Standard `<main>` attributes are forwarded to the canvas.
+When the Vite page plugin discovers two or more sibling TSX pages, Canvas also
+shows the built-in page selector automatically.
 
 ### `Block`
 

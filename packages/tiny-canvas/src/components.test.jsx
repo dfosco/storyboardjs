@@ -1,18 +1,38 @@
 /**
  * @vitest-environment jsdom
  */
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import Canvas from './Canvas.jsx';
 import Link from './Link.jsx';
 import Mark from './Mark.jsx';
 import Note from './Note.jsx';
 
+function setPageManifest(pages) {
+  const script = document.createElement('script');
+  script.id = 'tiny-canvas-pages';
+  script.type = 'application/json';
+  script.textContent = JSON.stringify({ pagesDir: '/canvas', pages });
+  document.head.append(script);
+}
+
 describe('Canvas components', () => {
   beforeEach(() => {
     localStorage.clear();
     vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+    document.getElementById('tiny-canvas-pages')?.remove();
+    window.history.replaceState({}, '', '/');
   });
 
   it('renders Markdown in resizable Note and Mark components', () => {
@@ -57,6 +77,52 @@ describe('Canvas components', () => {
     expect(writeText.mock.calls[0][0]).toContain('"width": 300');
     expect(writeText.mock.calls[0][0]).not.toContain('stale');
     expect(screen.getByRole('button', { name: 'Copied' })).toBeTruthy();
+  });
+
+  it('scopes persisted geometry by page and keeps the source component ID', () => {
+    window.history.replaceState({}, '', '/app/canvas');
+    setPageManifest([
+      { id: '/canvas', title: 'Canvas', href: '/app/canvas' },
+      { id: '/canvas/details', title: 'Details', href: '/app/canvas/details' },
+    ]);
+
+    const { container, unmount } = render(
+      <Canvas title="Overview">
+        <Note id="note">Page note</Note>
+      </Canvas>
+    );
+
+    fireEvent.keyDown(screen.getByLabelText('Resize note'), {
+      key: 'ArrowRight',
+    });
+
+    const block = container.querySelector('#note');
+    expect(block.getAttribute('data-block-id')).toBe(
+      'tc-page:%2Fcanvas:note'
+    );
+    expect(JSON.parse(localStorage.getItem('tiny-canvas-queue'))[0]).toMatchObject({
+      id: 'tc-page:%2Fcanvas:note',
+      width: 180,
+      height: 60,
+    });
+
+    unmount();
+    window.history.replaceState({}, '', '/app/canvas/details');
+    render(
+      <Canvas title="Details">
+        <Note id="note">Page note</Note>
+      </Canvas>
+    );
+    fireEvent.keyDown(screen.getByLabelText('Resize note'), {
+      key: 'ArrowDown',
+    });
+
+    expect(
+      JSON.parse(localStorage.getItem('tiny-canvas-queue')).map(({ id }) => id)
+    ).toEqual([
+      'tc-page:%2Fcanvas:note',
+      'tc-page:%2Fcanvas%2Fdetails:note',
+    ]);
   });
 
   it('renders a resizable Link with an origin favicon', () => {
