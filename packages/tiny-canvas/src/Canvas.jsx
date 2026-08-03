@@ -8,7 +8,10 @@ import {
   useState,
 } from 'react';
 import { CanvasContext } from './CanvasContext';
-import PageSelector, { getCanvasPageContext } from './PageSelector';
+import PageSelector, {
+  getCanvasConfig,
+  getCanvasPageContext,
+} from './PageSelector';
 import { isAuthorizedCanvasChild } from './canvasChild';
 import { writeClipboardText } from './clipboard';
 import { useResetCanvas } from './useResetCanvas';
@@ -46,7 +49,8 @@ function Canvas({
     []
   );
   const showDots = dotted || grid;
-  const pageContext = getCanvasPageContext();
+  const canvasConfig = getCanvasConfig();
+  const pageContext = getCanvasPageContext(canvasConfig);
   const pageId = pageContext?.currentPage.id;
   const blockIds = new Set();
   const blocks = new Map();
@@ -71,6 +75,18 @@ function Canvas({
       );
     }
 
+    const component =
+      child.type.displayName || child.type.name || 'Canvas component';
+    const configuredProps = canvasConfig?.widgets?.[component];
+    const widgetDefaults =
+      configuredProps && typeof configuredProps === 'object'
+        ? Object.fromEntries(
+            Object.entries(configuredProps).filter(
+              ([property]) =>
+                !['id', 'blockId', 'children'].includes(property)
+            )
+          )
+        : {};
     const sourceId = child.props.id || generateBlockId(child, index);
     const blockId = pageId
       ? `tc-page:${encodeURIComponent(pageId)}:${sourceId}`
@@ -80,8 +96,7 @@ function Canvas({
     }
     blockIds.add(blockId);
     blocks.set(blockId, {
-      component:
-        child.type.displayName || child.type.name || 'Canvas component',
+      component,
       index,
       sourceId,
       ...(pageId
@@ -91,6 +106,8 @@ function Canvas({
     });
 
     return cloneElement(child, {
+      ...widgetDefaults,
+      ...child.props,
       key: blockId,
       blockId,
     });

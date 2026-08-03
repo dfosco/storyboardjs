@@ -1,6 +1,6 @@
 import ResizableBlock from './ResizableBlock';
 import { authorizeCanvasChild } from './canvasChild';
-import { buildFrameHref } from './frameUrl';
+import { buildFrameDisplayRoute, buildFrameHref } from './frameUrl';
 
 const DEFAULT_MIN_WIDTH = 320;
 const DEFAULT_MIN_HEIGHT = 240;
@@ -8,6 +8,8 @@ const DEFAULT_MIN_HEIGHT = 240;
 function Frame({
   route,
   title,
+  prepend,
+  apend,
   width,
   height,
   minWidth = DEFAULT_MIN_WIDTH,
@@ -39,11 +41,16 @@ function Frame({
       <section className="tc-frame">
         <div className="tc-frame-title-bar">
           <span className="tc-frame-title">{title}</span>
-          <span className="tc-frame-route">{String(route)}</span>
+          <span className="tc-frame-route">
+            {buildFrameDisplayRoute(route, { prepend, apend })}
+          </span>
         </div>
         <iframe
           className="tc-frame-viewport"
-          src={buildFrameHref(route)}
+          src={buildFrameHref(route, window.location.href, {
+            prepend,
+            apend,
+          })}
           title={title}
         />
       </section>

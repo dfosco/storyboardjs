@@ -26,7 +26,15 @@ export default defineConfig({
   plugins: [
     react(),
     mdx(),
-    tinyCanvas({ pagesDir: '/canvas' }),
+    tinyCanvas({
+      pagesDir: '/canvas',
+      widgets: {
+        Frame: {
+          prepend: { value: '/tiny-canvas', visible: false },
+          apend: { value: 'canvas', visible: true },
+        },
+      },
+    }),
     generouted({
       // Configure route generation for MDX files
       routesConfig: {

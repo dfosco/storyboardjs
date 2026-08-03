@@ -45,7 +45,17 @@ afterEach(() => {
 describe('tinyCanvas Vite plugin', () => {
   it('discovers independent TSX pages under /canvas by default', () => {
     const root = createProject();
-    const plugin = tinyCanvas({ titles: { '/canvas': 'Overview' } });
+    const widgets = {
+      Frame: {
+        prepend: { value: '/preview', visible: false },
+        apend: { value: '/embedded', visible: true },
+      },
+      Note: { color: 'blue' },
+    };
+    const plugin = tinyCanvas({
+      titles: { '/canvas': 'Overview' },
+      widgets,
+    });
     plugin.configResolved({ root, base: '/app/' });
     const [tag] = plugin.transformIndexHtml();
     const manifest = JSON.parse(tag.children);
@@ -54,6 +64,7 @@ describe('tinyCanvas Vite plugin', () => {
       id: 'tiny-canvas-pages',
       type: 'application/json',
     });
+    expect(manifest.widgets).toEqual(widgets);
     expect(manifest.pages).toEqual([
       { id: '/canvas', title: 'Overview', href: '/app/canvas' },
       {

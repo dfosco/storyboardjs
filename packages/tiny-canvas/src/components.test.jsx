@@ -11,15 +11,16 @@ import {
   waitFor,
 } from '@testing-library/react';
 import Canvas from './Canvas.jsx';
+import Frame from './Frame.jsx';
 import Link from './Link.jsx';
 import Mark from './Mark.jsx';
 import Note from './Note.jsx';
 
-function setPageManifest(pages) {
+function setPageManifest(pages, widgets = {}) {
   const script = document.createElement('script');
   script.id = 'tiny-canvas-pages';
   script.type = 'application/json';
-  script.textContent = JSON.stringify({ pagesDir: '/canvas', pages });
+  script.textContent = JSON.stringify({ pagesDir: '/canvas', pages, widgets });
   document.head.append(script);
 }
 
@@ -146,5 +147,29 @@ describe('Canvas components', () => {
       'https://github.com/favicon.ico'
     );
     expect(screen.getByLabelText('Resize link: Tiny Canvas')).toBeTruthy();
+  });
+
+  it('applies optional widget config defaults before instance props', () => {
+    setPageManifest([], {
+      Frame: {
+        prepend: { value: '/preview', visible: false },
+        apend: { value: '/embedded', visible: true },
+      },
+      Note: { color: 'blue', width: 310 },
+    });
+
+    const { container } = render(
+      <Canvas>
+        <Frame id="frame" route="/settings?tab=profile" title="Settings" />
+        <Note id="note" color="pink">Configured note</Note>
+      </Canvas>
+    );
+
+    expect(screen.getByText('/settings/embedded?tab=profile')).toBeTruthy();
+    expect(screen.getByTitle('Settings').getAttribute('src')).toBe(
+      '/preview/settings/embedded?tab=profile&embedView=1'
+    );
+    expect(container.querySelector('#note').style.width).toBe('310px');
+    expect(container.querySelector('.tc-note').dataset.color).toBe('pink');
   });
 });

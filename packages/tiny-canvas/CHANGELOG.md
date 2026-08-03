@@ -1,5 +1,14 @@
 # @dfosco/tiny-canvas
 
+## 0.8.0
+
+### Minor Changes
+
+- Add optional per-widget defaults through the Vite `widgets` config. Component
+  props override configured defaults.
+- Add `prepend` and `apend` Frame pathname affixes with independently
+  configurable route-label visibility.
+
 ## 0.7.0
 
 ### Minor Changes

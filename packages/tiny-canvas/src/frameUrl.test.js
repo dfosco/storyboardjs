@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildFrameHref } from './frameUrl.js';
+import { buildFrameDisplayRoute, buildFrameHref } from './frameUrl.js';
 
 const ORIGIN = 'https://github.com';
 const BASE = `${ORIGIN}/orgs/cli/security`;
@@ -85,5 +85,53 @@ describe('buildFrameHref', () => {
     const result = buildFrameHref('#/foo', BASE);
     expect(result).not.toMatch(/^https?:\/\//);
     expect(result.startsWith('/')).toBe(true);
+  });
+
+  it('adds prepend and apend values to the URL pathname', () => {
+    const result = buildFrameHref('/settings?tab=profile#/account', BASE, {
+      prepend: { value: '/preview', visible: false },
+      apend: { value: '/embedded', visible: true },
+    });
+    const url = new URL(result, ORIGIN);
+
+    expect(url.pathname).toBe('/preview/settings/embedded');
+    expect(url.searchParams.get('tab')).toBe('profile');
+    expect(url.searchParams.get('embedView')).toBe('1');
+    expect(url.hash).toBe('#/account');
+  });
+
+  it('hides invisible affixes only from the displayed route', () => {
+    const options = {
+      prepend: { value: '/preview', visible: false },
+      apend: { value: '/embedded', visible: true },
+    };
+
+    expect(buildFrameDisplayRoute('/settings?tab=profile', options, BASE)).toBe(
+      '/settings/embedded?tab=profile'
+    );
+    expect(buildFrameHref('/settings?tab=profile', BASE, options)).toBe(
+      '/preview/settings/embedded?tab=profile&embedView=1'
+    );
+  });
+
+  it('preserves the original route label when no affix is visible', () => {
+    expect(buildFrameDisplayRoute('#/settings', {}, BASE)).toBe('#/settings');
+    expect(
+      buildFrameDisplayRoute(
+        '/settings?tab=profile',
+        { prepend: { value: '/preview', visible: false } },
+        BASE
+      )
+    ).toBe('/settings?tab=profile');
+  });
+
+  it('validates path affix values', () => {
+    expect(() =>
+      buildFrameHref('/settings', BASE, {
+        prepend: { value: '/preview', visible: 'no' },
+      })
+    ).toThrow(
+      'Frame prepend must contain a string value and boolean visible.'
+    );
   });
 });

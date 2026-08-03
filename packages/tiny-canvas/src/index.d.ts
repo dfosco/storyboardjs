@@ -82,11 +82,22 @@ export interface BlockProps
 
 export declare function Block(props: BlockProps): ReactElement;
 
+export interface FramePathAffix {
+  /** String added to the iframe URL pathname. */
+  value: string;
+  /** Show this value in the Frame header route. */
+  visible: boolean;
+}
+
 export interface FrameProps extends Omit<BlockProps, 'children'> {
   /** Same-origin URL, path, query, or hash route rendered inside the frame. */
   route: string | URL;
   /** Accessible frame title shown in the title bar. */
   title: string;
+  /** String added before the iframe URL pathname. */
+  prepend?: FramePathAffix;
+  /** String added after the iframe URL pathname. */
+  apend?: FramePathAffix;
   /** Initial frame width in pixels. A saved width takes precedence. Default: 640 */
   width?: number;
   /** Initial frame height in pixels. A saved height takes precedence. Default: 480 */
@@ -164,6 +175,18 @@ export interface LinkProps extends Omit<BlockProps, 'children'> {
 }
 
 export declare function Link(props: LinkProps): ReactElement;
+
+export type WidgetDefaults<Props> = Partial<
+  Omit<Props, 'id' | 'children'>
+>;
+
+export interface TinyCanvasWidgetConfig {
+  Block?: WidgetDefaults<BlockProps>;
+  Frame?: WidgetDefaults<FrameProps>;
+  Note?: WidgetDefaults<NoteProps>;
+  Mark?: WidgetDefaults<MarkProps>;
+  Link?: WidgetDefaults<LinkProps>;
+}
 
 export interface UseResetCanvasOptions {
   /** Reload the page after clearing state. Default: false */

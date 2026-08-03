@@ -26,8 +26,11 @@ function getPageManifest() {
   }
 }
 
-export function getCanvasPageContext() {
-  const manifest = getPageManifest();
+export function getCanvasConfig() {
+  return getPageManifest();
+}
+
+export function getCanvasPageContext(manifest = getCanvasConfig()) {
   if (!manifest) {
     return null;
   }

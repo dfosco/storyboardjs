@@ -89,7 +89,11 @@ function joinBase(base, route) {
 /**
  * Vite plugin that discovers independent Tiny Canvas TSX pages.
  */
-export default function tinyCanvas({ pagesDir = '/canvas', titles = {} } = {}) {
+export default function tinyCanvas({
+  pagesDir = '/canvas',
+  titles = {},
+  widgets = {},
+} = {}) {
   const normalizedPagesDir = normalizeRoute(pagesDir);
   let projectRoot = '';
   let base = '/';
@@ -127,10 +131,11 @@ export default function tinyCanvas({ pagesDir = '/canvas', titles = {} } = {}) {
         {
           tag: 'script',
           attrs: { id: MANIFEST_ID, type: 'application/json' },
-          children: JSON.stringify({ pagesDir: normalizedPagesDir, pages }).replaceAll(
-            '<',
-            '\\u003c'
-          ),
+          children: JSON.stringify({
+            pagesDir: normalizedPagesDir,
+            pages,
+            widgets,
+          }).replaceAll('<', '\\u003c'),
           injectTo: 'head-prepend',
         },
       ];

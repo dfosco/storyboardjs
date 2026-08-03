@@ -64,10 +64,24 @@ import tinyCanvas from '@dfosco/tiny-canvas/vite'
 export default defineConfig({
   plugins: [
     react(),
-    tinyCanvas({ pagesDir: '/canvas' }),
+    tinyCanvas({
+      pagesDir: '/canvas',
+      widgets: {
+        Frame: {
+          prepend: { value: '/preview', visible: false },
+          apend: { value: '/embedded', visible: true },
+        },
+        Note: { color: 'blue' },
+      },
+    }),
   ],
 })
 ```
+
+`widgets` optionally supplies default props for `Block`, `Frame`, `Note`,
+`Mark`, and `Link`. Defaults are JSON-serializable and apply to every instance;
+props written directly on a component take precedence. Identity and content
+props (`id`, `blockId`, and `children`) are never inherited from widget config.
 
 `pagesDir` defaults to `/canvas` and maps to `src/pages/canvas`. For example:
 
@@ -192,6 +206,8 @@ the current application:
   <Frame
     route="/?urlstate=security#/orgs/cli/security"
     title="Security overview"
+    prepend={{ value: '/preview', visible: false }}
+    apend={{ value: '/embedded', visible: true }}
     x={48}
     y={48}
     width={640}
@@ -204,6 +220,8 @@ the current application:
 | --- | --- | --- | --- |
 | `route` | `string \| URL` | — | Same-origin URL, path, query, or hash route loaded by the iframe. |
 | `title` | `string` | — | Accessible iframe title shown in the frame header. |
+| `prepend` | `{ value: string, visible: boolean }` | — | Add `value` before the URL pathname. `visible: false` hides it only from the frame header. |
+| `apend` | `{ value: string, visible: boolean }` | — | Add `value` after the URL pathname. `visible: false` hides it only from the frame header. |
 | `width` | `number` | `640` | Initial width in pixels. Saved width takes precedence. |
 | `height` | `number` | `480` | Initial height in pixels. Saved height takes precedence. |
 | `minWidth` | `number` | `320` | Minimum width while resizing. |
@@ -214,6 +232,8 @@ the current application:
 Select a frame, then drag its lower-right handle or use the handle's arrow keys
 to resize it. The embedded application can use the `embedView` query parameter
 to suppress redirects or chrome that should not appear inside the preview.
+Both path affixes always affect the iframe URL. Their `visible` flags only
+control whether each value appears in the route text shown in the title bar.
 
 ### `Note` and `Mark`
 
