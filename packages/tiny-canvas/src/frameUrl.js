@@ -25,10 +25,11 @@ function pathAffixes(value, propName, environment = 'prod') {
       typeof entry !== 'object' ||
       typeof entry.value !== 'string' ||
       typeof entry.visible !== 'boolean' ||
+      (entry.external !== undefined && typeof entry.external !== 'boolean') ||
       (entry.env !== undefined && entry.env !== 'dev' && entry.env !== 'prod')
     ) {
       throw new TypeError(
-        `Frame ${propName} entries must contain a string value, boolean visible, and optional dev or prod env.`
+        `Frame ${propName} entries must contain a string value, boolean visible, optional boolean external, and optional dev or prod env.`
       );
     }
   }
@@ -48,14 +49,16 @@ function resolveAffixes({ prepend, append, apend, environment = 'prod' } = {}) {
 }
 
 function isQueryAffix(affix) {
-  return affix.value.startsWith('?');
+  return affix.value.startsWith('?') || affix.value.startsWith('/?');
 }
 
-function pathAffixValue(affixes, visibleOnly = false) {
+function queryAffixValue(affix) {
+  return affix.value.slice(affix.value.startsWith('/?') ? 2 : 1);
+}
+
+function pathAffixValue(affixes, include = () => true) {
   return affixes
-    .filter(
-      (affix) => !isQueryAffix(affix) && (!visibleOnly || affix.visible)
-    )
+    .filter((affix) => !isQueryAffix(affix) && include(affix))
     .map((affix) => affix.value)
     .join('');
 }
@@ -65,7 +68,7 @@ function applyQueryAffixes(frameUrl, affixes, visibleOnly = false) {
     if (!isQueryAffix(affix) || (visibleOnly && !affix.visible)) {
       continue;
     }
-    const params = new URLSearchParams(affix.value.slice(1));
+    const params = new URLSearchParams(queryAffixValue(affix));
     for (const [key, value] of params) {
       frameUrl.searchParams.set(key, value);
     }
@@ -73,8 +76,9 @@ function applyQueryAffixes(frameUrl, affixes, visibleOnly = false) {
 }
 
 function applyPathAffixes(frameUrl, affixes, visibleOnly = false) {
-  const prefixValue = pathAffixValue(affixes.prepend, visibleOnly);
-  const suffixValue = pathAffixValue(affixes.append, visibleOnly);
+  const include = (affix) => !visibleOnly || affix.visible;
+  const prefixValue = pathAffixValue(affixes.prepend, include);
+  const suffixValue = pathAffixValue(affixes.append, include);
   frameUrl.pathname = `${prefixValue}${frameUrl.pathname}${suffixValue}`;
   applyQueryAffixes(
     frameUrl,
@@ -88,7 +92,12 @@ function relativeFrameUrl(frameUrl) {
   return `${frameUrl.pathname}${frameUrl.search}${frameUrl.hash}`;
 }
 
-function replaceAppliedPathAffixes(pathname, affixes, edge) {
+function replaceAppliedPathAffixes(
+  pathname,
+  affixes,
+  edge,
+  include = (affix) => affix.visible
+) {
   const applied = pathAffixValue(affixes);
   if (!applied) {
     return pathname;
@@ -100,20 +109,24 @@ function replaceAppliedPathAffixes(pathname, affixes, edge) {
     return pathname;
   }
 
-  const visible = pathAffixValue(affixes, true);
+  const retained = pathAffixValue(affixes, include);
   const nextPathname =
     edge === 'start'
-      ? `${visible}${pathname.slice(applied.length)}`
-      : `${pathname.slice(0, -applied.length)}${visible}`;
+      ? `${retained}${pathname.slice(applied.length)}`
+      : `${pathname.slice(0, -applied.length)}${retained}`;
   return nextPathname.startsWith('/') ? nextPathname : `/${nextPathname}`;
 }
 
-function removeHiddenQueryAffixes(frameUrl, affixes) {
+function removeQueryAffixes(
+  frameUrl,
+  affixes,
+  shouldRemove = (affix) => !affix.visible
+) {
   for (const affix of affixes) {
-    if (!isQueryAffix(affix) || affix.visible) {
+    if (!isQueryAffix(affix) || !shouldRemove(affix)) {
       continue;
     }
-    const params = new URLSearchParams(affix.value.slice(1));
+    const params = new URLSearchParams(queryAffixValue(affix));
     for (const [key, value] of params) {
       if (frameUrl.searchParams.get(key) === value) {
         frameUrl.searchParams.delete(key);
@@ -162,7 +175,7 @@ export function buildFrameNavigationDisplayRoute(
     affixes.append,
     'end'
   );
-  removeHiddenQueryAffixes(frameUrl, [
+  removeQueryAffixes(frameUrl, [
     ...affixes.prepend,
     ...affixes.append,
   ]);
@@ -172,9 +185,28 @@ export function buildFrameNavigationDisplayRoute(
 
 export function buildFrameOpenHref(
   navigationHref,
-  currentHref = window.location.href
+  currentHref = window.location.href,
+  options = {}
 ) {
   const frameUrl = resolveFrameUrl(navigationHref, currentHref);
+  const affixes = resolveAffixes(options);
+  const includeExternal = (affix) => affix.external !== false;
+  frameUrl.pathname = replaceAppliedPathAffixes(
+    replaceAppliedPathAffixes(
+      frameUrl.pathname,
+      affixes.prepend,
+      'start',
+      includeExternal
+    ),
+    affixes.append,
+    'end',
+    includeExternal
+  );
+  removeQueryAffixes(
+    frameUrl,
+    [...affixes.prepend, ...affixes.append],
+    (affix) => affix.external === false
+  );
   frameUrl.searchParams.delete('embedView');
   return frameUrl.href;
 }

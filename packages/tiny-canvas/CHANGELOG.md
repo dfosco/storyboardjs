@@ -1,5 +1,14 @@
 # @dfosco/tiny-canvas
 
+## 0.15.0
+
+### Minor Changes
+
+- Add optional `external` flags to Frame affix entries. `external: false`
+  keeps an affix in the iframe URL while removing it from **Open in new tab**.
+- Treat both `?query` and `/?query` append values as query parameters instead
+  of encoding them into the pathname.
+
 ## 0.14.0
 
 ### Minor Changes

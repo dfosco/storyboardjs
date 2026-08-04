@@ -72,7 +72,15 @@ export default defineConfig({
             { value: '/dev-proxy', visible: false, env: 'dev' },
             { value: '/previews/branch', visible: false, env: 'prod' },
           ],
-          append: [{ value: '/embedded', visible: true }],
+          append: [
+            { value: '/embedded', visible: true },
+            {
+              value: '/?hideTooling=1',
+              external: false,
+              visible: false,
+              env: 'dev',
+            },
+          ],
         },
         Note: { color: 'blue' },
       },
@@ -247,7 +255,15 @@ the current application:
       { value: '/dev-proxy', visible: false, env: 'dev' },
       { value: '/previews/branch', visible: false, env: 'prod' },
     ]}
-    append={[{ value: '/embedded', visible: true }]}
+    append={[
+      { value: '/embedded', visible: true },
+      {
+        value: '/?hideTooling=1',
+        external: false,
+        visible: false,
+        env: 'dev',
+      },
+    ]}
     x={48}
     y={48}
     width={1270}
@@ -261,7 +277,7 @@ the current application:
 | `route` | `string \| URL` | — | Same-origin URL, path, query, or hash route loaded by the iframe. |
 | `title` | `string` | — | Initial accessible iframe title and header label. Same-origin navigation replaces it with the loaded document title. |
 | `prepend` | `{ value, visible, env? }[]` | — | Add ordered entries before the URL pathname. |
-| `append` | `{ value, visible, env? }[]` | — | Add ordered entries after the URL pathname. A leading `?` adds query parameters without pathname encoding. |
+| `append` | `{ value, visible, external?, env? }[]` | — | Add ordered entries after the URL pathname. A leading `?` or `/?` adds query parameters without pathname encoding. `external: false` omits the entry from **Open in new tab**. |
 | `apend` | object or array | — | Deprecated runtime alias for `append`. |
 | `width` | `number` | `1270` | Initial width in pixels. Saved width takes precedence. |
 | `height` | `number` | `776` | Initial height in pixels. Saved height takes precedence. |
@@ -276,6 +292,8 @@ to suppress redirects or chrome that should not appear inside the preview.
 Affixes without `env` apply everywhere. `env: 'dev'` applies during Vite serve;
 `env: 'prod'` applies during production builds. Their `visible` flags only
 control whether each value appears in the route text shown in the title bar.
+`external` defaults to `true`; set it to `false` to keep an affix in the iframe
+URL while removing it from the Frame's external URL.
 Environment targeting uses the manifest injected by the Tiny Canvas Vite
 plugin; without that plugin, Frame defaults to `prod`.
 The title bar follows same-origin iframe navigation and includes an **Open in

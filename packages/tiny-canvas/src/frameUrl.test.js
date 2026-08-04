@@ -136,7 +136,7 @@ describe('buildFrameHref', () => {
         prepend: [{ value: '/preview', visible: 'no' }],
       })
     ).toThrow(
-      'Frame prepend entries must contain a string value, boolean visible, and optional dev or prod env.'
+      'Frame prepend entries must contain a string value, boolean visible, optional boolean external, and optional dev or prod env.'
     );
   });
 
@@ -170,6 +170,44 @@ describe('buildFrameHref', () => {
     expect(url.pathname).not.toContain('%3F');
     expect(url.searchParams.get('hideTooling')).toBe('1');
     expect(url.hash).toBe('#/orgs/github/security');
+  });
+
+  it('supports slash-question-mark query entries and excludes external=false from new tabs', () => {
+    const options = {
+      append: [
+        {
+          value: '/?hideTooling=1',
+          external: false,
+          visible: false,
+          env: 'dev',
+        },
+      ],
+      environment: 'dev',
+    };
+    const iframeHref = buildFrameHref('/settings', BASE, options);
+    const iframeUrl = new URL(iframeHref, ORIGIN);
+
+    expect(iframeUrl.pathname).toBe('/settings');
+    expect(iframeUrl.pathname).not.toContain('%3F');
+    expect(iframeUrl.searchParams.get('hideTooling')).toBe('1');
+    expect(
+      buildFrameOpenHref(iframeHref, BASE, options)
+    ).toBe(`${ORIGIN}/settings`);
+  });
+
+  it('strips external=false pathname entries only from new-tab URLs', () => {
+    const options = {
+      append: [
+        { value: '/embedded', external: false, visible: true },
+        { value: '/shared', visible: true },
+      ],
+    };
+    const iframeHref = buildFrameHref('/settings', BASE, options);
+
+    expect(iframeHref).toBe('/settings/embedded/shared?embedView=1');
+    expect(buildFrameOpenHref(iframeHref, BASE, options)).toBe(
+      `${ORIGIN}/settings/shared`
+    );
   });
 
   it('preserves a deployed preview subdirectory for hash navigation', () => {

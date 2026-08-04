@@ -48,7 +48,11 @@ function Frame({
       sourceKey,
       title,
       route: buildFrameDisplayRoute(route, affixOptions),
-      href: buildFrameOpenHref(iframeSrc),
+      href: buildFrameOpenHref(
+        iframeSrc,
+        window.location.href,
+        affixOptions
+      ),
     }),
     [apend, append, environment, iframeSrc, prepend, route, sourceKey, title]
   );
@@ -73,7 +77,11 @@ function Frame({
           affixOptions,
           window.location.href
         ),
-        href: buildFrameOpenHref(navigationHref),
+        href: buildFrameOpenHref(
+          navigationHref,
+          window.location.href,
+          affixOptions
+        ),
       });
     } catch {
       // Keep the last same-origin navigation state.

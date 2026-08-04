@@ -279,7 +279,9 @@ describe('Canvas components', () => {
     setPageManifest([], {
       Frame: {
         prepend: [{ value: '/preview', visible: false }],
-        append: [{ value: '/embedded', visible: true }],
+        append: [
+          { value: '/embedded', external: false, visible: true },
+        ],
       },
       Note: { color: 'blue', width: 310 },
     });
@@ -295,6 +297,11 @@ describe('Canvas components', () => {
     expect(screen.getByTitle('Settings').getAttribute('src')).toBe(
       '/preview/settings/embedded?tab=profile&embedView=1'
     );
+    expect(
+      screen
+        .getByRole('link', { name: 'Open Settings in new tab' })
+        .getAttribute('href')
+    ).toBe('http://localhost:3000/preview/settings?tab=profile');
     expect(container.querySelector('#frame').style.width).toBe('1270px');
     expect(container.querySelector('#frame').style.height).toBe('776px');
     expect(container.querySelector('#note').style.width).toBe('310px');

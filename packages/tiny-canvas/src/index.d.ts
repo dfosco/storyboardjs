@@ -91,6 +91,8 @@ export interface FramePathAffix {
   value: string;
   /** Show this value in the Frame header route. */
   visible: boolean;
+  /** Include this value when opening the Frame URL externally. Default: true */
+  external?: boolean;
   /** Apply only during Vite development or production builds. Omit for both. */
   env?: 'dev' | 'prod';
 }

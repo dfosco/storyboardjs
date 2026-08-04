@@ -31,7 +31,15 @@ export default defineConfig({
       widgets: {
         Frame: {
           prepend: [{ value: '/tiny-canvas', visible: false }],
-          append: [{ value: 'canvas', visible: true }],
+          append: [
+            { value: 'canvas', visible: true },
+            {
+              value: '/?hideTooling=1',
+              external: false,
+              visible: false,
+              env: 'dev',
+            },
+          ],
         },
       },
     }),
