@@ -10,6 +10,8 @@ import {
 
 const DEFAULT_MIN_WIDTH = 320;
 const DEFAULT_MIN_HEIGHT = 240;
+const DEFAULT_WIDTH = 1270;
+const DEFAULT_HEIGHT = 776;
 
 function Frame({
   route,
@@ -140,8 +142,8 @@ function Frame({
       blockId={blockId}
       componentName="Frame"
       resizeLabel={`Resize ${currentNavigation.title}`}
-      defaultWidth={640}
-      defaultHeight={480}
+      defaultWidth={DEFAULT_WIDTH}
+      defaultHeight={DEFAULT_HEIGHT}
       width={width}
       height={height}
       minWidth={minWidth}

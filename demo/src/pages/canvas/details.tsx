@@ -24,13 +24,11 @@ export default function CanvasDetailsPage() {
         y={340}
       />
       <Frame
-        id="overview-frame"
+        id="overview-frame-default"
         route="/"
         title="Overview preview"
         x={240}
         y={540}
-        width={640}
-        height={420}
       />
     </Canvas>
   )

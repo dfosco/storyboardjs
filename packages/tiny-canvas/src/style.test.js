@@ -14,4 +14,9 @@ describe('Canvas viewport styles', () => {
     expect(styles).toContain('html:has(.tc-canvas)');
     expect(styles.match(/overscroll-behavior-y: none;/g)).toHaveLength(2);
   });
+
+  it('provides a large scrollable board extent', () => {
+    expect(styles).toContain('var(--tc-canvas-width, 10000px)');
+    expect(styles).toContain('var(--tc-canvas-height, 10000px)');
+  });
 });

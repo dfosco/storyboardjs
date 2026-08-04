@@ -80,8 +80,8 @@ body:has(.tc-canvas) {
 
 .tc-canvas-board {
   position: relative;
-  min-inline-size: 100%;
-  min-block-size: 100%;
+  inline-size: max(100%, var(--tc-canvas-width, 10000px));
+  block-size: max(100%, var(--tc-canvas-height, 10000px));
   zoom: var(--tc-canvas-zoom, 1);
 }
 
@@ -353,8 +353,8 @@ body .tc-block {
 }
 
 .tc-frame-block {
-  inline-size: min(var(--tc-frame-width, 640px), calc(100vw - 72px));
-  block-size: var(--tc-frame-height, 480px);
+  inline-size: min(var(--tc-frame-width, 1270px), calc(100vw - 72px));
+  block-size: var(--tc-frame-height, 776px);
 }
 
 .tc-frame-block > .tc-block-content {

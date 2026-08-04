@@ -44,6 +44,7 @@ produces a clear runtime error.
 - **Position with props.** Set initial placement directly with `x` and `y`.
 - **Persistent layout.** Dragged coordinates and resized frame dimensions are
   restored from localStorage and take precedence over initial props.
+- **Room to move.** Canvas provides a 10,000×10,000 scrollable board by default.
 - **Built-in zoom.** Bottom-left controls scale board content from 50% to 200%.
 - **Built-in selection.** Clicking or focusing a block selects it. Clicking the
   canvas background or pressing Escape clears selection.
@@ -75,6 +76,8 @@ and persistence identifier, but it is not required.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `children` | `Block \| Frame \| Array<Block \| Frame>` | — | Authorized canvas children. Plain elements are rejected. |
+| `canvasWidth` | `number` | `10000` | Scrollable board width in pixels. |
+| `canvasHeight` | `number` | `10000` | Scrollable board height in pixels. |
 | `dotted` | `boolean` | `false` | Show the dotted canvas background. |
 | `grid` | `boolean` | `false` | Legacy alias that also enables the dotted background. |
 | `gridSize` | `number` | `36` | Dot-grid spacing in pixels. |
@@ -111,8 +114,8 @@ the current application:
     title="Security overview"
     x={48}
     y={48}
-    width={640}
-    height={480}
+    width={1270}
+    height={776}
   />
 </Canvas>
 ```
@@ -121,8 +124,8 @@ the current application:
 | --- | --- | --- | --- |
 | `route` | `string \| URL` | — | Same-origin URL, path, query, or hash route loaded by the iframe. |
 | `title` | `string` | — | Initial accessible iframe title. Same-origin navigation updates it from the loaded document title. |
-| `width` | `number` | `640` | Initial width in pixels. Saved width takes precedence. |
-| `height` | `number` | `480` | Initial height in pixels. Saved height takes precedence. |
+| `width` | `number` | `1270` | Initial width in pixels. Saved width takes precedence. |
+| `height` | `number` | `776` | Initial height in pixels. Saved height takes precedence. |
 | `minWidth` | `number` | `320` | Minimum width while resizing. |
 | `minHeight` | `number` | `240` | Minimum height while resizing. |
 | `onSizeChange` | `({ width, height }) => void` | — | Observe live resize updates. |
@@ -171,8 +174,8 @@ Override CSS custom properties to fit your application:
   --tc-block-padding: 24px;
   --tc-frame-bg: #fff;
   --tc-frame-border-color: rgb(0 0 0 / 15%);
-  --tc-frame-width: 640px;
-  --tc-frame-height: 480px;
+  --tc-frame-width: 1270px;
+  --tc-frame-height: 776px;
   --tc-frame-title-bg: #f6f8fa;
   --tc-grid-size: 36px;
 }

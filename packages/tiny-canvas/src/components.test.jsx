@@ -90,6 +90,8 @@ describe('Canvas components', () => {
     const board = container.querySelector('.tc-canvas-board');
 
     expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('1');
+    expect(board.style.getPropertyValue('--tc-canvas-width')).toBe('10000px');
+    expect(board.style.getPropertyValue('--tc-canvas-height')).toBe('10000px');
     fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
     expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('1.25');
     expect(screen.getByRole('button', { name: 'Reset zoom' }).textContent).toBe(
@@ -100,6 +102,16 @@ describe('Canvas components', () => {
     expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('1');
     fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }));
     expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('0.75');
+  });
+
+  it('supports custom Canvas dimensions', () => {
+    const { container } = render(
+      <Canvas canvasWidth={2400} canvasHeight={1800} />
+    );
+    const board = container.querySelector('.tc-canvas-board');
+
+    expect(board.style.getPropertyValue('--tc-canvas-width')).toBe('2400px');
+    expect(board.style.getPropertyValue('--tc-canvas-height')).toBe('1800px');
   });
 
   it('scopes persisted geometry by page and keeps the source component ID', () => {
@@ -191,6 +203,8 @@ describe('Canvas components', () => {
     expect(screen.getByTitle('Settings').getAttribute('src')).toBe(
       '/preview/settings/embedded?tab=profile&embedView=1'
     );
+    expect(container.querySelector('#frame').style.width).toBe('1270px');
+    expect(container.querySelector('#frame').style.height).toBe('776px');
     expect(container.querySelector('#note').style.width).toBe('310px');
     expect(container.querySelector('.tc-note').dataset.color).toBe('pink');
   });

@@ -23,10 +23,22 @@ import {
 
 const ZOOM_LEVELS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 const DEFAULT_ZOOM_INDEX = ZOOM_LEVELS.indexOf(1);
+const DEFAULT_CANVAS_WIDTH = 10000;
+const DEFAULT_CANVAS_HEIGHT = 10000;
+
+function canvasDimension(value, propName) {
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new TypeError(`Canvas ${propName} must be a positive finite number.`);
+  }
+
+  return value;
+}
 
 function Canvas({
   children,
   title,
+  canvasWidth = DEFAULT_CANVAS_WIDTH,
+  canvasHeight = DEFAULT_CANVAS_HEIGHT,
   dotted = false,
   grid = false,
   gridSize = 36,
@@ -54,6 +66,8 @@ function Canvas({
   );
   const showDots = dotted || grid;
   const zoom = ZOOM_LEVELS[zoomIndex];
+  const boardWidth = canvasDimension(canvasWidth, 'canvasWidth');
+  const boardHeight = canvasDimension(canvasHeight, 'canvasHeight');
   const canvasConfig = getCanvasConfig();
   const pageContext = getCanvasPageContext(canvasConfig);
   const pageId = pageContext?.currentPage.id;
@@ -139,7 +153,11 @@ function Canvas({
         <PageSelector title={title} />
         <div
           className="tc-canvas-board"
-          style={{ '--tc-canvas-zoom': zoom }}
+          style={{
+            '--tc-canvas-zoom': zoom,
+            '--tc-canvas-width': `${boardWidth}px`,
+            '--tc-canvas-height': `${boardHeight}px`,
+          }}
           onPointerDown={(event) => {
             if (event.target === event.currentTarget) {
               contextValue.selectBlock(null);

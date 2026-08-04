@@ -39,6 +39,10 @@ export interface CanvasProps
   children?: CanvasChild | readonly CanvasChild[];
   /** Canvas page title. Overrides its filename in the page selector. */
   title?: string;
+  /** Scrollable board width in pixels. Default: 10000 */
+  canvasWidth?: number;
+  /** Scrollable board height in pixels. Default: 10000 */
+  canvasHeight?: number;
   /** Show dot background. Default: false */
   dotted?: boolean;
   /** Legacy alias for dotted. Default: false */
@@ -98,9 +102,9 @@ export interface FrameProps extends Omit<BlockProps, 'children'> {
   prepend?: FramePathAffix;
   /** String added after the iframe URL pathname. */
   apend?: FramePathAffix;
-  /** Initial frame width in pixels. A saved width takes precedence. Default: 640 */
+  /** Initial frame width in pixels. A saved width takes precedence. Default: 1270 */
   width?: number;
-  /** Initial frame height in pixels. A saved height takes precedence. Default: 480 */
+  /** Initial frame height in pixels. A saved height takes precedence. Default: 776 */
   height?: number;
   /** Minimum resizable width in pixels. Default: 320 */
   minWidth?: number;

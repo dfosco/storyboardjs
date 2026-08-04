@@ -1,5 +1,14 @@
 # @dfosco/tiny-canvas
 
+## 0.11.0
+
+### Minor Changes
+
+- Change the default Frame size to 1270×776.
+- Give Canvas a 10,000×10,000 scrollable board by default so users can move
+  beyond existing widgets.
+- Add `canvasWidth` and `canvasHeight` props for overriding the board extent.
+
 ## 0.10.0
 
 ### Minor Changes
