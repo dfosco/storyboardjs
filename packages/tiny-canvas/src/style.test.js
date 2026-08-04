@@ -20,3 +20,14 @@ describe('Canvas viewport styles', () => {
     expect(styles).toContain('var(--tc-canvas-height, 10000px)');
   });
 });
+
+describe('Frame interaction styles', () => {
+  it('shields every iframe while a Frame is being dragged', () => {
+    expect(styles).toContain(
+      '.tc-canvas:has(.tc-frame-block.tc-block-dragging) .tc-frame::before'
+    );
+    expect(styles).toContain('content: "";');
+    expect(styles).toContain('inset: 0;');
+    expect(styles).toContain('pointer-events: auto;');
+  });
+});

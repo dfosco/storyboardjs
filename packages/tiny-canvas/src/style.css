@@ -383,6 +383,8 @@ body .tc-block {
 }
 
 .tc-frame-title-bar {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -393,6 +395,15 @@ body .tc-block {
   background-color: var(--tc-frame-title-bg, var(--bgColor-muted, var(--tc-bg-muted-default)));
   border-bottom: var(--borderWidth-thin, 1px) solid
     var(--tc-frame-border-color, var(--borderColor-default, var(--tc-border-color)));
+}
+
+.tc-canvas:has(.tc-frame-block.tc-block-dragging) .tc-frame::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  cursor: grabbing;
+  pointer-events: auto;
 }
 
 .tc-frame-title {

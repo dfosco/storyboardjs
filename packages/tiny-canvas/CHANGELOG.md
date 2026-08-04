@@ -1,5 +1,13 @@
 # @dfosco/tiny-canvas
 
+## 0.13.0
+
+### Minor Changes
+
+- Shield every Frame iframe with an invisible interaction layer while a Frame
+  is being dragged so pointer release reaches the canvas and reliably ends the
+  drag, even when released over another Frame.
+
 ## 0.12.0
 
 ### Minor Changes
