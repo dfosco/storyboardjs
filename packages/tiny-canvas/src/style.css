@@ -13,6 +13,14 @@
 
 /* Canvas */
 
+html:has(.tc-canvas),
+body:has(.tc-canvas) {
+  block-size: 100%;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior-y: none;
+}
+
 .tc-canvas {
   --tc-bg-muted-default: var(--bgColor-muted, #f6f8fa);
   --tc-dot-color-default: var(
@@ -23,14 +31,22 @@
     --shadow-floating-small,
     0 4px 12px rgba(0, 0, 0, 0.15)
   );
-  min-width: 100vw;
+  box-sizing: border-box;
+  min-width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   font-family: var(--tc-font-stack);
-  position: relative;
+  position: fixed;
+  inset: 0;
+  overflow: auto;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
   background-color: var(--tc-bg-muted, var(--tc-bg-muted-default));
-  width: 100vw;
-  max-width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  height: 100vh;
+  height: 100dvh;
   color-scheme: light dark;
 }
 

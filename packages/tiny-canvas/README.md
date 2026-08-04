@@ -133,6 +133,8 @@ element produces a clear runtime error.
 - **Position with props.** Set initial placement directly with `x` and `y`.
 - **Persistent layout.** Dragged coordinates and resized dimensions are scoped
   by page and component ID in localStorage, then restored ahead of initial props.
+- **Viewport-owned board.** Canvas fills the dynamic viewport, owns board
+  scrolling, and disables mobile pull-to-refresh.
 - **Agent handoff.** **Copy changes** copies changed coordinates and sizes as
   JSON with component, key/index, and persistence identity.
 - **Built-in selection.** Clicking or focusing a block selects it. Clicking the

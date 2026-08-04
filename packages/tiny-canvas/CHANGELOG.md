@@ -1,5 +1,14 @@
 # @dfosco/tiny-canvas
 
+## 0.9.0
+
+### Minor Changes
+
+- Make Canvas a dynamic-viewport scroll container so its background always
+  covers desktop and mobile viewports.
+- Disable vertical overscroll and mobile pull-to-refresh while Canvas is
+  mounted.
+
 ## 0.8.0
 
 ### Minor Changes
