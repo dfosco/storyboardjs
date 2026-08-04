@@ -1,5 +1,14 @@
 # @dfosco/tiny-canvas
 
+## 0.12.0
+
+### Minor Changes
+
+- Anchor Ctrl/⌘+wheel and trackpad-pinch zoom at the cursor while keeping zoom
+  buttons anchored at the viewport center.
+- Make Link a fixed-size draggable card without resize controls or persisted
+  size changes.
+
 ## 0.11.0
 
 ### Minor Changes

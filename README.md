@@ -45,7 +45,8 @@ produces a clear runtime error.
 - **Persistent layout.** Dragged coordinates and resized frame dimensions are
   restored from localStorage and take precedence over initial props.
 - **Room to move.** Canvas provides a 10,000×10,000 scrollable board by default.
-- **Built-in zoom.** Bottom-left controls scale board content from 50% to 200%.
+- **Built-in zoom.** Bottom-left controls zoom around viewport center;
+  Ctrl/⌘+wheel and trackpad pinch zoom around cursor.
 - **Built-in selection.** Clicking or focusing a block selects it. Clicking the
   canvas background or pressing Escape clears selection.
 - **Same-origin previews.** `Frame` accepts relative paths, query strings,

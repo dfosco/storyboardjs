@@ -87,21 +87,67 @@ describe('Canvas components', () => {
         <Note id="note">Zoom me</Note>
       </Canvas>
     );
+    const canvas = container.querySelector('.tc-canvas');
     const board = container.querySelector('.tc-canvas-board');
+    Object.defineProperties(canvas, {
+      clientWidth: { configurable: true, value: 800 },
+      clientHeight: { configurable: true, value: 600 },
+      scrollLeft: { configurable: true, value: 100, writable: true },
+      scrollTop: { configurable: true, value: 200, writable: true },
+    });
+    vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 800,
+      height: 600,
+    });
 
     expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('1');
     expect(board.style.getPropertyValue('--tc-canvas-width')).toBe('10000px');
     expect(board.style.getPropertyValue('--tc-canvas-height')).toBe('10000px');
     fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
     expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('1.25');
+    expect(canvas.scrollLeft).toBe(225);
+    expect(canvas.scrollTop).toBe(325);
     expect(screen.getByRole('button', { name: 'Reset zoom' }).textContent).toBe(
       '125%'
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Reset zoom' }));
     expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('1');
+    expect(canvas.scrollLeft).toBe(100);
+    expect(canvas.scrollTop).toBe(200);
     fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }));
     expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('0.75');
+  });
+
+  it('anchors modified-wheel zoom at the cursor', () => {
+    const { container } = render(<Canvas />);
+    const canvas = container.querySelector('.tc-canvas');
+    const board = container.querySelector('.tc-canvas-board');
+    Object.defineProperties(canvas, {
+      scrollLeft: { configurable: true, value: 100, writable: true },
+      scrollTop: { configurable: true, value: 200, writable: true },
+    });
+    vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      top: 0,
+    });
+    const wheelEvent = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 200,
+      clientY: 150,
+      ctrlKey: true,
+      deltaY: -100,
+    });
+
+    act(() => canvas.dispatchEvent(wheelEvent));
+
+    expect(wheelEvent.defaultPrevented).toBe(true);
+    expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('1.25');
+    expect(canvas.scrollLeft).toBe(175);
+    expect(canvas.scrollTop).toBe(287.5);
   });
 
   it('supports custom Canvas dimensions', () => {
@@ -160,7 +206,7 @@ describe('Canvas components', () => {
     ]);
   });
 
-  it('renders a resizable Link with an origin favicon', () => {
+  it('renders a fixed-size Link with an origin favicon', () => {
     const { container } = render(
       <Canvas>
         <Link
@@ -180,7 +226,9 @@ describe('Canvas components', () => {
     expect(container.querySelector('.tc-link-favicon img').src).toBe(
       'https://github.com/favicon.ico'
     );
-    expect(screen.getByLabelText('Resize link: Tiny Canvas')).toBeTruthy();
+    expect(container.querySelector('#repo').style.width).toBe('320px');
+    expect(screen.queryByLabelText('Resize link: Tiny Canvas')).toBeNull();
+    expect(container.querySelector('#repo .tc-resize-handle')).toBeNull();
   });
 
   it('applies optional widget config defaults before instance props', () => {
@@ -226,6 +274,7 @@ describe('Canvas components', () => {
       'http://localhost:3000/preview/settings/embedded?embedView=1#/profile';
     let documentTitle = 'Profile';
     const listeners = {};
+    const documentListeners = {};
     const history = {
       pushState: vi.fn(),
       replaceState: vi.fn(),
@@ -253,6 +302,10 @@ describe('Canvas components', () => {
       },
       querySelector: vi.fn(() => null),
       head: null,
+      addEventListener: vi.fn((type, listener) => {
+        documentListeners[type] = listener;
+      }),
+      removeEventListener: vi.fn(),
     };
     Object.defineProperty(iframe, 'contentWindow', {
       configurable: true,
@@ -264,6 +317,7 @@ describe('Canvas components', () => {
     });
 
     fireEvent.load(iframe);
+    expect(documentListeners.wheel).toBeTypeOf('function');
     expect(screen.getByText('Profile')).toBeTruthy();
     expect(screen.getByText('/settings/embedded#/profile')).toBeTruthy();
     const openLink = screen.getByRole('link', {
@@ -273,6 +327,42 @@ describe('Canvas components', () => {
       'http://localhost:3000/preview/settings/embedded#/profile'
     );
     expect(openLink.getAttribute('target')).toBe('_blank');
+
+    const canvasElement = container.querySelector('.tc-canvas');
+    Object.defineProperties(canvasElement, {
+      scrollLeft: { configurable: true, value: 0, writable: true },
+      scrollTop: { configurable: true, value: 0, writable: true },
+    });
+    vi.spyOn(canvasElement, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      top: 0,
+    });
+    vi.spyOn(iframe, 'getBoundingClientRect').mockReturnValue({
+      left: 50,
+      top: 100,
+    });
+    const preventDefault = vi.fn();
+    const stopPropagation = vi.fn();
+    act(() =>
+      documentListeners.wheel({
+        ctrlKey: true,
+        metaKey: false,
+        deltaY: -100,
+        clientX: 20,
+        clientY: 30,
+        preventDefault,
+        stopPropagation,
+      })
+    );
+    expect(preventDefault).toHaveBeenCalledOnce();
+    expect(stopPropagation).toHaveBeenCalledOnce();
+    expect(
+      container
+        .querySelector('.tc-canvas-board')
+        .style.getPropertyValue('--tc-canvas-zoom')
+    ).toBe('1.25');
+    expect(canvasElement.scrollLeft).toBe(17.5);
+    expect(canvasElement.scrollTop).toBe(32.5);
 
     href =
       'http://localhost:3000/preview/details/embedded?embedView=1&tab=activity';

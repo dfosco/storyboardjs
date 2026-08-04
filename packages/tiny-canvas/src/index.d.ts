@@ -167,15 +167,10 @@ export interface LinkProps extends Omit<BlockProps, 'children'> {
   title: string;
   /** URL text shown under the title. */
   displayUrl: string;
-  /** Initial width in pixels. Saved width takes precedence. Default: 320 */
+  /** Static card width in pixels. Default: 320 */
   width?: number;
-  /** Initial height in pixels. Saved height takes precedence. */
+  /** Optional static card height in pixels. */
   height?: number;
-  /** Minimum resizable width in pixels. Default: 240 */
-  minWidth?: number;
-  /** Minimum resizable height in pixels. Default: 72 */
-  minHeight?: number;
-  onSizeChange?: (size: Size) => void;
 }
 
 export declare function Link(props: LinkProps): ReactElement;

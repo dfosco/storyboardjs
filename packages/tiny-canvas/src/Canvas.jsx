@@ -2,7 +2,9 @@ import {
   Children,
   cloneElement,
   isValidElement,
+  useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -23,6 +25,7 @@ import {
 
 const ZOOM_LEVELS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 const DEFAULT_ZOOM_INDEX = ZOOM_LEVELS.indexOf(1);
+const WHEEL_ZOOM_THRESHOLD = 40;
 const DEFAULT_CANVAS_WIDTH = 10000;
 const DEFAULT_CANVAS_HEIGHT = 10000;
 
@@ -52,12 +55,17 @@ function Canvas({
   className,
   style,
   onPointerDown,
+  onWheel,
   onSelectionChange,
   ...rest
 }) {
   const [selectedBlockId, setSelectedBlockId] = useState(null);
   const [copyStatus, setCopyStatus] = useState('idle');
   const [zoomIndex, setZoomIndex] = useState(DEFAULT_ZOOM_INDEX);
+  const canvasRef = useRef(null);
+  const zoomIndexRef = useRef(DEFAULT_ZOOM_INDEX);
+  const wheelZoomDeltaRef = useRef(0);
+  const pendingZoomAnchorRef = useRef(null);
   const copyStatusTimer = useRef(null);
   const resetCanvas = useResetCanvas({ reload: true });
   useEffect(
@@ -73,6 +81,89 @@ function Canvas({
   const pageId = pageContext?.currentPage.id;
   const blockIds = new Set();
   const blocks = new Map();
+  const zoomAt = useCallback((nextIndex, clientX, clientY) => {
+    const canvas = canvasRef.current;
+    const resolvedIndex = Math.max(
+      0,
+      Math.min(ZOOM_LEVELS.length - 1, nextIndex)
+    );
+    const currentIndex = zoomIndexRef.current;
+    if (!canvas || resolvedIndex === currentIndex) {
+      return;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const viewportX = clientX - rect.left;
+    const viewportY = clientY - rect.top;
+    const currentZoom = ZOOM_LEVELS[currentIndex];
+    pendingZoomAnchorRef.current = {
+      canvas,
+      contentX: (canvas.scrollLeft + viewportX) / currentZoom,
+      contentY: (canvas.scrollTop + viewportY) / currentZoom,
+      viewportX,
+      viewportY,
+    };
+    zoomIndexRef.current = resolvedIndex;
+    setZoomIndex(resolvedIndex);
+  }, []);
+
+  const zoomAtViewportCenter = (nextIndex) => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    zoomAt(
+      nextIndex,
+      rect.left + canvas.clientWidth / 2,
+      rect.top + canvas.clientHeight / 2
+    );
+  };
+
+  const zoomByWheel = useCallback(
+    (deltaY, clientX, clientY) => {
+      wheelZoomDeltaRef.current -= deltaY;
+      if (Math.abs(wheelZoomDeltaRef.current) < WHEEL_ZOOM_THRESHOLD) {
+        return;
+      }
+
+      const direction = Math.sign(wheelZoomDeltaRef.current);
+      wheelZoomDeltaRef.current = 0;
+      zoomAt(zoomIndexRef.current + direction, clientX, clientY);
+    },
+    [zoomAt]
+  );
+
+  useLayoutEffect(() => {
+    const anchor = pendingZoomAnchorRef.current;
+    if (!anchor) {
+      return;
+    }
+
+    anchor.canvas.scrollLeft = anchor.contentX * zoom - anchor.viewportX;
+    anchor.canvas.scrollTop = anchor.contentY * zoom - anchor.viewportY;
+    pendingZoomAnchorRef.current = null;
+  }, [zoom]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return undefined;
+    }
+
+    const handleWheelZoom = (event) => {
+      if ((!event.ctrlKey && !event.metaKey) || event.deltaY === 0) {
+        return;
+      }
+
+      event.preventDefault();
+      zoomByWheel(event.deltaY, event.clientX, event.clientY);
+    };
+    canvas.addEventListener('wheel', handleWheelZoom, { passive: false });
+    return () => canvas.removeEventListener('wheel', handleWheelZoom);
+  }, [zoomByWheel]);
+
   const contextValue = useMemo(
     () => ({
       selectedBlockId,
@@ -80,8 +171,9 @@ function Canvas({
         setSelectedBlockId(nextBlockId);
         onSelectionChange?.(nextBlockId);
       },
+      zoomByWheel,
     }),
-    [onSelectionChange, selectedBlockId]
+    [onSelectionChange, selectedBlockId, zoomByWheel]
   );
   const renderedChildren = Children.map(children, (child, index) => {
     if (child === null || child === undefined || child === false) {
@@ -136,6 +228,7 @@ function Canvas({
     <CanvasContext.Provider value={contextValue}>
       <main
         {...rest}
+        ref={canvasRef}
         className={['tc-canvas', className].filter(Boolean).join(' ')}
         data-dotted={showDots || undefined}
         data-color-mode={colorMode !== 'auto' ? colorMode : undefined}
@@ -149,6 +242,7 @@ function Canvas({
           }
           onPointerDown?.(event);
         }}
+        onWheel={onWheel}
       >
         <PageSelector title={title} />
         <div
@@ -173,7 +267,9 @@ function Canvas({
               className="tc-canvas-control tc-canvas-zoom-button"
               aria-label="Zoom out"
               disabled={zoomIndex === 0}
-              onClick={() => setZoomIndex((index) => Math.max(0, index - 1))}
+              onClick={() =>
+                zoomAtViewportCenter(zoomIndexRef.current - 1)
+              }
             >
               −
             </button>
@@ -181,7 +277,7 @@ function Canvas({
               type="button"
               className="tc-canvas-control tc-canvas-zoom-value"
               aria-label="Reset zoom"
-              onClick={() => setZoomIndex(DEFAULT_ZOOM_INDEX)}
+              onClick={() => zoomAtViewportCenter(DEFAULT_ZOOM_INDEX)}
             >
               {Math.round(zoom * 100)}%
             </button>
@@ -191,9 +287,7 @@ function Canvas({
               aria-label="Zoom in"
               disabled={zoomIndex === ZOOM_LEVELS.length - 1}
               onClick={() =>
-                setZoomIndex((index) =>
-                  Math.min(ZOOM_LEVELS.length - 1, index + 1)
-                )
+                zoomAtViewportCenter(zoomIndexRef.current + 1)
               }
             >
               +

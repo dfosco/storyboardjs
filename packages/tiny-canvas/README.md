@@ -137,7 +137,8 @@ element produces a clear runtime error.
   scrolling, and disables mobile pull-to-refresh.
 - **Room to move.** Canvas provides a 10,000×10,000 scrollable board by default.
 - **Built-in zoom.** Bottom-left controls scale board content from 50% to 200%
-  without moving canvas chrome.
+  around the viewport center. Ctrl/⌘+wheel and trackpad pinch zoom around the
+  cursor.
 - **Agent handoff.** **Copy changes** copies changed coordinates and sizes as
   JSON with component, key/index, and persistence identity.
 - **Built-in selection.** Clicking or focusing a block selects it. Clicking the
@@ -266,7 +267,7 @@ width and height.
 
 ### `Link`
 
-`Link` renders a draggable, resizable link card. It loads `/favicon.ico` from
+`Link` renders a draggable, fixed-size link card. It loads `/favicon.ico` from
 the destination origin; if that image fails, a neutral globe remains visible.
 The title and displayed URL are explicit so the component never needs to fetch
 cross-origin page metadata.
@@ -278,9 +279,11 @@ cross-origin page metadata.
   displayUrl="github.com/dfosco/tiny-canvas"
   x={48}
   y={48}
-  width={320}
 />
 ```
+
+Use `width` or `height` for a static size override. Link has no resize handle
+and does not persist size changes.
 
 ### `useResetCanvas`
 

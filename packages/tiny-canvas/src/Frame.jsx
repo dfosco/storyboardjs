@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import ResizableBlock from './ResizableBlock';
+import { CanvasContext } from './CanvasContext';
 import { authorizeCanvasChild } from './canvasChild';
 import {
   buildFrameDisplayRoute,
@@ -30,6 +31,7 @@ function Frame({
   ...blockProps
 }) {
   const iframeRef = useRef(null);
+  const canvas = useContext(CanvasContext);
   const navigationCleanupRef = useRef(null);
   const sourceKey = `${String(route)}\n${title}\n${prepend?.value ?? ''}\n${prepend?.visible ?? ''}\n${apend?.value ?? ''}\n${apend?.visible ?? ''}`;
   const iframeSrc = useMemo(
@@ -101,6 +103,23 @@ function Frame({
         };
       const observedPushState = observeHistory(pushState);
       const observedReplaceState = observeHistory(replaceState);
+      const forwardWheelZoom = (event) => {
+        if (
+          (!event.ctrlKey && !event.metaKey) ||
+          !canvas?.zoomByWheel
+        ) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        const iframeRect = iframe.getBoundingClientRect();
+        canvas.zoomByWheel(
+          event.deltaY,
+          iframeRect.left + event.clientX,
+          iframeRect.top + event.clientY
+        );
+      };
       frameHistory.pushState = observedPushState;
       frameHistory.replaceState = observedReplaceState;
       observer?.observe(observerTarget, {
@@ -114,6 +133,10 @@ function Frame({
         'currententrychange',
         syncNavigation
       );
+      frameDocument.addEventListener('wheel', forwardWheelZoom, {
+        capture: true,
+        passive: false,
+      });
 
       navigationCleanupRef.current = () => {
         observer?.disconnect();
@@ -129,6 +152,7 @@ function Frame({
           'currententrychange',
           syncNavigation
         );
+        frameDocument.removeEventListener('wheel', forwardWheelZoom, true);
       };
     } catch {
       navigationCleanupRef.current = null;

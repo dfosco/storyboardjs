@@ -1,4 +1,4 @@
-import ResizableBlock from './ResizableBlock';
+import Block from './Block';
 import { authorizeCanvasChild } from './canvasChild';
 import { getLinkData } from './linkUrl';
 
@@ -10,16 +10,26 @@ function text(value, propName) {
   return value;
 }
 
+function dimension(value, propName) {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new TypeError(`Link ${propName} must be a positive finite number.`);
+  }
+
+  return value;
+}
+
 function Link({
   url,
   title,
   displayUrl,
   width,
   height,
-  minWidth = 240,
-  minHeight = 72,
-  onSizeChange,
   className,
+  style,
   ...blockProps
 }) {
   const { href, faviconHref } = getLinkData(url);
@@ -27,17 +37,16 @@ function Link({
   const resolvedDisplayUrl = text(displayUrl, 'displayUrl');
 
   return (
-    <ResizableBlock
+    <Block
       {...blockProps}
-      componentName="Link"
-      resizeLabel={`Resize link: ${resolvedTitle}`}
-      defaultWidth={320}
-      width={width}
-      height={height}
-      minWidth={minWidth}
-      minHeight={minHeight}
-      onSizeChange={onSizeChange}
       className={['tc-link-block', className].filter(Boolean).join(' ')}
+      style={{
+        ...style,
+        width: dimension(width, 'width') ?? 320,
+        ...(height === undefined
+          ? {}
+          : { height: dimension(height, 'height') }),
+      }}
     >
       <article className="tc-link">
         <div className="tc-link-favicon" aria-hidden="true">
@@ -72,7 +81,7 @@ function Link({
           <span className="tc-link-url">{resolvedDisplayUrl}</span>
         </div>
       </article>
-    </ResizableBlock>
+    </Block>
   );
 }
 
