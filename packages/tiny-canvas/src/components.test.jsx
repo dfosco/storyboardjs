@@ -17,11 +17,16 @@ import Link from './Link.jsx';
 import Mark from './Mark.jsx';
 import Note from './Note.jsx';
 
-function setPageManifest(pages, widgets = {}) {
+function setPageManifest(pages, widgets = {}, environment = 'prod') {
   const script = document.createElement('script');
   script.id = 'tiny-canvas-pages';
   script.type = 'application/json';
-  script.textContent = JSON.stringify({ pagesDir: '/canvas', pages, widgets });
+  script.textContent = JSON.stringify({
+    pagesDir: '/canvas',
+    pages,
+    widgets,
+    environment,
+  });
   document.head.append(script);
 }
 
@@ -273,8 +278,8 @@ describe('Canvas components', () => {
   it('applies optional widget config defaults before instance props', () => {
     setPageManifest([], {
       Frame: {
-        prepend: { value: '/preview', visible: false },
-        apend: { value: '/embedded', visible: true },
+        prepend: [{ value: '/preview', visible: false }],
+        append: [{ value: '/embedded', visible: true }],
       },
       Note: { color: 'blue', width: 310 },
     });
@@ -296,6 +301,31 @@ describe('Canvas components', () => {
     expect(container.querySelector('.tc-note').dataset.color).toBe('pink');
   });
 
+  it('applies only Frame affixes for the injected environment', () => {
+    setPageManifest(
+      [],
+      {
+        Frame: {
+          prepend: [
+            { value: '/development', visible: false, env: 'dev' },
+            { value: '/previews/branch', visible: false, env: 'prod' },
+          ],
+        },
+      },
+      'dev'
+    );
+
+    const { container } = render(
+      <Canvas>
+        <Frame id="frame" route="/settings" title="Settings" />
+      </Canvas>
+    );
+
+    expect(container.querySelector('iframe').getAttribute('src')).toBe(
+      '/development/settings?embedView=1'
+    );
+  });
+
   it('tracks same-origin Frame title and route navigation', () => {
     const { container } = render(
       <Canvas>
@@ -303,8 +333,8 @@ describe('Canvas components', () => {
           id="frame"
           route="/settings"
           title="Initial title"
-          prepend={{ value: '/preview', visible: false }}
-          apend={{ value: '/embedded', visible: true }}
+          prepend={[{ value: '/preview', visible: false }]}
+          append={[{ value: '/embedded', visible: true }]}
         />
       </Canvas>
     );

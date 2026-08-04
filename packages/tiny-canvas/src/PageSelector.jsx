@@ -30,6 +30,10 @@ export function getCanvasConfig() {
   return getPageManifest();
 }
 
+export function getCanvasEnvironment(manifest = getCanvasConfig()) {
+  return manifest?.environment === 'dev' ? 'dev' : 'prod';
+}
+
 export function getCanvasPageContext(manifest = getCanvasConfig()) {
   if (!manifest) {
     return null;

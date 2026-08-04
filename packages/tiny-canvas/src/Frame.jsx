@@ -2,6 +2,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import ResizableBlock from './ResizableBlock';
 import { CanvasContext } from './CanvasContext';
 import { authorizeCanvasChild } from './canvasChild';
+import { getCanvasEnvironment } from './PageSelector';
 import {
   buildFrameDisplayRoute,
   buildFrameHref,
@@ -18,6 +19,7 @@ function Frame({
   route,
   title,
   prepend,
+  append,
   apend,
   width,
   height,
@@ -33,23 +35,22 @@ function Frame({
   const iframeRef = useRef(null);
   const canvas = useContext(CanvasContext);
   const navigationCleanupRef = useRef(null);
-  const sourceKey = `${String(route)}\n${title}\n${prepend?.value ?? ''}\n${prepend?.visible ?? ''}\n${apend?.value ?? ''}\n${apend?.visible ?? ''}`;
+  const environment = getCanvasEnvironment();
+  const affixOptions = { prepend, append, apend, environment };
+  const sourceKey = `${String(route)}\n${title}\n${environment}\n${JSON.stringify(prepend)}\n${JSON.stringify(append ?? apend)}`;
   const iframeSrc = useMemo(
     () =>
-      buildFrameHref(route, window.location.href, {
-        prepend,
-        apend,
-      }),
-    [apend, prepend, route]
+      buildFrameHref(route, window.location.href, affixOptions),
+    [apend, append, environment, prepend, route]
   );
   const initialNavigation = useMemo(
     () => ({
       sourceKey,
       title,
-      route: buildFrameDisplayRoute(route, { prepend, apend }),
+      route: buildFrameDisplayRoute(route, affixOptions),
       href: buildFrameOpenHref(iframeSrc),
     }),
-    [apend, iframeSrc, prepend, route, sourceKey, title]
+    [apend, append, environment, iframeSrc, prepend, route, sourceKey, title]
   );
   const [navigation, setNavigation] = useState(initialNavigation);
   const currentNavigation =
@@ -69,7 +70,7 @@ function Frame({
         title: iframe.contentDocument?.title?.trim() || title,
         route: buildFrameNavigationDisplayRoute(
           navigationHref,
-          { prepend, apend },
+          affixOptions,
           window.location.href
         ),
         href: buildFrameOpenHref(navigationHref),

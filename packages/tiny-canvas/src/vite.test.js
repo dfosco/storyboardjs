@@ -30,7 +30,7 @@ function createProject() {
       target,
       file === 'details.tsx'
         ? 'export default function Page() { return <Canvas title="Specs" /> }'
-        : 'export default function Page() {}'
+        : 'export default function Page() { return <Canvas /> }'
     );
   }
   return root;
@@ -47,8 +47,8 @@ describe('tinyCanvas Vite plugin', () => {
     const root = createProject();
     const widgets = {
       Frame: {
-        prepend: { value: '/preview', visible: false },
-        apend: { value: '/embedded', visible: true },
+        prepend: [{ value: '/preview', visible: false }],
+        append: [{ value: '/embedded', visible: true }],
       },
       Note: { color: 'blue' },
     };
@@ -85,7 +85,10 @@ describe('tinyCanvas Vite plugin', () => {
     temporaryDirectories.push(root);
     const pages = join(root, 'src/pages/tiny-board');
     mkdirSync(pages, { recursive: true });
-    writeFileSync(join(pages, 'roadmap.tsx'), 'export default function Page() {}');
+    writeFileSync(
+      join(pages, 'roadmap.tsx'),
+      'export default function Page() { return <Canvas /> }'
+    );
 
     const plugin = tinyCanvas({ pagesDir: '/tiny-board' });
     plugin.configResolved({ root, base: '/' });
@@ -98,6 +101,57 @@ describe('tinyCanvas Vite plugin', () => {
         href: '/tiny-board/roadmap',
       },
     ]);
+  });
+
+  it('separates filesystem discovery from router definitions', () => {
+    const root = mkdtempSync(join(tmpdir(), 'tiny-canvas-pages-'));
+    temporaryDirectories.push(root);
+    const pages = join(root, 'src/routes/tiny-board');
+    mkdirSync(pages, { recursive: true });
+    writeFileSync(
+      join(pages, 'route.tsx'),
+      'export const route = createRoute({ path: "tiny-board" })'
+    );
+    writeFileSync(
+      join(pages, 'TinyBoardPage.tsx'),
+      'export default function Page() { return <Canvas title="Board one" /> }'
+    );
+    writeFileSync(
+      join(pages, 'TinyBoardPage2.tsx'),
+      'export default function Page() { return <Canvas title="Board two" /> }'
+    );
+
+    const plugin = tinyCanvas({
+      pagesPath: 'src/routes/tiny-board',
+      routeBase: '/tiny-board',
+      resolveRoute: ({ relativePath }) =>
+        relativePath === 'TinyBoardPage.tsx'
+          ? '/tiny-board'
+          : '/tiny-board/second',
+    });
+    plugin.configResolved({ root, base: '/preview/', command: 'serve' });
+    const manifest = JSON.parse(plugin.transformIndexHtml()[0].children);
+
+    expect(manifest.environment).toBe('dev');
+    expect(manifest.pages).toEqual([
+      {
+        id: '/tiny-board',
+        title: 'Board one',
+        href: '/preview/tiny-board',
+      },
+      {
+        id: '/tiny-board/second',
+        title: 'Board two',
+        href: '/preview/tiny-board/second',
+      },
+    ]);
+
+    const virtualId = plugin.resolveId('virtual:tiny-canvas-pages');
+    const registry = plugin.load(virtualId);
+    expect(registry).toContain('export const pages=Object.freeze');
+    expect(registry).toContain('TinyBoardPage.tsx');
+    expect(registry).toContain('TinyBoardPage2.tsx');
+    expect(registry).not.toContain('route.tsx');
   });
 
   it('rejects directory traversal', () => {

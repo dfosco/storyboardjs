@@ -27,11 +27,11 @@ export default defineConfig({
     react(),
     mdx(),
     tinyCanvas({
-      pagesDir: '/canvas',
+      routeBase: '/canvas',
       widgets: {
         Frame: {
-          prepend: { value: '/tiny-canvas', visible: false },
-          apend: { value: 'canvas', visible: true },
+          prepend: [{ value: '/tiny-canvas', visible: false }],
+          append: [{ value: 'canvas', visible: true }],
         },
       },
     }),

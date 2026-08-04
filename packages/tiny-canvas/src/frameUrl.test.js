@@ -92,10 +92,10 @@ describe('buildFrameHref', () => {
     expect(result.startsWith('/')).toBe(true);
   });
 
-  it('adds prepend and apend values to the URL pathname', () => {
+  it('adds ordered prepend and append entries to the URL pathname', () => {
     const result = buildFrameHref('/settings?tab=profile#/account', BASE, {
-      prepend: { value: '/preview', visible: false },
-      apend: { value: '/embedded', visible: true },
+      prepend: [{ value: '/preview', visible: false }],
+      append: [{ value: '/embedded', visible: true }],
     });
     const url = new URL(result, ORIGIN);
 
@@ -107,8 +107,8 @@ describe('buildFrameHref', () => {
 
   it('hides invisible affixes only from the displayed route', () => {
     const options = {
-      prepend: { value: '/preview', visible: false },
-      apend: { value: '/embedded', visible: true },
+      prepend: [{ value: '/preview', visible: false }],
+      append: [{ value: '/embedded', visible: true }],
     };
 
     expect(buildFrameDisplayRoute('/settings?tab=profile', options, BASE)).toBe(
@@ -124,7 +124,7 @@ describe('buildFrameHref', () => {
     expect(
       buildFrameDisplayRoute(
         '/settings?tab=profile',
-        { prepend: { value: '/preview', visible: false } },
+        { prepend: [{ value: '/preview', visible: false }] },
         BASE
       )
     ).toBe('/settings?tab=profile');
@@ -133,11 +133,72 @@ describe('buildFrameHref', () => {
   it('validates path affix values', () => {
     expect(() =>
       buildFrameHref('/settings', BASE, {
-        prepend: { value: '/preview', visible: 'no' },
+        prepend: [{ value: '/preview', visible: 'no' }],
       })
     ).toThrow(
-      'Frame prepend must contain a string value and boolean visible.'
+      'Frame prepend entries must contain a string value, boolean visible, and optional dev or prod env.'
     );
+  });
+
+  it('applies entries for the active environment and entries without env', () => {
+    const affixes = {
+      prepend: [
+        { value: '/dev', visible: false, env: 'dev' },
+        { value: '/previews/branch', visible: false, env: 'prod' },
+        { value: '/shared', visible: true },
+      ],
+    };
+
+    expect(
+      buildFrameHref('/', BASE, { ...affixes, environment: 'dev' })
+    ).toBe('/dev/shared/?embedView=1');
+    expect(
+      buildFrameHref('/', BASE, { ...affixes, environment: 'prod' })
+    ).toBe('/previews/branch/shared/?embedView=1');
+    expect(
+      buildFrameDisplayRoute('/', { ...affixes, environment: 'prod' }, BASE)
+    ).toBe('/shared/');
+  });
+
+  it('adds leading-question-mark entries as query params, not encoded pathname text', () => {
+    const result = buildFrameHref('#/orgs/github/security', BASE, {
+      append: [{ value: '?hideTooling=1', visible: false }],
+    });
+    const url = new URL(result, ORIGIN);
+
+    expect(url.pathname).toBe('/orgs/cli/security');
+    expect(url.pathname).not.toContain('%3F');
+    expect(url.searchParams.get('hideTooling')).toBe('1');
+    expect(url.hash).toBe('#/orgs/github/security');
+  });
+
+  it('preserves a deployed preview subdirectory for hash navigation', () => {
+    const preview = `${ORIGIN}/previews/e0dd6f5860a2dc34c3f9220b8725450c/`;
+    const result = buildFrameHref(
+      '#/orgs/github/security?hideTooling=1',
+      preview,
+      {
+        append: [
+          { value: '?hideTooling=1', visible: false, env: 'prod' },
+        ],
+        environment: 'prod',
+      }
+    );
+    const url = new URL(result, ORIGIN);
+
+    expect(url.pathname).toBe(
+      '/previews/e0dd6f5860a2dc34c3f9220b8725450c/'
+    );
+    expect(url.pathname).not.toContain('%3F');
+    expect(url.hash).toBe('#/orgs/github/security?hideTooling=1');
+  });
+
+  it('accepts the legacy apend spelling at runtime', () => {
+    expect(
+      buildFrameHref('/settings', BASE, {
+        apend: { value: '/embedded', visible: true },
+      })
+    ).toBe('/settings/embedded?embedView=1');
   });
 
   it('displays the current iframe route without hidden affixes or embedView', () => {
@@ -145,8 +206,8 @@ describe('buildFrameHref', () => {
       buildFrameNavigationDisplayRoute(
         `${ORIGIN}/preview/settings/embedded?embedView=1&tab=profile#/account`,
         {
-          prepend: { value: '/preview', visible: false },
-          apend: { value: '/embedded', visible: true },
+          prepend: [{ value: '/preview', visible: false }],
+          append: [{ value: '/embedded', visible: true }],
         },
         BASE
       )

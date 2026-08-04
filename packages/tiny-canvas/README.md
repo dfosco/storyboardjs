@@ -65,11 +65,14 @@ export default defineConfig({
   plugins: [
     react(),
     tinyCanvas({
-      pagesDir: '/canvas',
+      routeBase: '/canvas',
       widgets: {
         Frame: {
-          prepend: { value: '/preview', visible: false },
-          apend: { value: '/embedded', visible: true },
+          prepend: [
+            { value: '/dev-proxy', visible: false, env: 'dev' },
+            { value: '/previews/branch', visible: false, env: 'prod' },
+          ],
+          append: [{ value: '/embedded', visible: true }],
         },
         Note: { color: 'blue' },
       },
@@ -83,7 +86,8 @@ export default defineConfig({
 props written directly on a component take precedence. Identity and content
 props (`id`, `blockId`, and `children`) are never inherited from widget config.
 
-`pagesDir` defaults to `/canvas` and maps to `src/pages/canvas`. For example:
+`routeBase` defaults to `/canvas`; `pagesPath` defaults to the matching
+`src/pages/canvas` directory. For example:
 
 ```text
 src/pages/canvas/index.tsx       → /canvas
@@ -106,20 +110,44 @@ export default function DetailsPage() {
 }
 ```
 
-Configure another directory with `tinyCanvas({ pagesDir: '/tiny-board' })`.
-Static `.tsx` files are discovered recursively; dynamic route files and test
-files are skipped. A static `title` prop on `Canvas` overrides the filename in
-the selector. Plugin `titles` overrides take highest priority:
+For routers that use another filesystem convention, configure discovery and URL
+routing separately. `resolveRoute` can map each discovered file to the route
+actually registered by the host router:
 
 ```ts
 tinyCanvas({
-  pagesDir: '/tiny-board',
+  pagesPath: 'src/routes/tiny-board',
+  routeBase: '/tiny-board',
+  resolveRoute: ({ relativePath, defaultRoute }) => {
+    if (relativePath === 'TinyBoardPage.tsx') return '/tiny-board'
+    if (relativePath === 'TinyBoardPage2.tsx') return '/tiny-board/second'
+    return defaultRoute
+  },
   titles: {
     '/tiny-board': 'Overview',
-    '/tiny-board/review': 'Review',
+    '/tiny-board/second': 'Review',
   },
 })
 ```
+
+Only static `.tsx` files containing a `<Canvas>` are discovered; route
+definition files, dynamic route files, tests, and specs are skipped. A static
+`title` prop on `Canvas` overrides the filename in the selector. Plugin
+`titles` overrides take highest priority. `pagesDir` remains as a deprecated
+alias for `routeBase`.
+
+The router-agnostic virtual registry exposes the same discovered pages as lazy
+module loaders. Use it when constructing routes for React Router, TanStack
+Router, or another host router:
+
+```ts
+import pages from 'virtual:tiny-canvas-pages'
+
+// [{ id, title, href, load: () => import(pageFile) }]
+```
+
+Tiny Canvas does not mutate the host router. Each registry route must still be
+registered by that router.
 
 `Canvas` only accepts authorized canvas components. Use `Block` for arbitrary
 content, `Frame` for same-origin route previews, `Note` for sticky notes,
@@ -215,8 +243,11 @@ the current application:
   <Frame
     route="/?urlstate=security#/orgs/cli/security"
     title="Security overview"
-    prepend={{ value: '/preview', visible: false }}
-    apend={{ value: '/embedded', visible: true }}
+    prepend={[
+      { value: '/dev-proxy', visible: false, env: 'dev' },
+      { value: '/previews/branch', visible: false, env: 'prod' },
+    ]}
+    append={[{ value: '/embedded', visible: true }]}
     x={48}
     y={48}
     width={1270}
@@ -229,8 +260,9 @@ the current application:
 | --- | --- | --- | --- |
 | `route` | `string \| URL` | — | Same-origin URL, path, query, or hash route loaded by the iframe. |
 | `title` | `string` | — | Initial accessible iframe title and header label. Same-origin navigation replaces it with the loaded document title. |
-| `prepend` | `{ value: string, visible: boolean }` | — | Add `value` before the URL pathname. `visible: false` hides it only from the frame header. |
-| `apend` | `{ value: string, visible: boolean }` | — | Add `value` after the URL pathname. `visible: false` hides it only from the frame header. |
+| `prepend` | `{ value, visible, env? }[]` | — | Add ordered entries before the URL pathname. |
+| `append` | `{ value, visible, env? }[]` | — | Add ordered entries after the URL pathname. A leading `?` adds query parameters without pathname encoding. |
+| `apend` | object or array | — | Deprecated runtime alias for `append`. |
 | `width` | `number` | `1270` | Initial width in pixels. Saved width takes precedence. |
 | `height` | `number` | `776` | Initial height in pixels. Saved height takes precedence. |
 | `minWidth` | `number` | `320` | Minimum width while resizing. |
@@ -241,8 +273,11 @@ the current application:
 Select a frame, then drag its lower-right handle or use the handle's arrow keys
 to resize it. The embedded application can use the `embedView` query parameter
 to suppress redirects or chrome that should not appear inside the preview.
-Both path affixes always affect the iframe URL. Their `visible` flags only
+Affixes without `env` apply everywhere. `env: 'dev'` applies during Vite serve;
+`env: 'prod'` applies during production builds. Their `visible` flags only
 control whether each value appears in the route text shown in the title bar.
+Environment targeting uses the manifest injected by the Tiny Canvas Vite
+plugin; without that plugin, Frame defaults to `prod`.
 The title bar follows same-origin iframe navigation and includes an **Open in
 new tab** link for the current URL, with `embedView` removed.
 

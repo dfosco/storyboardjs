@@ -4,7 +4,7 @@
 import React from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import PageSelector from './PageSelector.jsx';
+import PageSelector, { getCanvasEnvironment } from './PageSelector.jsx';
 
 function setManifest(pages) {
   document.getElementById('tiny-canvas-pages')?.remove();
@@ -22,6 +22,17 @@ afterEach(() => {
 });
 
 describe('PageSelector', () => {
+  it('reads the environment injected by the Vite plugin', () => {
+    setManifest([]);
+    expect(getCanvasEnvironment()).toBe('prod');
+
+    document.getElementById('tiny-canvas-pages').textContent = JSON.stringify({
+      environment: 'dev',
+      pages: [],
+    });
+    expect(getCanvasEnvironment()).toBe('dev');
+  });
+
   it('renders sibling pages and marks the current TSX route', () => {
     window.history.replaceState({}, '', '/app/canvas/details');
     setManifest([

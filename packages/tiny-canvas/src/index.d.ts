@@ -87,10 +87,12 @@ export interface BlockProps
 export declare function Block(props: BlockProps): ReactElement;
 
 export interface FramePathAffix {
-  /** String added to the iframe URL pathname. */
+  /** String added to the iframe URL. A leading ? adds query parameters. */
   value: string;
   /** Show this value in the Frame header route. */
   visible: boolean;
+  /** Apply only during Vite development or production builds. Omit for both. */
+  env?: 'dev' | 'prod';
 }
 
 export interface FrameProps extends Omit<BlockProps, 'children'> {
@@ -98,10 +100,12 @@ export interface FrameProps extends Omit<BlockProps, 'children'> {
   route: string | URL;
   /** Accessible frame title shown in the title bar. */
   title: string;
-  /** String added before the iframe URL pathname. */
-  prepend?: FramePathAffix;
-  /** String added after the iframe URL pathname. */
-  apend?: FramePathAffix;
+  /** Ordered entries added before the iframe URL pathname. */
+  prepend?: readonly FramePathAffix[];
+  /** Ordered entries added after the iframe URL pathname. */
+  append?: readonly FramePathAffix[];
+  /** @deprecated Use append. Legacy objects and arrays remain accepted at runtime. */
+  apend?: FramePathAffix | readonly FramePathAffix[];
   /** Initial frame width in pixels. A saved width takes precedence. Default: 1270 */
   width?: number;
   /** Initial frame height in pixels. A saved height takes precedence. Default: 776 */

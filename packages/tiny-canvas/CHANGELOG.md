@@ -1,5 +1,19 @@
 # @dfosco/tiny-canvas
 
+## 0.14.0
+
+### Minor Changes
+
+- Separate Canvas page filesystem discovery (`pagesPath`) from browser routing
+  (`routeBase` and `resolveRoute`) and expose discovered lazy modules through
+  `virtual:tiny-canvas-pages` for integration with any host router.
+- Change Frame `prepend` and corrected `append` affixes to ordered arrays, with
+  optional `dev`/`prod` environment targeting. Keep `apend` as a deprecated
+  runtime alias.
+- Treat leading-question-mark append entries as query parameters instead of
+  encoding them into the pathname as `%3F`.
+- Keep Frame, Note, and Mark resizing accurate at non-default Canvas zoom.
+
 ## 0.13.0
 
 ### Minor Changes
