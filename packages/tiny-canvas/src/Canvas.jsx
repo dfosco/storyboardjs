@@ -21,6 +21,9 @@ import {
   getCanvasChanges,
 } from './utils';
 
+const ZOOM_LEVELS = [0.5, 0.75, 1, 1.25, 1.5, 2];
+const DEFAULT_ZOOM_INDEX = ZOOM_LEVELS.indexOf(1);
+
 function Canvas({
   children,
   title,
@@ -42,6 +45,7 @@ function Canvas({
 }) {
   const [selectedBlockId, setSelectedBlockId] = useState(null);
   const [copyStatus, setCopyStatus] = useState('idle');
+  const [zoomIndex, setZoomIndex] = useState(DEFAULT_ZOOM_INDEX);
   const copyStatusTimer = useRef(null);
   const resetCanvas = useResetCanvas({ reload: true });
   useEffect(
@@ -49,6 +53,7 @@ function Canvas({
     []
   );
   const showDots = dotted || grid;
+  const zoom = ZOOM_LEVELS[zoomIndex];
   const canvasConfig = getCanvasConfig();
   const pageContext = getCanvasPageContext(canvasConfig);
   const pageId = pageContext?.currentPage.id;
@@ -132,51 +137,91 @@ function Canvas({
         }}
       >
         <PageSelector title={title} />
-        {renderedChildren}
-        {resettable || copyable ? (
-          <div className="tc-canvas-controls tc-no-drag">
-            {resettable ? (
-              <button
-                type="button"
-                className="tc-canvas-control"
-                onClick={resetCanvas}
-              >
-                {resetLabel}
-              </button>
-            ) : null}
-            {copyable ? (
-              <button
-                type="button"
-                className="tc-canvas-control"
-                onClick={async () => {
-                  const changes = getCanvasChanges(blocks);
-                  const text = formatCanvasChanges(changes);
-                  try {
-                    await writeClipboardText(text);
-                  } catch (error) {
-                    console.error('Error copying canvas changes:', error);
-                    setCopyStatus('failed');
-                    return;
-                  }
-
-                  setCopyStatus('copied');
-                  onCopyChanges?.(changes, text);
-                  clearTimeout(copyStatusTimer.current);
-                  copyStatusTimer.current = setTimeout(
-                    () => setCopyStatus('idle'),
-                    1600
-                  );
-                }}
-              >
-                {copyStatus === 'copied'
-                  ? copiedLabel
-                  : copyStatus === 'failed'
-                    ? 'Copy failed'
-                    : copyLabel}
-              </button>
-            ) : null}
+        <div
+          className="tc-canvas-board"
+          style={{ '--tc-canvas-zoom': zoom }}
+          onPointerDown={(event) => {
+            if (event.target === event.currentTarget) {
+              contextValue.selectBlock(null);
+            }
+          }}
+        >
+          {renderedChildren}
+        </div>
+        <div className="tc-canvas-controls tc-no-drag">
+          <div className="tc-canvas-zoom" role="group" aria-label="Canvas zoom">
+            <button
+              type="button"
+              className="tc-canvas-control tc-canvas-zoom-button"
+              aria-label="Zoom out"
+              disabled={zoomIndex === 0}
+              onClick={() => setZoomIndex((index) => Math.max(0, index - 1))}
+            >
+              −
+            </button>
+            <button
+              type="button"
+              className="tc-canvas-control tc-canvas-zoom-value"
+              aria-label="Reset zoom"
+              onClick={() => setZoomIndex(DEFAULT_ZOOM_INDEX)}
+            >
+              {Math.round(zoom * 100)}%
+            </button>
+            <button
+              type="button"
+              className="tc-canvas-control tc-canvas-zoom-button"
+              aria-label="Zoom in"
+              disabled={zoomIndex === ZOOM_LEVELS.length - 1}
+              onClick={() =>
+                setZoomIndex((index) =>
+                  Math.min(ZOOM_LEVELS.length - 1, index + 1)
+                )
+              }
+            >
+              +
+            </button>
           </div>
-        ) : null}
+          {resettable ? (
+            <button
+              type="button"
+              className="tc-canvas-control"
+              onClick={resetCanvas}
+            >
+              {resetLabel}
+            </button>
+          ) : null}
+          {copyable ? (
+            <button
+              type="button"
+              className="tc-canvas-control"
+              onClick={async () => {
+                const changes = getCanvasChanges(blocks);
+                const text = formatCanvasChanges(changes);
+                try {
+                  await writeClipboardText(text);
+                } catch (error) {
+                  console.error('Error copying canvas changes:', error);
+                  setCopyStatus('failed');
+                  return;
+                }
+
+                setCopyStatus('copied');
+                onCopyChanges?.(changes, text);
+                clearTimeout(copyStatusTimer.current);
+                copyStatusTimer.current = setTimeout(
+                  () => setCopyStatus('idle'),
+                  1600
+                );
+              }}
+            >
+              {copyStatus === 'copied'
+                ? copiedLabel
+                : copyStatus === 'failed'
+                  ? 'Copy failed'
+                  : copyLabel}
+            </button>
+          ) : null}
+        </div>
       </main>
     </CanvasContext.Provider>
   );

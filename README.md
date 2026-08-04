@@ -44,6 +44,7 @@ produces a clear runtime error.
 - **Position with props.** Set initial placement directly with `x` and `y`.
 - **Persistent layout.** Dragged coordinates and resized frame dimensions are
   restored from localStorage and take precedence over initial props.
+- **Built-in zoom.** Bottom-left controls scale board content from 50% to 200%.
 - **Built-in selection.** Clicking or focusing a block selects it. Clicking the
   canvas background or pressing Escape clears selection.
 - **Same-origin previews.** `Frame` accepts relative paths, query strings,
@@ -119,7 +120,7 @@ the current application:
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `route` | `string \| URL` | — | Same-origin URL, path, query, or hash route loaded by the iframe. |
-| `title` | `string` | — | Accessible iframe title shown in the frame header. |
+| `title` | `string` | — | Initial accessible iframe title. Same-origin navigation updates it from the loaded document title. |
 | `width` | `number` | `640` | Initial width in pixels. Saved width takes precedence. |
 | `height` | `number` | `480` | Initial height in pixels. Saved height takes precedence. |
 | `minWidth` | `number` | `320` | Minimum width while resizing. |
@@ -129,7 +130,8 @@ the current application:
 
 Select a frame, then drag its lower-right handle or use the handle's arrow keys
 to resize it. The embedded application can use the `embedView` query parameter
-to suppress redirects or chrome that should not appear inside the preview.
+to suppress redirects or chrome that should not appear inside the preview. The
+header follows same-origin navigation and links the current URL in a new tab.
 
 ### `useResetCanvas`
 

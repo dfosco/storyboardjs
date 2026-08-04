@@ -73,7 +73,48 @@ body:has(.tc-canvas) {
   inset-block-end: var(--base-size-16, 16px);
   inset-inline-start: var(--base-size-16, 16px);
   display: flex;
+  flex-wrap: wrap;
   gap: var(--base-size-8, 8px);
+  max-inline-size: calc(100vw - var(--base-size-32, 32px));
+}
+
+.tc-canvas-board {
+  position: relative;
+  min-inline-size: 100%;
+  min-block-size: 100%;
+  zoom: var(--tc-canvas-zoom, 1);
+}
+
+.tc-canvas-zoom {
+  display: inline-flex;
+}
+
+.tc-canvas-zoom .tc-canvas-control {
+  border-radius: 0;
+}
+
+.tc-canvas-zoom .tc-canvas-control:first-child {
+  border-start-start-radius: var(--borderRadius-medium, 6px);
+  border-end-start-radius: var(--borderRadius-medium, 6px);
+}
+
+.tc-canvas-zoom .tc-canvas-control:last-child {
+  border-start-end-radius: var(--borderRadius-medium, 6px);
+  border-end-end-radius: var(--borderRadius-medium, 6px);
+}
+
+.tc-canvas-zoom .tc-canvas-control + .tc-canvas-control {
+  margin-inline-start: -1px;
+}
+
+.tc-canvas-zoom-button {
+  min-inline-size: 36px;
+  font-size: 18px;
+}
+
+.tc-canvas-zoom-value {
+  min-inline-size: 58px;
+  font-variant-numeric: tabular-nums;
 }
 
 .tc-canvas-control {
@@ -96,6 +137,11 @@ body:has(.tc-canvas) {
 .tc-canvas-control:focus-visible {
   outline: 2px solid var(--tc-selection-color);
   outline-offset: 2px;
+}
+
+.tc-canvas-control:disabled {
+  cursor: default;
+  opacity: 0.5;
 }
 
 /* Canvas pages */
@@ -350,15 +396,40 @@ body .tc-block {
 }
 
 .tc-frame-title {
+  min-inline-size: 0;
+  overflow: hidden;
   font-weight: var(--base-text-weight-semibold, 600);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tc-frame-route {
+  margin-inline-start: auto;
   overflow: hidden;
   font-size: var(--text-body-size-small, 12px);
   color: var(--fgColor-muted, GrayText);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.tc-frame-open {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  color: var(--fgColor-muted, GrayText);
+  border-radius: var(--borderRadius-small, 4px);
+}
+
+.tc-frame-open:hover {
+  color: var(--fgColor-default, CanvasText);
+  background: var(--control-transparent-bgColor-hover, rgba(127, 127, 127, 0.12));
+}
+
+.tc-frame-open:focus-visible {
+  outline: 2px solid var(--tc-selection-color);
+  outline-offset: 1px;
 }
 
 .tc-frame-viewport {

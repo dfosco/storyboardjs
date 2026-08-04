@@ -4,6 +4,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import React from 'react';
 import {
+  act,
   cleanup,
   fireEvent,
   render,
@@ -78,6 +79,27 @@ describe('Canvas components', () => {
     expect(writeText.mock.calls[0][0]).toContain('"width": 300');
     expect(writeText.mock.calls[0][0]).not.toContain('stale');
     expect(screen.getByRole('button', { name: 'Copied' })).toBeTruthy();
+  });
+
+  it('zooms the board from bottom controls', () => {
+    const { container } = render(
+      <Canvas>
+        <Note id="note">Zoom me</Note>
+      </Canvas>
+    );
+    const board = container.querySelector('.tc-canvas-board');
+
+    expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('1');
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
+    expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('1.25');
+    expect(screen.getByRole('button', { name: 'Reset zoom' }).textContent).toBe(
+      '125%'
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reset zoom' }));
+    expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('1');
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }));
+    expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('0.75');
   });
 
   it('scopes persisted geometry by page and keeps the source component ID', () => {
@@ -171,5 +193,85 @@ describe('Canvas components', () => {
     );
     expect(container.querySelector('#note').style.width).toBe('310px');
     expect(container.querySelector('.tc-note').dataset.color).toBe('pink');
+  });
+
+  it('tracks same-origin Frame title and route navigation', () => {
+    const { container } = render(
+      <Canvas>
+        <Frame
+          id="frame"
+          route="/settings"
+          title="Initial title"
+          prepend={{ value: '/preview', visible: false }}
+          apend={{ value: '/embedded', visible: true }}
+        />
+      </Canvas>
+    );
+    const iframe = container.querySelector('iframe');
+    let href =
+      'http://localhost:3000/preview/settings/embedded?embedView=1#/profile';
+    let documentTitle = 'Profile';
+    const listeners = {};
+    const history = {
+      pushState: vi.fn(),
+      replaceState: vi.fn(),
+    };
+    const navigation = {
+      addEventListener: vi.fn((type, listener) => {
+        listeners[type] = listener;
+      }),
+      removeEventListener: vi.fn(),
+    };
+    const frameWindow = {
+      get location() {
+        return { href };
+      },
+      history,
+      navigation,
+      addEventListener: vi.fn((type, listener) => {
+        listeners[type] = listener;
+      }),
+      removeEventListener: vi.fn(),
+    };
+    const frameDocument = {
+      get title() {
+        return documentTitle;
+      },
+      querySelector: vi.fn(() => null),
+      head: null,
+    };
+    Object.defineProperty(iframe, 'contentWindow', {
+      configurable: true,
+      value: frameWindow,
+    });
+    Object.defineProperty(iframe, 'contentDocument', {
+      configurable: true,
+      value: frameDocument,
+    });
+
+    fireEvent.load(iframe);
+    expect(screen.getByText('Profile')).toBeTruthy();
+    expect(screen.getByText('/settings/embedded#/profile')).toBeTruthy();
+    const openLink = screen.getByRole('link', {
+      name: 'Open Profile in new tab',
+    });
+    expect(openLink.getAttribute('href')).toBe(
+      'http://localhost:3000/preview/settings/embedded#/profile'
+    );
+    expect(openLink.getAttribute('target')).toBe('_blank');
+
+    href =
+      'http://localhost:3000/preview/details/embedded?embedView=1&tab=activity';
+    documentTitle = 'Details';
+    act(() => history.pushState({}, '', '/details'));
+    expect(screen.getByText('Details')).toBeTruthy();
+    expect(screen.getByText('/details/embedded?tab=activity')).toBeTruthy();
+    expect(
+      screen
+        .getByRole('link', { name: 'Open Details in new tab' })
+        .getAttribute('href')
+    ).toBe(
+      'http://localhost:3000/preview/details/embedded?tab=activity'
+    );
   });
 });

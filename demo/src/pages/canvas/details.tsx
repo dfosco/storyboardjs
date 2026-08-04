@@ -1,6 +1,15 @@
+import { useEffect } from 'react'
 import { Canvas, Frame, Link, Note } from '@dfosco/tiny-canvas'
 
 export default function CanvasDetailsPage() {
+  useEffect(() => {
+    const previousTitle = document.title
+    document.title = 'Tiny Canvas — Details'
+    return () => {
+      document.title = previousTitle
+    }
+  }, [])
+
   return (
     <Canvas title="Details" dotted resettable>
       <Note id="details-note" x={240} y={140} color="purple">

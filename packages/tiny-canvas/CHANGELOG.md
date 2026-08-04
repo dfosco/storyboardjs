@@ -1,5 +1,15 @@
 # @dfosco/tiny-canvas
 
+## 0.10.0
+
+### Minor Changes
+
+- Add bottom-left Canvas zoom controls from 50% to 200%.
+- Keep Frame title and displayed route synchronized with same-origin iframe
+  navigation.
+- Add a Frame chrome button that opens the current URL in a new tab without
+  `embedView`.
+
 ## 0.9.0
 
 ### Minor Changes

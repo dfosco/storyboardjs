@@ -47,6 +47,28 @@ function relativeFrameUrl(frameUrl) {
   return `${frameUrl.pathname}${frameUrl.search}${frameUrl.hash}`;
 }
 
+function removeHiddenAffix(pathname, affix, edge) {
+  if (!affix || affix.visible || !affix.value) {
+    return pathname;
+  }
+
+  const values = affix.value.startsWith('/')
+    ? [affix.value]
+    : [affix.value, `/${affix.value}`];
+  const match = values.find((value) =>
+    edge === 'start' ? pathname.startsWith(value) : pathname.endsWith(value)
+  );
+  if (!match) {
+    return pathname;
+  }
+
+  const nextPathname =
+    edge === 'start'
+      ? pathname.slice(match.length)
+      : pathname.slice(0, -match.length);
+  return nextPathname.startsWith('/') ? nextPathname : `/${nextPathname}`;
+}
+
 export function buildFrameDisplayRoute(
   route,
   { prepend, apend } = {},
@@ -77,4 +99,30 @@ export function buildFrameHref(
 
   frameUrl.searchParams.set('embedView', '1');
   return relativeFrameUrl(frameUrl);
+}
+
+export function buildFrameNavigationDisplayRoute(
+  navigationHref,
+  { prepend, apend } = {},
+  currentHref = window.location.href
+) {
+  const prefix = pathAffix(prepend, 'prepend');
+  const suffix = pathAffix(apend, 'apend');
+  const frameUrl = resolveFrameUrl(navigationHref, currentHref);
+  frameUrl.pathname = removeHiddenAffix(
+    removeHiddenAffix(frameUrl.pathname, prefix, 'start'),
+    suffix,
+    'end'
+  );
+  frameUrl.searchParams.delete('embedView');
+  return relativeFrameUrl(frameUrl);
+}
+
+export function buildFrameOpenHref(
+  navigationHref,
+  currentHref = window.location.href
+) {
+  const frameUrl = resolveFrameUrl(navigationHref, currentHref);
+  frameUrl.searchParams.delete('embedView');
+  return frameUrl.href;
 }

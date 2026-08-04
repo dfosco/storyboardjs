@@ -135,6 +135,8 @@ element produces a clear runtime error.
   by page and component ID in localStorage, then restored ahead of initial props.
 - **Viewport-owned board.** Canvas fills the dynamic viewport, owns board
   scrolling, and disables mobile pull-to-refresh.
+- **Built-in zoom.** Bottom-left controls scale board content from 50% to 200%
+  without moving canvas chrome.
 - **Agent handoff.** **Copy changes** copies changed coordinates and sizes as
   JSON with component, key/index, and persistence identity.
 - **Built-in selection.** Clicking or focusing a block selects it. Clicking the
@@ -182,7 +184,8 @@ and persistence identifier, but it is not required.
 
 Standard `<main>` attributes are forwarded to the canvas.
 When the Vite page plugin discovers two or more sibling TSX pages, Canvas also
-shows the built-in page selector automatically.
+shows the built-in page selector automatically. Zoom controls are always shown
+in the bottom-left corner.
 
 ### `Block`
 
@@ -221,7 +224,7 @@ the current application:
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `route` | `string \| URL` | — | Same-origin URL, path, query, or hash route loaded by the iframe. |
-| `title` | `string` | — | Accessible iframe title shown in the frame header. |
+| `title` | `string` | — | Initial accessible iframe title and header label. Same-origin navigation replaces it with the loaded document title. |
 | `prepend` | `{ value: string, visible: boolean }` | — | Add `value` before the URL pathname. `visible: false` hides it only from the frame header. |
 | `apend` | `{ value: string, visible: boolean }` | — | Add `value` after the URL pathname. `visible: false` hides it only from the frame header. |
 | `width` | `number` | `640` | Initial width in pixels. Saved width takes precedence. |
@@ -236,6 +239,8 @@ to resize it. The embedded application can use the `embedView` query parameter
 to suppress redirects or chrome that should not appear inside the preview.
 Both path affixes always affect the iframe URL. Their `visible` flags only
 control whether each value appears in the route text shown in the title bar.
+The title bar follows same-origin iframe navigation and includes an **Open in
+new tab** link for the current URL, with `embedView` removed.
 
 ### `Note` and `Mark`
 

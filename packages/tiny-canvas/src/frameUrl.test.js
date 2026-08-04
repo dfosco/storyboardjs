@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { buildFrameDisplayRoute, buildFrameHref } from './frameUrl.js';
+import {
+  buildFrameDisplayRoute,
+  buildFrameHref,
+  buildFrameNavigationDisplayRoute,
+  buildFrameOpenHref,
+} from './frameUrl.js';
 
 const ORIGIN = 'https://github.com';
 const BASE = `${ORIGIN}/orgs/cli/security`;
@@ -132,6 +137,30 @@ describe('buildFrameHref', () => {
       })
     ).toThrow(
       'Frame prepend must contain a string value and boolean visible.'
+    );
+  });
+
+  it('displays the current iframe route without hidden affixes or embedView', () => {
+    expect(
+      buildFrameNavigationDisplayRoute(
+        `${ORIGIN}/preview/settings/embedded?embedView=1&tab=profile#/account`,
+        {
+          prepend: { value: '/preview', visible: false },
+          apend: { value: '/embedded', visible: true },
+        },
+        BASE
+      )
+    ).toBe('/settings/embedded?tab=profile#/account');
+  });
+
+  it('builds an absolute new-tab URL without embedView', () => {
+    expect(
+      buildFrameOpenHref(
+        `${ORIGIN}/preview/settings/embedded?embedView=1&tab=profile#/account`,
+        BASE
+      )
+    ).toBe(
+      `${ORIGIN}/preview/settings/embedded?tab=profile#/account`
     );
   });
 });
