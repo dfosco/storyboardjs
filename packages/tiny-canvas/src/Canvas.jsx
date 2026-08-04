@@ -171,9 +171,10 @@ function Canvas({
         setSelectedBlockId(nextBlockId);
         onSelectionChange?.(nextBlockId);
       },
+      zoom,
       zoomByWheel,
     }),
-    [onSelectionChange, selectedBlockId, zoomByWheel]
+    [onSelectionChange, selectedBlockId, zoom, zoomByWheel]
   );
   const renderedChildren = Children.map(children, (child, index) => {
     if (child === null || child === undefined || child === false) {

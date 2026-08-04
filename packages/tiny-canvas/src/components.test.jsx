@@ -121,6 +121,45 @@ describe('Canvas components', () => {
     expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('0.75');
   });
 
+  it('resizes Frames in logical pixels while the Canvas is zoomed', () => {
+    const onSizeChange = vi.fn();
+    const { container } = render(
+      <Canvas>
+        <Frame
+          id="frame"
+          route="/settings"
+          title="Settings"
+          width={1000}
+          height={800}
+          onSizeChange={onSizeChange}
+        />
+      </Canvas>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }));
+
+    const frame = container.querySelector('#frame');
+    const handle = screen.getByRole('button', { name: 'Resize Settings' });
+    handle.setPointerCapture = vi.fn();
+
+    fireEvent.pointerDown(handle, {
+      pointerId: 1,
+      clientX: 750,
+      clientY: 600,
+    });
+    fireEvent.pointerMove(handle, {
+      pointerId: 1,
+      clientX: 825,
+      clientY: 675,
+    });
+
+    expect(frame.style.width).toBe('1100px');
+    expect(frame.style.height).toBe('900px');
+    expect(onSizeChange).toHaveBeenLastCalledWith({
+      width: 1100,
+      height: 900,
+    });
+  });
+
   it('anchors modified-wheel zoom at the cursor', () => {
     const { container } = render(<Canvas />);
     const canvas = container.querySelector('.tc-canvas');
@@ -183,8 +222,8 @@ describe('Canvas components', () => {
     );
     expect(JSON.parse(localStorage.getItem('tiny-canvas-queue'))[0]).toMatchObject({
       id: 'tc-page:%2Fcanvas:note',
-      width: 180,
-      height: 60,
+      width: 280,
+      height: 170,
     });
 
     unmount();

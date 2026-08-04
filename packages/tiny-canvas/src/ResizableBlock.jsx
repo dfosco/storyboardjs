@@ -1,5 +1,6 @@
-import { useId, useRef, useState } from 'react';
+import { useContext, useId, useRef, useState } from 'react';
 import Block from './Block';
+import { CanvasContext } from './CanvasContext';
 import { getSavedSize, saveSize } from './utils';
 
 function dimension(value, propName, componentName) {
@@ -43,6 +44,8 @@ export default function ResizableBlock({
   const surfaceRef = useRef(null);
   const resizeStartRef = useRef(null);
   const currentSizeRef = useRef(null);
+  const canvas = useContext(CanvasContext);
+  const zoom = canvas?.zoom ?? 1;
   const [size, setSize] = useState(() => {
     const savedSize = getSavedSize(resolvedId);
     return {
@@ -111,12 +114,15 @@ export default function ResizableBlock({
 
           event.preventDefault();
           event.stopPropagation();
-          const rect = surfaceRef.current.getBoundingClientRect();
-          const startingSize = { width: rect.width, height: rect.height };
+          const startingSize = {
+            width: size.width ?? surfaceRef.current.offsetWidth,
+            height: size.height ?? surfaceRef.current.offsetHeight,
+          };
           resizeStartRef.current = {
             pointerId: event.pointerId,
             clientX: event.clientX,
             clientY: event.clientY,
+            zoom,
             ...startingSize,
           };
           currentSizeRef.current = startingSize;
@@ -132,11 +138,13 @@ export default function ResizableBlock({
           updateSize({
             width: Math.max(
               minimumWidth,
-              resizeStart.width + event.clientX - resizeStart.clientX
+              resizeStart.width +
+                (event.clientX - resizeStart.clientX) / resizeStart.zoom
             ),
             height: Math.max(
               minimumHeight,
-              resizeStart.height + event.clientY - resizeStart.clientY
+              resizeStart.height +
+                (event.clientY - resizeStart.clientY) / resizeStart.zoom
             ),
           });
         }}
@@ -156,11 +164,12 @@ export default function ResizableBlock({
 
           event.preventDefault();
           event.stopPropagation();
-          const rect = surfaceRef.current.getBoundingClientRect();
+          const currentWidth = size.width ?? surfaceRef.current.offsetWidth;
+          const currentHeight = size.height ?? surfaceRef.current.offsetHeight;
           updateSize(
             {
-              width: Math.max(minimumWidth, rect.width + delta[0]),
-              height: Math.max(minimumHeight, rect.height + delta[1]),
+              width: Math.max(minimumWidth, currentWidth + delta[0]),
+              height: Math.max(minimumHeight, currentHeight + delta[1]),
             },
             true
           );
