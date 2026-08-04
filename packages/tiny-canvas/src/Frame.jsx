@@ -18,6 +18,7 @@ const DEFAULT_HEIGHT = 776;
 function Frame({
   route,
   title,
+  description,
   prepend,
   append,
   apend,
@@ -187,7 +188,12 @@ function Frame({
     >
       <section className="tc-frame">
         <div className="tc-frame-title-bar">
-          <span className="tc-frame-title">{currentNavigation.title}</span>
+          <span className="tc-frame-heading">
+            <span className="tc-frame-title">{currentNavigation.title}</span>
+            {description ? (
+              <span className="tc-frame-description">{description}</span>
+            ) : null}
+          </span>
           <span className="tc-frame-route">
             {currentNavigation.route}
           </span>

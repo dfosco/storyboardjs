@@ -15,7 +15,7 @@ npm install @dfosco/tiny-canvas
 ## Quick start
 
 ```jsx
-import { Block, Canvas, Link, Mark, Note } from '@dfosco/tiny-canvas'
+import { Block, Canvas, Image, Link, Mark, Note } from '@dfosco/tiny-canvas'
 import '@dfosco/tiny-canvas/style.css'
 
 export function Board() {
@@ -43,6 +43,13 @@ export function Board() {
         displayUrl="github.com/dfosco/tiny-canvas"
         x={400}
         y={480}
+      />
+
+      <Image
+        src="/reference.png"
+        alt="Reference screen"
+        x={760}
+        y={240}
       />
     </Canvas>
   )
@@ -172,7 +179,7 @@ element produces a clear runtime error.
 - **Viewport-owned board.** Canvas fills the dynamic viewport, owns board
   scrolling, and disables mobile pull-to-refresh.
 - **Room to move.** Canvas provides a 10,000×10,000 scrollable board by default.
-- **Built-in zoom.** Bottom-left controls scale board content from 50% to 200%
+- **Built-in zoom.** Bottom-left controls scale board content from 10% to 200%
   around the viewport center. Ctrl/⌘+wheel and trackpad pinch zoom around the
   cursor.
 - **Agent handoff.** **Copy changes** copies changed coordinates and sizes as
@@ -251,6 +258,7 @@ the current application:
   <Frame
     route="/?urlstate=security#/orgs/cli/security"
     title="Security overview"
+    description="Unread comment inbox"
     prepend={[
       { value: '/dev-proxy', visible: false, env: 'dev' },
       { value: '/previews/branch', visible: false, env: 'prod' },
@@ -276,6 +284,7 @@ the current application:
 | --- | --- | --- | --- |
 | `route` | `string \| URL` | — | Same-origin URL, path, query, or hash route loaded by the iframe. |
 | `title` | `string` | — | Initial accessible iframe title and header label. Same-origin navigation replaces it with the loaded document title. |
+| `description` | `string` | — | Optional state description shown beside the title in smaller type. |
 | `prepend` | `{ value, visible, env? }[]` | — | Add ordered entries before the URL pathname. |
 | `append` | `{ value, visible, external?, env? }[]` | — | Add ordered entries after the URL pathname. A leading `?` or `/?` adds query parameters without pathname encoding. `external: false` omits the entry from **Open in new tab**. |
 | `apend` | object or array | — | Deprecated runtime alias for `append`. |
@@ -298,6 +307,9 @@ Environment targeting uses the manifest injected by the Tiny Canvas Vite
 plugin; without that plugin, Frame defaults to `prod`.
 The title bar follows same-origin iframe navigation and includes an **Open in
 new tab** link for the current URL, with `embedView` removed.
+URL-state query parameters (`urlstate` and `state.*`) stay active in the iframe
+and external link, but are silently omitted from the route shown in the title
+bar. Use `description` to label the represented screen state.
 
 ### `Note` and `Mark`
 
@@ -317,6 +329,28 @@ width and height.
 
 `Note` supports `yellow`, `blue`, `green`, `pink`, `purple`, and `orange`.
 `Mark` also accepts Markdown through its `content` prop; `Note` accepts `text`.
+
+### `Image`
+
+`Image` renders a browser-resolvable image URL or imported asset without extra
+chrome. It defaults to `400×300`, preserves the image's natural aspect ratio
+while resizing, persists size changes, and uses 4px rounded corners.
+
+```jsx
+import referenceUrl from './reference.png'
+
+<Image
+  src={referenceUrl}
+  alt="Comment inbox — unread state"
+  x={48}
+  y={48}
+  width={400}
+  height={300}
+/>
+```
+
+`alt` defaults to an empty string for decorative images. The minimum size is
+`100×60`. Use `--tc-image-radius` and `--tc-image-bg` to customize its surface.
 
 ### `Link`
 
@@ -378,6 +412,8 @@ Override CSS custom properties to fit your application:
   --tc-frame-border-color: rgb(0 0 0 / 15%);
   --tc-frame-width: 1270px;
   --tc-frame-height: 776px;
+  --tc-image-radius: 4px;
+  --tc-image-bg: transparent;
   --tc-frame-title-bg: #f6f8fa;
   --tc-mark-bg: #fff;
   --tc-mark-border-color: rgb(0 0 0 / 15%);

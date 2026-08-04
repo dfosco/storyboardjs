@@ -23,7 +23,7 @@ import {
   getCanvasChanges,
 } from './utils';
 
-const ZOOM_LEVELS = [0.5, 0.75, 1, 1.25, 1.5, 2];
+const ZOOM_LEVELS = [0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
 const DEFAULT_ZOOM_INDEX = ZOOM_LEVELS.indexOf(1);
 const WHEEL_ZOOM_THRESHOLD = 40;
 const DEFAULT_CANVAS_WIDTH = 10000;
@@ -183,7 +183,7 @@ function Canvas({
 
     if (!isValidElement(child) || !isAuthorizedCanvasChild(child)) {
       throw new TypeError(
-        'Canvas only accepts authorized canvas components such as <Block>, <Frame>, <Note>, <Mark>, and <Link>.'
+        'Canvas only accepts authorized canvas components such as <Block>, <Frame>, <Note>, <Mark>, <Link>, and <Image>.'
       );
     }
 

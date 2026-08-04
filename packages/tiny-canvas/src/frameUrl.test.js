@@ -130,6 +130,31 @@ describe('buildFrameHref', () => {
     ).toBe('/settings?tab=profile');
   });
 
+  it('silently hides URL state only from the displayed route', () => {
+    const route =
+      '/?urlstate=&state.q.prototype-data=_j%7B%22inbox%22%3A1%7D&tab=unread#/orgs/github/security';
+    const iframeHref = buildFrameHref(route, BASE);
+
+    expect(buildFrameDisplayRoute(route, {}, BASE)).toBe(
+      '/?tab=unread#/orgs/github/security'
+    );
+    expect(
+      buildFrameDisplayRoute(
+        route,
+        { append: [{ value: 'embedded', visible: true }] },
+        BASE
+      )
+    ).toBe('/embedded?tab=unread#/orgs/github/security');
+    expect(
+      buildFrameNavigationDisplayRoute(iframeHref, {}, BASE)
+    ).toBe('/?tab=unread#/orgs/github/security');
+    expect(iframeHref).toContain('urlstate=');
+    expect(iframeHref).toContain('state.q.prototype-data=');
+    expect(buildFrameOpenHref(iframeHref, BASE)).toContain(
+      'state.q.prototype-data='
+    );
+  });
+
   it('validates path affix values', () => {
     expect(() =>
       buildFrameHref('/settings', BASE, {

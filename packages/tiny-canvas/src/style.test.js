@@ -30,4 +30,18 @@ describe('Frame interaction styles', () => {
     expect(styles).toContain('inset: 0;');
     expect(styles).toContain('pointer-events: auto;');
   });
+
+  it('renders Frame descriptions as secondary text', () => {
+    expect(styles).toContain('.tc-frame-description');
+    expect(styles).toContain('font-size: var(--text-body-size-small, 12px);');
+  });
+});
+
+describe('Image styles', () => {
+  it('contains images with rounded corners and no drag capture', () => {
+    expect(styles).toContain('.tc-image img');
+    expect(styles).toContain('object-fit: contain;');
+    expect(styles).toContain('border-radius: var(--tc-image-radius, 4px);');
+    expect(styles).toContain('pointer-events: none;');
+  });
 });

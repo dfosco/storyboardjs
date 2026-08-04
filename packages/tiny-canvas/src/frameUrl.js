@@ -92,6 +92,40 @@ function relativeFrameUrl(frameUrl) {
   return `${frameUrl.pathname}${frameUrl.search}${frameUrl.hash}`;
 }
 
+function isUrlStateParam(key) {
+  return key === 'urlstate' || key.startsWith('state.');
+}
+
+function removeUrlStateParams(frameUrl) {
+  for (const key of [...frameUrl.searchParams.keys()]) {
+    if (isUrlStateParam(key)) {
+      frameUrl.searchParams.delete(key);
+    }
+  }
+  return frameUrl;
+}
+
+function hideUrlStateFromRoute(route) {
+  const value = String(route);
+  const hashIndex = value.indexOf('#');
+  const beforeHash = hashIndex === -1 ? value : value.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? '' : value.slice(hashIndex);
+  const queryIndex = beforeHash.indexOf('?');
+  if (queryIndex === -1) {
+    return value;
+  }
+
+  const pathname = beforeHash.slice(0, queryIndex);
+  const searchParams = new URLSearchParams(beforeHash.slice(queryIndex + 1));
+  for (const key of [...searchParams.keys()]) {
+    if (isUrlStateParam(key)) {
+      searchParams.delete(key);
+    }
+  }
+  const search = searchParams.toString();
+  return `${pathname}${search ? `?${search}` : ''}${hash}`;
+}
+
 function replaceAppliedPathAffixes(
   pathname,
   affixes,
@@ -142,11 +176,13 @@ export function buildFrameDisplayRoute(
 ) {
   const affixes = resolveAffixes(options);
   if (![...affixes.prepend, ...affixes.append].some((affix) => affix.visible)) {
-    return String(route);
+    return hideUrlStateFromRoute(route);
   }
 
   const frameUrl = resolveFrameUrl(route, currentHref);
-  return relativeFrameUrl(applyPathAffixes(frameUrl, affixes, true));
+  return relativeFrameUrl(
+    removeUrlStateParams(applyPathAffixes(frameUrl, affixes, true))
+  );
 }
 
 export function buildFrameHref(
@@ -180,7 +216,7 @@ export function buildFrameNavigationDisplayRoute(
     ...affixes.append,
   ]);
   frameUrl.searchParams.delete('embedView');
-  return relativeFrameUrl(frameUrl);
+  return relativeFrameUrl(removeUrlStateParams(frameUrl));
 }
 
 export function buildFrameOpenHref(

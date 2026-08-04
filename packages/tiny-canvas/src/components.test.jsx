@@ -13,6 +13,7 @@ import {
 } from '@testing-library/react';
 import Canvas from './Canvas.jsx';
 import Frame from './Frame.jsx';
+import Image from './Image.jsx';
 import Link from './Link.jsx';
 import Mark from './Mark.jsx';
 import Note from './Note.jsx';
@@ -122,8 +123,17 @@ describe('Canvas components', () => {
     expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('1');
     expect(canvas.scrollLeft).toBe(100);
     expect(canvas.scrollTop).toBe(200);
-    fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }));
+    const zoomOut = screen.getByRole('button', { name: 'Zoom out' });
+    fireEvent.click(zoomOut);
     expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('0.75');
+    fireEvent.click(zoomOut);
+    fireEvent.click(zoomOut);
+    fireEvent.click(zoomOut);
+    expect(board.style.getPropertyValue('--tc-canvas-zoom')).toBe('0.1');
+    expect(screen.getByRole('button', { name: 'Reset zoom' }).textContent).toBe(
+      '10%'
+    );
+    expect(zoomOut.disabled).toBe(true);
   });
 
   it('resizes Frames in logical pixels while the Canvas is zoomed', () => {
@@ -275,6 +285,47 @@ describe('Canvas components', () => {
     expect(container.querySelector('#repo .tc-resize-handle')).toBeNull();
   });
 
+  it('renders and aspect-locks a resizable Image', () => {
+    const onLoad = vi.fn();
+    const { container } = render(
+      <Canvas>
+        <Image
+          id="reference"
+          src="/reference.png"
+          alt="Reference screen"
+          onLoad={onLoad}
+        />
+      </Canvas>
+    );
+
+    const image = screen.getByRole('img', { name: 'Reference screen' });
+    expect(image.getAttribute('src')).toBe('/reference.png');
+    expect(image.getAttribute('loading')).toBe('lazy');
+    expect(image.getAttribute('decoding')).toBe('async');
+    expect(image.getAttribute('draggable')).toBe('false');
+    Object.defineProperties(image, {
+      naturalWidth: { configurable: true, value: 800 },
+      naturalHeight: { configurable: true, value: 400 },
+    });
+    fireEvent.load(image);
+    expect(onLoad).toHaveBeenCalledOnce();
+
+    const block = container.querySelector('#reference');
+    expect(block.style.width).toBe('400px');
+    expect(block.style.height).toBe('200px');
+
+    fireEvent.keyDown(screen.getByLabelText('Resize image: Reference screen'), {
+      key: 'ArrowRight',
+    });
+    expect(block.style.width).toBe('410px');
+    expect(block.style.height).toBe('205px');
+    expect(JSON.parse(localStorage.getItem('tiny-canvas-queue'))[0]).toMatchObject({
+      id: 'reference',
+      width: 410,
+      height: 205,
+    });
+  });
+
   it('applies optional widget config defaults before instance props', () => {
     setPageManifest([], {
       Frame: {
@@ -340,6 +391,7 @@ describe('Canvas components', () => {
           id="frame"
           route="/settings"
           title="Initial title"
+          description="Filtered inbox"
           prepend={[{ value: '/preview', visible: false }]}
           append={[{ value: '/embedded', visible: true }]}
         />
@@ -395,6 +447,7 @@ describe('Canvas components', () => {
     fireEvent.load(iframe);
     expect(documentListeners.wheel).toBeTypeOf('function');
     expect(screen.getByText('Profile')).toBeTruthy();
+    expect(screen.getByText('Filtered inbox')).toBeTruthy();
     expect(screen.getByText('/settings/embedded#/profile')).toBeTruthy();
     const openLink = screen.getByRole('link', {
       name: 'Open Profile in new tab',

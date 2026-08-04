@@ -1,5 +1,6 @@
 import {
   HTMLAttributes,
+  ImgHTMLAttributes,
   ReactElement,
   ReactNode,
 } from 'react';
@@ -32,7 +33,8 @@ type CanvasChild =
   | ReactElement<FrameProps, typeof Frame>
   | ReactElement<NoteProps, typeof Note>
   | ReactElement<MarkProps, typeof Mark>
-  | ReactElement<LinkProps, typeof Link>;
+  | ReactElement<LinkProps, typeof Link>
+  | ReactElement<ImageProps, typeof Image>;
 
 export interface CanvasProps
   extends Omit<HTMLAttributes<HTMLElement>, 'onSelectionChange'> {
@@ -102,6 +104,8 @@ export interface FrameProps extends Omit<BlockProps, 'children'> {
   route: string | URL;
   /** Accessible frame title shown in the title bar. */
   title: string;
+  /** Optional state description shown beside the title in smaller type. */
+  description?: string;
   /** Ordered entries added before the iframe URL pathname. */
   prepend?: readonly FramePathAffix[];
   /** Ordered entries added after the iframe URL pathname. */
@@ -181,6 +185,31 @@ export interface LinkProps extends Omit<BlockProps, 'children'> {
 
 export declare function Link(props: LinkProps): ReactElement;
 
+export interface ImageProps
+  extends Omit<BlockProps, 'children' | 'onLoad' | 'onError'> {
+  /** Browser-resolvable image URL or imported asset URL. */
+  src: string;
+  /** Accessible alternative text. Empty means decorative. Default: '' */
+  alt?: string;
+  /** Initial width in pixels. Saved width takes precedence. Default: 400 */
+  width?: number;
+  /** Initial height in pixels. Saved height takes precedence. Default: 300 */
+  height?: number;
+  /** Minimum resizable width in pixels. Default: 100 */
+  minWidth?: number;
+  /** Minimum resizable height in pixels. Default: 60 */
+  minHeight?: number;
+  /** Browser image loading behavior. Default: 'lazy' */
+  loading?: ImgHTMLAttributes<HTMLImageElement>['loading'];
+  /** Browser image decoding behavior. Default: 'async' */
+  decoding?: ImgHTMLAttributes<HTMLImageElement>['decoding'];
+  onLoad?: ImgHTMLAttributes<HTMLImageElement>['onLoad'];
+  onError?: ImgHTMLAttributes<HTMLImageElement>['onError'];
+  onSizeChange?: (size: Size) => void;
+}
+
+export declare function Image(props: ImageProps): ReactElement;
+
 export type WidgetDefaults<Props> = Partial<
   Omit<Props, 'id' | 'children'>
 >;
@@ -191,6 +220,7 @@ export interface TinyCanvasWidgetConfig {
   Note?: WidgetDefaults<NoteProps>;
   Mark?: WidgetDefaults<MarkProps>;
   Link?: WidgetDefaults<LinkProps>;
+  Image?: WidgetDefaults<ImageProps>;
 }
 
 export interface UseResetCanvasOptions {

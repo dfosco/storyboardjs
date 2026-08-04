@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Canvas, Frame, Link, Note } from '@dfosco/tiny-canvas'
+import { Canvas, Frame, Image, Link, Note } from '@dfosco/tiny-canvas'
 
 export default function CanvasDetailsPage() {
   useEffect(() => {
@@ -23,10 +23,18 @@ export default function CanvasDetailsPage() {
         x={560}
         y={340}
       />
+      <Image
+        id="details-image"
+        src="/tiny-canvas/vite.svg"
+        alt="Vite logo"
+        x={960}
+        y={140}
+      />
       <Frame
         id="overview-frame-default"
-        route="/"
+        route="/?urlstate=&state.q.demo=filtered"
         title="Overview preview"
+        description="Filtered state"
         x={240}
         y={540}
       />

@@ -1,5 +1,15 @@
 # @dfosco/tiny-canvas
 
+## 0.16.0
+
+### Minor Changes
+
+- Add a resizable `Image` widget with natural aspect-ratio locking, persisted
+  dimensions, rounded corners, and configurable widget defaults.
+- Add optional Frame descriptions and silently hide `urlstate` and `state.*`
+  query parameters from Frame chrome while preserving navigation state.
+- Lower the minimum Canvas zoom from 50% to 10%.
+
 ## 0.15.0
 
 ### Minor Changes

@@ -1,4 +1,4 @@
-import { useContext, useId, useRef, useState } from 'react';
+import { useContext, useEffect, useId, useRef, useState } from 'react';
 import Block from './Block';
 import { CanvasContext } from './CanvasContext';
 import { getSavedSize, saveSize } from './utils';
@@ -17,6 +17,18 @@ function dimension(value, propName, componentName) {
   return value;
 }
 
+function aspectSize(width, aspectRatio, minWidth, minHeight) {
+  const constrainedWidth = Math.max(
+    minWidth,
+    width,
+    minHeight * aspectRatio
+  );
+  return {
+    width: constrainedWidth,
+    height: Math.round(constrainedWidth / aspectRatio),
+  };
+}
+
 export default function ResizableBlock({
   children,
   componentName,
@@ -27,6 +39,7 @@ export default function ResizableBlock({
   height = defaultHeight,
   minWidth,
   minHeight,
+  aspectRatio,
   onSizeChange,
   id,
   blockId,
@@ -37,13 +50,19 @@ export default function ResizableBlock({
 }) {
   const initialWidth = dimension(width, 'width', componentName);
   const initialHeight = dimension(height, 'height', componentName);
-  const minimumWidth = dimension(minWidth, 'minWidth', componentName);
-  const minimumHeight = dimension(minHeight, 'minHeight', componentName);
+  const minimumWidth = dimension(minWidth, 'minWidth', componentName) ?? 0;
+  const minimumHeight = dimension(minHeight, 'minHeight', componentName) ?? 0;
+  const lockedAspectRatio = dimension(
+    aspectRatio,
+    'aspectRatio',
+    componentName
+  );
   const generatedId = useId().replaceAll(':', '');
   const resolvedId = blockId ?? id ?? `tc-${componentName.toLowerCase()}-${generatedId}`;
   const surfaceRef = useRef(null);
   const resizeStartRef = useRef(null);
   const currentSizeRef = useRef(null);
+  const aspectRatioRef = useRef(lockedAspectRatio);
   const canvas = useContext(CanvasContext);
   const zoom = canvas?.zoom ?? 1;
   const [size, setSize] = useState(() => {
@@ -59,6 +78,24 @@ export default function ResizableBlock({
           : Math.max(minimumHeight, savedSize.height),
     };
   });
+
+  useEffect(() => {
+    if (!lockedAspectRatio || aspectRatioRef.current === lockedAspectRatio) {
+      return;
+    }
+
+    aspectRatioRef.current = lockedAspectRatio;
+    setSize((currentSize) => {
+      const nextSize = aspectSize(
+        currentSize.width ?? initialWidth,
+        lockedAspectRatio,
+        minimumWidth,
+        minimumHeight
+      );
+      currentSizeRef.current = nextSize;
+      return nextSize;
+    });
+  }, [initialWidth, lockedAspectRatio, minimumHeight, minimumWidth]);
 
   const updateSize = (nextSize, persist = false) => {
     currentSizeRef.current = nextSize;
@@ -135,17 +172,30 @@ export default function ResizableBlock({
           }
 
           event.preventDefault();
+          const widthDelta =
+            (event.clientX - resizeStart.clientX) / resizeStart.zoom;
+          const heightDelta =
+            (event.clientY - resizeStart.clientY) / resizeStart.zoom;
+          if (lockedAspectRatio) {
+            const widthFromHeight = heightDelta * lockedAspectRatio;
+            const lockedWidthDelta =
+              Math.abs(widthDelta) >= Math.abs(widthFromHeight)
+                ? widthDelta
+                : widthFromHeight;
+            updateSize(
+              aspectSize(
+                resizeStart.width + lockedWidthDelta,
+                lockedAspectRatio,
+                minimumWidth,
+                minimumHeight
+              )
+            );
+            return;
+          }
+
           updateSize({
-            width: Math.max(
-              minimumWidth,
-              resizeStart.width +
-                (event.clientX - resizeStart.clientX) / resizeStart.zoom
-            ),
-            height: Math.max(
-              minimumHeight,
-              resizeStart.height +
-                (event.clientY - resizeStart.clientY) / resizeStart.zoom
-            ),
+            width: Math.max(minimumWidth, resizeStart.width + widthDelta),
+            height: Math.max(minimumHeight, resizeStart.height + heightDelta),
           });
         }}
         onPointerUp={finishResize}
@@ -166,13 +216,19 @@ export default function ResizableBlock({
           event.stopPropagation();
           const currentWidth = size.width ?? surfaceRef.current.offsetWidth;
           const currentHeight = size.height ?? surfaceRef.current.offsetHeight;
-          updateSize(
-            {
-              width: Math.max(minimumWidth, currentWidth + delta[0]),
-              height: Math.max(minimumHeight, currentHeight + delta[1]),
-            },
-            true
-          );
+          const nextSize = lockedAspectRatio
+            ? aspectSize(
+                currentWidth +
+                  (delta[0] || delta[1] * lockedAspectRatio),
+                lockedAspectRatio,
+                minimumWidth,
+                minimumHeight
+              )
+            : {
+                width: Math.max(minimumWidth, currentWidth + delta[0]),
+                height: Math.max(minimumHeight, currentHeight + delta[1]),
+              };
+          updateSize(nextSize, true);
         }}
       />
     </Block>
