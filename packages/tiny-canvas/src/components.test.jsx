@@ -43,14 +43,15 @@ describe('Canvas components', () => {
     window.history.replaceState({}, '', '/');
   });
 
-  it('renders Markdown in resizable Note and Mark components', () => {
-    render(
-      <Canvas>
+  it('renders Markdown in resizable Note and Mark components in dark mode', () => {
+    const { container } = render(
+      <Canvas colorMode="dark">
         <Note id="note" color="yellow">## Sticky note</Note>
         <Mark id="mark">### Markdown block</Mark>
       </Canvas>
     );
 
+    expect(container.querySelector('.tc-canvas').dataset.colorMode).toBe('dark');
     expect(screen.getByRole('heading', { name: 'Sticky note' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Markdown block' })).toBeTruthy();
     expect(screen.getByLabelText('Resize note')).toBeTruthy();

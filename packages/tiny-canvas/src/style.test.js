@@ -45,3 +45,14 @@ describe('Image styles', () => {
     expect(styles).toContain('pointer-events: none;');
   });
 });
+
+describe('Note styles', () => {
+  it('keeps Markdown readable on light sticky colors in dark mode', () => {
+    const noteRule = styles.match(/\.tc-note \{([^}]*)\}/)?.[1];
+
+    expect(noteRule).toContain('color: var(--tc-note-fg, #24292f);');
+    expect(noteRule).toContain('color-scheme: light;');
+    expect(noteRule).not.toContain('--fgColor-default');
+    expect(styles).toContain('.tc-note-content :is(h1, h2, h3, h4)');
+  });
+});

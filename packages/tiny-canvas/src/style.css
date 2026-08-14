@@ -545,7 +545,6 @@ body .tc-block {
   inline-size: 100%;
   block-size: 100%;
   overflow: auto;
-  color: var(--fgColor-default, #24292f);
   border-radius: var(--tc-border-radius);
 }
 
@@ -554,6 +553,8 @@ body .tc-block {
   --tc-note-border: #d4a72c;
   min-inline-size: 180px;
   min-block-size: 60px;
+  color: var(--tc-note-fg, #24292f);
+  color-scheme: light;
   background: var(--tc-note-bg);
   border: 2px solid var(--tc-note-border);
   box-shadow: 2px 3px 8px rgb(0 0 0 / 4%);
@@ -587,6 +588,7 @@ body .tc-block {
 .tc-mark {
   min-inline-size: 200px;
   min-block-size: 60px;
+  color: var(--fgColor-default, #24292f);
   background: var(--tc-mark-bg, var(--bgColor-default, Canvas));
   border: var(--borderWidth-thin, 1px) solid
     var(--tc-mark-border-color, var(--borderColor-default, var(--tc-border-color)));
