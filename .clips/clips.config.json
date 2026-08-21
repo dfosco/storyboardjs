@@ -1,0 +1,17 @@
+{
+  "default_branch": "main",
+  "username": "dfosco",
+  "collaboration": true,
+  "body_max_length": null,
+  "tasks_as_issues": false,
+  "agent_dir": ".github",
+  "view": {
+    "hide_goal_statuses": [],
+    "hide_task_statuses": [],
+    "hide_tasks_for_goal_statuses": [
+      "closed",
+      "not_planned",
+      "duplicate"
+    ]
+  }
+}
