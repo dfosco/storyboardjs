@@ -207,6 +207,44 @@ must follow them:
 An optional `id` can still be supplied when an application needs a specific DOM
 and persistence identifier, but it is not required.
 
+## JSON Canvas documents
+
+`JsonCanvas` accepts JSON Canvas documents, JSONL records, or compiled MDX
+materialized through a host compiler. All sources become one canonical document
+before rendering or interaction.
+
+```jsx
+import { JsonCanvas } from '@dfosco/tiny-canvas'
+
+<JsonCanvas
+  document={board}
+  storageKey="roadmap"
+  ref={canvasRef}
+  onDocumentChange={(next) => save(next)}
+/>
+```
+
+Standard `text`, `file`, `link`, and `group` nodes render directly. Edges render
+as an SVG overlay. Tiny Canvas metadata under `x-tiny-canvas` preserves Frame,
+registered React widgets, link display data, and other custom behavior.
+
+Use `serializeCanvasJSON`, `serializeCanvasJSONL`, or `serializeCanvasMDX` for
+source export. `tinyCanvasSources()` adds JSONL preprocessing to Vite; JSON uses
+native Vite imports and MDX uses the host MDX plugin.
+
+Viewport methods use content-space coordinates:
+
+```js
+canvasRef.current.centerOnNode('release-note')
+canvasRef.current.setViewport({ x: 1200, y: 600, zoom: 0.75 })
+canvasRef.current.fitToNodes()
+```
+
+URL targeting accepts `canvasX`, `canvasY`, `canvasZoom`, and `canvasNode`.
+Window messages support `tiny-canvas:set-viewport`,
+`tiny-canvas:center-on-node`, `tiny-canvas:fit-to-nodes`, and
+`tiny-canvas:get-viewport`.
+
 ## API
 
 ### `Canvas`

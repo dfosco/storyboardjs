@@ -29,4 +29,10 @@ export interface TinyCanvasViteOptions {
   widgets?: Readonly<TinyCanvasWidgetConfig>;
 }
 
+export declare function tinyCanvasSources(): {
+  name: 'tiny-canvas-sources';
+  enforce: 'pre';
+  transform(source: string, id: string): { code: string; map: null } | null;
+};
+
 export default function tinyCanvas(options?: TinyCanvasViteOptions): Plugin;

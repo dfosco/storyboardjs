@@ -15,6 +15,84 @@ export interface Size {
   height: number;
 }
 
+export type JSONCanvasNodeType = 'text' | 'file' | 'link' | 'group';
+export type JSONCanvasSide = 'top' | 'right' | 'bottom' | 'left';
+export type JSONCanvasEnd = 'none' | 'arrow';
+export type JSONCanvasColor = `#${string}` | '1' | '2' | '3' | '4' | '5' | '6';
+
+export interface JSONCanvasNode {
+  id: string;
+  type: JSONCanvasNodeType;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color?: JSONCanvasColor;
+  text?: string;
+  file?: string;
+  subpath?: `#${string}`;
+  url?: string;
+  label?: string;
+  background?: string;
+  backgroundStyle?: 'cover' | 'ratio' | 'repeat';
+  [extension: string]: unknown;
+}
+
+export interface JSONCanvasEdge {
+  id: string;
+  fromNode: string;
+  fromSide?: JSONCanvasSide;
+  fromEnd?: JSONCanvasEnd;
+  toNode: string;
+  toSide?: JSONCanvasSide;
+  toEnd?: JSONCanvasEnd;
+  color?: JSONCanvasColor;
+  label?: string;
+  [extension: string]: unknown;
+}
+
+export interface CanvasDocument {
+  nodes?: JSONCanvasNode[];
+  edges?: JSONCanvasEdge[];
+  [extension: string]: unknown;
+}
+
+export interface CanvasValidationIssue {
+  path: string;
+  message: string;
+}
+
+export interface CanvasValidationResult {
+  valid: boolean;
+  issues: CanvasValidationIssue[];
+}
+
+export interface CanvasViewport {
+  /** Content-space horizontal scroll position. */
+  x: number;
+  /** Content-space vertical scroll position. */
+  y: number;
+  zoom: number;
+  width: number;
+  height: number;
+}
+
+export interface CanvasViewportOptions {
+  zoom?: number;
+  behavior?: ScrollBehavior;
+}
+
+export interface CanvasHandle {
+  getViewport(): CanvasViewport;
+  setViewport(viewport: Partial<CanvasViewport>): void;
+  panTo(point?: { x?: number; y?: number }, options?: CanvasViewportOptions): void;
+  centerOnNode(nodeId: string, options?: CanvasViewportOptions): boolean;
+  fitToNodes(nodeIds?: readonly string[], options?: CanvasViewportOptions & { padding?: number }): boolean;
+  zoomTo(zoom: number): void;
+  zoomBy(delta: number): void;
+  getDocument(): CanvasDocument;
+}
+
 export interface CanvasChange {
   component: string;
   index?: number;
@@ -34,7 +112,8 @@ type CanvasChild =
   | ReactElement<NoteProps, typeof Note>
   | ReactElement<MarkProps, typeof Mark>
   | ReactElement<LinkProps, typeof Link>
-  | ReactElement<ImageProps, typeof Image>;
+  | ReactElement<ImageProps, typeof Image>
+  | ReactElement<GroupProps, typeof Group>;
 
 export interface CanvasProps
   extends Omit<HTMLAttributes<HTMLElement>, 'onSelectionChange'> {
@@ -67,9 +146,64 @@ export interface CanvasProps
   onCopyChanges?: (changes: CanvasChange[], text: string) => void;
   /** Called when selection changes. Null means the canvas background is selected. */
   onSelectionChange?: (blockId: string | null) => void;
+  edges?: readonly JSONCanvasEdge[];
+  graphNodes?: readonly JSONCanvasNode[];
+  viewport?: Partial<CanvasViewport>;
+  onViewportChange?: (viewport: CanvasViewport) => void;
+  /** Read canvasX/canvasY/canvasZoom/canvasNode query parameters on initial load. */
+  viewportFromUrl?: boolean;
+  /** Write viewport changes to the current URL using replaceState. */
+  viewportToUrl?: boolean;
 }
 
-export declare function Canvas(props: CanvasProps): ReactElement;
+export declare const Canvas: React.ForwardRefExoticComponent<
+  CanvasProps & React.RefAttributes<CanvasHandle>
+>;
+
+export declare function validateCanvasDocument(
+  document: unknown
+): CanvasValidationResult;
+export declare function assertValidCanvasDocument(
+  document: unknown
+): CanvasDocument;
+export declare function normalizeCanvasDocument(
+  document: CanvasDocument
+): Required<Pick<CanvasDocument, 'nodes' | 'edges'>> & Omit<CanvasDocument, 'nodes' | 'edges'>;
+export declare function parseCanvasJSON(source: string | CanvasDocument): CanvasDocument;
+export declare function parseCanvasJSONL(source: string): CanvasDocument;
+export declare function materializeCanvasSource(
+  source: string | CanvasDocument,
+  options?: { format?: 'json' | 'jsonl' }
+): CanvasDocument;
+export declare function materializeReactChildren(
+  children: ReactNode,
+  options?: { widgets?: Readonly<Record<string, string>> }
+): { document: CanvasDocument; warnings: CanvasValidationIssue[] };
+export declare function materializeCanvasMDX(
+  source: string,
+  options: { compile: (source: string) => unknown | Promise<unknown> }
+): Promise<{ document: CanvasDocument; warnings: CanvasValidationIssue[] }>;
+export declare function serializeCanvasJSON(
+  document: CanvasDocument,
+  options?: { pretty?: boolean }
+): string;
+export declare function serializeCanvasJSONL(document: CanvasDocument): string;
+export declare function serializeCanvasMDX(
+  document: CanvasDocument,
+  options?: { importPath?: string }
+): string;
+export declare function getStoredCanvasDocument(key: string): CanvasDocument | null;
+export declare function saveStoredCanvasDocument(key: string, document: CanvasDocument): void;
+export declare function clearStoredCanvasDocument(key: string): void;
+export declare function canvasColorFromNoteColor(color: string): JSONCanvasColor | string;
+export declare function applyCanvasGeometry(
+  document: CanvasDocument,
+  changes: readonly Partial<JSONCanvasNode>[]
+): CanvasDocument;
+export declare const JSON_CANVAS_NODE_TYPES: readonly JSONCanvasNodeType[];
+export declare const JSON_CANVAS_SIDES: readonly JSONCanvasSide[];
+export declare const JSON_CANVAS_ENDS: readonly JSONCanvasEnd[];
+export declare const JSON_CANVAS_NOTE_COLORS: Readonly<Record<string, string>>;
 
 export interface BlockProps
   extends Omit<HTMLAttributes<HTMLElement>, 'onSelectionChange'> {
@@ -209,6 +343,31 @@ export interface ImageProps
 }
 
 export declare function Image(props: ImageProps): ReactElement;
+
+export interface GroupProps extends Omit<BlockProps, 'children'> {
+  label?: string;
+  background?: string;
+  backgroundStyle?: 'cover' | 'ratio' | 'repeat';
+  width?: number;
+  height?: number;
+  children?: ReactNode;
+}
+
+export declare function Group(props: GroupProps): ReactElement;
+
+export interface JsonCanvasProps extends Omit<CanvasProps, 'children'> {
+  document: CanvasDocument | string;
+  renderers?: Readonly<Record<string, (props: Record<string, unknown>) => ReactElement>>;
+  onDocumentChange?: (document: CanvasDocument, change: Record<string, number | string>) => void;
+  format?: 'json' | 'jsonl' | 'mdx';
+  compileMDX?: (source: string) => unknown | Promise<unknown>;
+  onMaterializeWarning?: (warnings: CanvasValidationIssue[]) => void;
+  storageKey?: string;
+}
+
+export declare const JsonCanvas: React.ForwardRefExoticComponent<
+  JsonCanvasProps & React.RefAttributes<CanvasHandle>
+>;
 
 export type WidgetDefaults<Props> = Partial<
   Omit<Props, 'id' | 'children'>

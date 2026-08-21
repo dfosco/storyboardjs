@@ -8,6 +8,7 @@ import {
   resolve,
   sep,
 } from 'node:path';
+import { parseCanvasJSONL } from './jsoncanvas.js';
 
 const PAGE_EXTENSIONS = new Set(['.tsx']);
 const MANIFEST_ID = 'tiny-canvas-pages';
@@ -211,3 +212,19 @@ export default function tinyCanvas({
 }
 
 export { MANIFEST_ID, VIRTUAL_PAGES_ID };
+
+/** Vite source adapter for JSONL canvas documents. JSON and MDX use native/host plugins. */
+export function tinyCanvasSources() {
+  return {
+    name: 'tiny-canvas-sources',
+    enforce: 'pre',
+    transform(source, id) {
+      if (!id.endsWith('.jsonl')) return null;
+      const document = parseCanvasJSONL(source);
+      return {
+        code: `export default ${JSON.stringify(document)};`,
+        map: null,
+      };
+    },
+  };
+}

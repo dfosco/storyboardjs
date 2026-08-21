@@ -85,6 +85,56 @@ body:has(.tc-canvas) {
   zoom: var(--tc-canvas-zoom, 1);
 }
 
+.tc-edge-layer {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  color: var(--tc-edge-color, var(--fgColor-muted, #57606a));
+  z-index: 0;
+}
+
+.tc-edge path {
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.tc-edge text {
+  fill: currentColor;
+  font: 12px var(--tc-font-stack);
+  paint-order: stroke;
+  stroke: var(--tc-bg-muted-default, #f6f8fa);
+  stroke-width: 4px;
+}
+
+.tc-group-block {
+  z-index: 0;
+}
+
+.tc-group {
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  padding: 16px;
+  background-color: var(--tc-group-bg, rgb(127 127 127 / 8%));
+  border: 1px solid var(--tc-group-border, var(--tc-border-color));
+  border-radius: var(--tc-border-radius);
+}
+
+.tc-group-label {
+  margin: 0;
+  font-size: 16px;
+}
+
+.tc-file-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: inherit;
+  text-decoration: none;
+}
+
 .tc-canvas-zoom {
   display: inline-flex;
 }

@@ -7,7 +7,7 @@ import {
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import tinyCanvas from './vite.js';
+import tinyCanvas, { tinyCanvasSources } from './vite.js';
 
 const temporaryDirectories = [];
 
@@ -43,6 +43,17 @@ afterEach(() => {
 });
 
 describe('tinyCanvas Vite plugin', () => {
+  it('materializes JSONL imports into canonical JSON modules', () => {
+    const plugin = tinyCanvasSources();
+    const result = plugin.transform(
+      '{"kind":"node","id":"a","type":"text","x":0,"y":0,"width":100,"height":80,"text":"A"}',
+      '/project/board.jsonl'
+    );
+    expect(result.map).toBeNull();
+    expect(result.code).toContain('"nodes"');
+    expect(plugin.transform('{}', '/project/board.json')).toBeNull();
+  });
+
   it('discovers independent TSX pages under /canvas by default', () => {
     const root = createProject();
     const widgets = {
