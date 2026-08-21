@@ -1,5 +1,12 @@
 # @dfosco/tiny-canvas
 
+## 0.16.3
+
+### Patch Changes
+
+- Republish the hash-routed Canvas page selector fix under a new patch
+  version.
+
 ## 0.16.2
 
 ### Patch Changes
