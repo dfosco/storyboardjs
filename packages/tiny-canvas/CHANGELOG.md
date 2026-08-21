@@ -1,5 +1,13 @@
 # @dfosco/tiny-canvas
 
+## 5.0.0
+
+### Major Changes
+
+- Continue the current Block-based Tiny Canvas API above the legacy `4.x`
+  release line so wildcard and semver-aware package updates resolve the
+  supported package instead of the retired Draggable API.
+
 ## 0.16.3
 
 ### Patch Changes
