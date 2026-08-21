@@ -4,6 +4,18 @@ function normalizePath(value) {
   return value.length > 1 ? value.replace(/\/$/, '') : value;
 }
 
+function getHashPath(hash) {
+  if (!hash.startsWith('#/')) {
+    return null;
+  }
+
+  return normalizePath(hash.slice(1).split(/[?#]/, 1)[0]);
+}
+
+function getPageRoute(page) {
+  return normalizePath(page.id || page.href);
+}
+
 function getPageManifest() {
   if (typeof document === 'undefined' || typeof window === 'undefined') {
     return null;
@@ -40,9 +52,21 @@ export function getCanvasPageContext(manifest = getCanvasConfig()) {
   }
 
   const pathname = normalizePath(window.location.pathname);
-  const currentIndex = manifest.pages.findIndex(
+  let currentIndex = manifest.pages.findIndex(
     (page) => normalizePath(page.href) === pathname
   );
+  let hashRoute = false;
+
+  if (currentIndex < 0) {
+    const hashPath = getHashPath(window.location.hash);
+    if (hashPath) {
+      currentIndex = manifest.pages.findIndex(
+        (page) => getPageRoute(page) === hashPath
+      );
+      hashRoute = currentIndex >= 0;
+    }
+  }
+
   if (currentIndex < 0) {
     return null;
   }
@@ -51,6 +75,7 @@ export function getCanvasPageContext(manifest = getCanvasConfig()) {
     ...manifest,
     currentIndex,
     currentPage: manifest.pages[currentIndex],
+    hashRoute,
   };
 }
 
@@ -60,7 +85,7 @@ export default function PageSelector({ title }) {
     return null;
   }
 
-  const { currentIndex, currentPage, pages } = pageContext;
+  const { currentIndex, currentPage, pages, hashRoute } = pageContext;
   const currentTitle =
     typeof title === 'string' && title.trim() ? title : currentPage.title;
 
@@ -91,7 +116,7 @@ export default function PageSelector({ title }) {
         {pages.map((page) => (
           <li key={page.id}>
             <a
-              href={page.href}
+              href={hashRoute ? `#${getPageRoute(page)}` : page.href}
               className="tc-canvas-pages-link"
               aria-current={page.id === currentPage.id ? 'page' : undefined}
             >

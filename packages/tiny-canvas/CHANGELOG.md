@@ -1,5 +1,12 @@
 # @dfosco/tiny-canvas
 
+## 0.16.2
+
+### Patch Changes
+
+- Support hash-routed Canvas page selectors and preserve hash routes when
+  navigating between pages.
+
 ## 0.16.1
 
 ### Patch Changes

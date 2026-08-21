@@ -58,6 +58,31 @@ describe('PageSelector', () => {
     );
   });
 
+  it('matches hash routes and keeps selector links in the hash router', () => {
+    window.history.replaceState({}, '', '/preview/#/canvas/details');
+    setManifest([
+      { id: '/canvas', title: 'Overview', href: '/preview/canvas' },
+      {
+        id: '/canvas/details',
+        title: 'Details',
+        href: '/preview/canvas/details',
+      },
+    ]);
+
+    render(<PageSelector />);
+
+    expect(screen.getByText('2/2')).toBeTruthy();
+    expect(
+      screen.getByRole('link', { name: 'Overview' }).getAttribute('href')
+    ).toBe('#/canvas');
+    expect(
+      screen.getByRole('link', { name: 'Details' }).getAttribute('href')
+    ).toBe('#/canvas/details');
+    expect(
+      screen.getByRole('link', { name: 'Details' }).getAttribute('aria-current')
+    ).toBe('page');
+  });
+
   it('stays hidden for a single page or a route outside the configured directory', () => {
     setManifest([{ id: '/canvas', title: 'Overview', href: '/canvas' }]);
     const { container, rerender } = render(<PageSelector />);
