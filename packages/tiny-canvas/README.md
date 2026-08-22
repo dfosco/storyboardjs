@@ -289,6 +289,9 @@ the current application:
 | `route` | `string \| URL` | — | Same-origin URL, path, query, or hash route loaded by the iframe. |
 | `title` | `string` | — | Initial accessible iframe title and header label. Same-origin navigation replaces it with the loaded document title. |
 | `description` | `string` | — | Optional state description shown beside the title in smaller type. |
+| `loadStrategy` | `'eager' \| 'interaction'` | inferred | Mount immediately with `eager`, or require explicit activation with `interaction`. Defaults to `interaction` when `snapshot` is set and `eager` otherwise. |
+| `snapshot` | `string` | — | Browser-resolvable preview image. Required for `interaction`; used as a loading poster with `eager`. |
+| `interactLabel` | `ReactNode` | `'Interact'` | Visible interaction-gate button content. Its accessible name also includes the Frame title. |
 | `prepend` | `{ value, visible, env? }[]` | — | Add ordered entries before the URL pathname. |
 | `append` | `{ value, visible, external?, env? }[]` | — | Add ordered entries after the URL pathname. A leading `?` or `/?` adds query parameters without pathname encoding. `external: false` omits the entry from **Open in new tab**. |
 | `apend` | object or array | — | Deprecated runtime alias for `append`. |
@@ -314,6 +317,35 @@ new tab** link for the current URL, with `embedView` removed.
 URL-state query parameters (`urlstate` and `state.*`) stay active in the iframe
 and external link, but are silently omitted from the route shown in the title
 bar. Use `description` to label the represented screen state.
+
+Frames remain eager by default for backwards compatibility. Supplying a
+snapshot without a strategy creates a snapshot gate: Tiny Canvas renders no
+iframe element or request until the user activates that Frame. Once mounted,
+the iframe stays live for the page session; ending interaction restores the
+guard without discarding its URL, state, or scroll position.
+
+```jsx
+import settingsSnapshot from './settings.png';
+
+<Frame
+  route="/settings"
+  title="Settings"
+  snapshot={settingsSnapshot}
+/>
+```
+
+Choose eager loading explicitly per Frame with `loadStrategy="eager"`, or for
+every Frame through the existing Vite widget defaults:
+
+```js
+tinyCanvas({
+  widgets: {
+    Frame: {
+      loadStrategy: 'eager',
+    },
+  },
+});
+```
 
 ### `Note` and `Mark`
 

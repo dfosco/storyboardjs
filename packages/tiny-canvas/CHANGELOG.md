@@ -1,5 +1,15 @@
 # @dfosco/tiny-canvas
 
+## 5.2.0
+
+### Minor Changes
+
+- Add native snapshot-gated Frames that start with no iframe or route request,
+  mount on explicit interaction, and preserve the live iframe when guarded
+  again.
+- Add configurable eager loading per Frame or through `widgets.Frame`
+  defaults, with snapshots acting as loading posters.
+
 ## 5.1.0
 
 ### Minor Changes

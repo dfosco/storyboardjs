@@ -102,6 +102,8 @@ export interface FramePathAffix {
   env?: 'dev' | 'prod';
 }
 
+export type FrameLoadStrategy = 'eager' | 'interaction';
+
 export interface FrameProps extends Omit<BlockProps, 'children'> {
   /** Same-origin URL, path, query, or hash route rendered inside the frame. */
   route: string | URL;
@@ -109,6 +111,12 @@ export interface FrameProps extends Omit<BlockProps, 'children'> {
   title: string;
   /** Optional state description shown beside the title in smaller type. */
   description?: string;
+  /** Iframe admission policy. Defaults to interaction when snapshot is set, otherwise eager. */
+  loadStrategy?: FrameLoadStrategy;
+  /** Browser-resolvable preview image. Required by the interaction strategy. */
+  snapshot?: string;
+  /** Interaction-gate button content. Default: 'Interact' */
+  interactLabel?: ReactNode;
   /** Ordered entries added before the iframe URL pathname. */
   prepend?: readonly FramePathAffix[];
   /** Ordered entries added after the iframe URL pathname. */

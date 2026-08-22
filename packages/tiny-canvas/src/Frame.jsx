@@ -1,8 +1,16 @@
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ResizableBlock from './ResizableBlock';
 import { CanvasContext } from './CanvasContext';
 import { authorizeCanvasChild } from './canvasChild';
 import { getCanvasEnvironment } from './PageSelector';
+import useFrameLoadPolicy from './useFrameLoadPolicy';
 import {
   buildFrameDisplayRoute,
   buildFrameHref,
@@ -22,6 +30,9 @@ function Frame({
   prepend,
   append,
   apend,
+  loadStrategy,
+  snapshot,
+  interactLabel = 'Interact',
   width,
   height,
   minWidth = DEFAULT_MIN_WIDTH,
@@ -29,6 +40,8 @@ function Frame({
   onSizeChange,
   id,
   blockId,
+  selected,
+  onSelectionChange,
   className,
   style,
   ...blockProps
@@ -36,6 +49,8 @@ function Frame({
   const iframeRef = useRef(null);
   const canvas = useContext(CanvasContext);
   const navigationCleanupRef = useRef(null);
+  const interactButtonRef = useRef(null);
+  const restoreInteractFocusRef = useRef(false);
   const environment = getCanvasEnvironment();
   const affixOptions = { prepend, append, apend, environment };
   const sourceKey = `${String(route)}\n${title}\n${environment}\n${JSON.stringify(prepend)}\n${JSON.stringify(append ?? apend)}`;
@@ -58,13 +73,65 @@ function Frame({
     [apend, append, environment, iframeSrc, prepend, route, sourceKey, title]
   );
   const [navigation, setNavigation] = useState(initialNavigation);
+  const [interactive, setInteractive] = useState(false);
+  const [loadedFrameSrc, setLoadedFrameSrc] = useState(null);
+  const [snapshotError, setSnapshotError] = useState(false);
+  const {
+    loadStrategy: resolvedLoadStrategy,
+    shouldMountIframe,
+    activate,
+  } = useFrameLoadPolicy({ loadStrategy, snapshot });
   const currentNavigation =
     navigation.sourceKey === sourceKey ? navigation : initialNavigation;
+  const usesInteractionGate = resolvedLoadStrategy === 'interaction';
+  const iframeLoaded = loadedFrameSrc === iframeSrc;
+  const showPoster = Boolean(snapshot) && !iframeLoaded;
+
+  useEffect(() => {
+    setSnapshotError(false);
+  }, [snapshot]);
+
+  useEffect(() => {
+    if (
+      usesInteractionGate &&
+      ((canvas && blockId && canvas.selectedBlockId !== blockId) ||
+        selected === false)
+    ) {
+      setInteractive(false);
+    }
+  }, [
+    blockId,
+    canvas,
+    canvas?.selectedBlockId,
+    selected,
+    usesInteractionGate,
+  ]);
+
+  useEffect(() => {
+    if (
+      !interactive &&
+      restoreInteractFocusRef.current &&
+      interactButtonRef.current
+    ) {
+      restoreInteractFocusRef.current = false;
+      interactButtonRef.current.focus();
+    }
+  }, [interactive]);
 
   useEffect(
     () => () => navigationCleanupRef.current?.(),
     []
   );
+
+  const stopInteraction = useCallback((restoreFocus = false) => {
+    restoreInteractFocusRef.current = restoreFocus;
+    setInteractive(false);
+  }, []);
+
+  const startInteraction = useCallback(() => {
+    activate();
+    setInteractive(true);
+  }, [activate]);
 
   const syncNavigation = () => {
     const iframe = iframeRef.current;
@@ -130,6 +197,11 @@ function Frame({
           iframeRect.top + event.clientY
         );
       };
+      const stopOnEscape = (event) => {
+        if (event.key === 'Escape') {
+          stopInteraction(true);
+        }
+      };
       frameHistory.pushState = observedPushState;
       frameHistory.replaceState = observedReplaceState;
       observer?.observe(observerTarget, {
@@ -147,6 +219,7 @@ function Frame({
         capture: true,
         passive: false,
       });
+      frameDocument.addEventListener('keydown', stopOnEscape);
 
       navigationCleanupRef.current = () => {
         observer?.disconnect();
@@ -163,17 +236,28 @@ function Frame({
           syncNavigation
         );
         frameDocument.removeEventListener('wheel', forwardWheelZoom, true);
+        frameDocument.removeEventListener('keydown', stopOnEscape);
       };
     } catch {
       navigationCleanupRef.current = null;
     }
   };
 
+  const showInteractionGuard =
+    usesInteractionGate && (!interactive || !iframeLoaded);
+  const interactionLoading =
+    usesInteractionGate && shouldMountIframe && !iframeLoaded;
+  const interactAccessibleLabel =
+    typeof interactLabel === 'string'
+      ? `${interactLabel} with ${currentNavigation.title}`
+      : `Interact with ${currentNavigation.title}`;
+
   return (
     <ResizableBlock
       {...blockProps}
       id={id}
       blockId={blockId}
+      selected={selected}
       componentName="Frame"
       resizeLabel={`Resize ${currentNavigation.title}`}
       defaultWidth={DEFAULT_WIDTH}
@@ -185,6 +269,12 @@ function Frame({
       onSizeChange={onSizeChange}
       className={['tc-frame-block', className].filter(Boolean).join(' ')}
       style={style}
+      onSelectionChange={(nextSelected) => {
+        if (!nextSelected) {
+          stopInteraction();
+        }
+        onSelectionChange?.(nextSelected);
+      }}
     >
       <section className="tc-frame">
         <div className="tc-frame-title-bar">
@@ -217,13 +307,70 @@ function Frame({
             </svg>
           </a>
         </div>
-        <iframe
-          ref={iframeRef}
-          className="tc-frame-viewport"
-          src={iframeSrc}
-          title={currentNavigation.title}
-          onLoad={observeNavigation}
-        />
+        <div className="tc-frame-viewport">
+          {shouldMountIframe ? (
+            <iframe
+              ref={iframeRef}
+              className="tc-frame-document"
+              src={iframeSrc}
+              title={currentNavigation.title}
+              onLoad={() => {
+                setLoadedFrameSrc(iframeSrc);
+                observeNavigation();
+              }}
+            />
+          ) : null}
+          {showPoster ? (
+            <div
+              className="tc-frame-poster"
+              data-loading={shouldMountIframe || undefined}
+            >
+              {snapshotError ? (
+                <div
+                  className="tc-frame-snapshot-fallback"
+                  aria-hidden="true"
+                >
+                  Preview unavailable
+                </div>
+              ) : (
+                <img
+                  src={snapshot}
+                  alt=""
+                  draggable="false"
+                  className="tc-frame-snapshot"
+                  onError={() => setSnapshotError(true)}
+                />
+              )}
+              {shouldMountIframe && !usesInteractionGate ? (
+                <span className="tc-frame-loading-status" role="status">
+                  Loading {currentNavigation.title}…
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+          {showInteractionGuard ? (
+            <div
+              className="tc-frame-interaction-guard"
+              data-loading={interactionLoading || undefined}
+            >
+              <button
+                ref={interactButtonRef}
+                type="button"
+                className="tc-frame-interact-button tc-no-drag"
+                aria-label={
+                  interactionLoading
+                    ? `Loading ${currentNavigation.title}`
+                    : interactAccessibleLabel
+                }
+                aria-busy={interactionLoading || undefined}
+                disabled={interactionLoading}
+                onClick={startInteraction}
+              >
+                {interactionLoading ? 'Loading…' : interactLabel}
+              </button>
+            </div>
+          ) : null}
+        </div>
       </section>
     </ResizableBlock>
   );

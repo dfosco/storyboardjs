@@ -467,12 +467,128 @@ body .tc-block {
 }
 
 .tc-frame-viewport {
-  display: block;
+  position: relative;
   flex: 1 1 auto;
+  overflow: hidden;
   inline-size: 100%;
   min-block-size: 0;
   background-color: var(--tc-frame-bg, var(--bgColor-default, Canvas));
+}
+
+.tc-frame-document {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
   border: 0;
+}
+
+.tc-frame-poster,
+.tc-frame-interaction-guard {
+  position: absolute;
+  inset: 0;
+}
+
+.tc-frame-poster {
+  z-index: 1;
+  overflow: hidden;
+  background: var(--tc-frame-bg, var(--bgColor-default, Canvas));
+  opacity: 1;
+  transition: opacity 120ms ease-out;
+}
+
+.tc-frame-snapshot {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: top left;
+  user-select: none;
+}
+
+.tc-frame-snapshot-fallback {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+  font-size: var(--text-body-size-small, 12px);
+  color: var(--fgColor-muted, GrayText);
+  background:
+    linear-gradient(
+      135deg,
+      transparent 25%,
+      rgba(127, 127, 127, 0.06) 25% 50%,
+      transparent 50% 75%,
+      rgba(127, 127, 127, 0.06) 75%
+    ),
+    var(--tc-frame-bg, var(--bgColor-default, Canvas));
+  background-size: 24px 24px;
+}
+
+.tc-frame-loading-status {
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-end: var(--base-size-16, 16px);
+  padding: var(--base-size-4, 4px) var(--base-size-8, 8px);
+  font-size: var(--text-body-size-small, 12px);
+  color: var(--fgColor-default, CanvasText);
+  white-space: nowrap;
+  background: var(--overlay-bgColor, var(--bgColor-default, Canvas));
+  border: var(--borderWidth-thin, 1px) solid
+    var(--borderColor-default, var(--tc-border-color));
+  border-radius: var(--borderRadius-medium, 6px);
+  box-shadow: var(--shadow-resting-medium, var(--tc-shadow-rest));
+  transform: translateX(-50%);
+}
+
+.tc-frame-interaction-guard {
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  cursor: grab;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.tc-frame-interaction-guard[data-loading] {
+  cursor: progress;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.tc-frame-interact-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 32px;
+  padding: var(--base-size-6, 6px) var(--base-size-16, 16px);
+  font: inherit;
+  font-weight: var(--base-text-weight-semibold, 600);
+  color: var(--button-primary-fgColor-rest, white);
+  cursor: pointer;
+  background: var(--button-primary-bgColor-rest, #1f883d);
+  border: var(--borderWidth-thin, 1px) solid
+    var(--button-primary-borderColor-rest, rgba(31, 35, 40, 0.15));
+  border-radius: var(--borderRadius-medium, 6px);
+  box-shadow: var(--shadow-resting-small, 0 1px 0 rgba(31, 35, 40, 0.1));
+}
+
+.tc-frame-interact-button:hover:not(:disabled) {
+  background: var(--button-primary-bgColor-hover, #1a7f37);
+}
+
+.tc-frame-interact-button:focus-visible {
+  outline: 2px solid var(--tc-selection-color);
+  outline-offset: 2px;
+}
+
+.tc-frame-interact-button:disabled {
+  cursor: progress;
+  opacity: 0.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tc-frame-poster {
+    transition: none;
+  }
 }
 
 .tc-resize-handle {
