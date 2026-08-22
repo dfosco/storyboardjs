@@ -149,7 +149,13 @@ body:has(.tc-canvas) {
 .tc-canvas-pages {
   position: fixed;
   z-index: 10;
-  inset-block-start: var(--base-size-16, 16px);
+  inset-block-start: var(
+    --tc-canvas-pages-inset-block-start,
+    calc(
+      var(--prototype-overlay-top-inset, 0px) +
+        var(--base-size-16, 16px)
+    )
+  );
   inset-inline-start: var(--base-size-16, 16px);
   font-size: var(--text-body-size-small, 13px);
 }

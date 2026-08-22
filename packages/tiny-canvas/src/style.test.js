@@ -21,6 +21,16 @@ describe('Canvas viewport styles', () => {
   });
 });
 
+describe('Page selector styles', () => {
+  it('clears host top chrome while remaining directly configurable', () => {
+    const pagesRule = styles.match(/\.tc-canvas-pages \{([^}]*)\}/)?.[1];
+
+    expect(pagesRule).toContain('--tc-canvas-pages-inset-block-start');
+    expect(pagesRule).toContain('var(--prototype-overlay-top-inset, 0px)');
+    expect(pagesRule).toContain('var(--base-size-16, 16px)');
+  });
+});
+
 describe('Frame interaction styles', () => {
   it('shields every iframe while a Frame is being dragged', () => {
     expect(styles).toContain(

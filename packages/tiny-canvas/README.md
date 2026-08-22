@@ -425,6 +425,9 @@ Override CSS custom properties to fit your application:
 
 `Block` owns its panel layout, background, border, spacing, and minimum width.
 Primer design tokens are used automatically when available.
+The page selector starts 16px below any inherited
+`--prototype-overlay-top-inset`. Set
+`--tc-canvas-pages-inset-block-start` to override its complete top inset.
 
 ## Requirements
 

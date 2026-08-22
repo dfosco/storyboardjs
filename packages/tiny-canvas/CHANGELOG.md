@@ -1,5 +1,12 @@
 # @dfosco/tiny-canvas
 
+## 5.0.1
+
+### Patch Changes
+
+- Keep the multi-page Canvas selector below inherited prototype toolbar chrome
+  while exposing a custom property for overriding its top inset.
+
 ## 5.0.0
 
 ### Major Changes
