@@ -59,7 +59,11 @@ describe('PageSelector', () => {
   });
 
   it('matches hash routes and keeps selector links in the hash router', () => {
-    window.history.replaceState({}, '', '/preview/#/canvas/details');
+    window.history.replaceState(
+      {},
+      '',
+      '/preview/#/canvas/details?urlstate=&state.r.view=compact'
+    );
     setManifest([
       { id: '/canvas', title: 'Overview', href: '/preview/canvas' },
       {
@@ -74,10 +78,10 @@ describe('PageSelector', () => {
     expect(screen.getByText('2/2')).toBeTruthy();
     expect(
       screen.getByRole('link', { name: 'Overview' }).getAttribute('href')
-    ).toBe('#/canvas');
+    ).toBe('#/canvas?urlstate=&state.r.view=compact');
     expect(
       screen.getByRole('link', { name: 'Details' }).getAttribute('href')
-    ).toBe('#/canvas/details');
+    ).toBe('#/canvas/details?urlstate=&state.r.view=compact');
     expect(
       screen.getByRole('link', { name: 'Details' }).getAttribute('aria-current')
     ).toBe('page');

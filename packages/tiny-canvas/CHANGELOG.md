@@ -1,5 +1,14 @@
 # @dfosco/tiny-canvas
 
+## 5.1.0
+
+### Minor Changes
+
+- Generate kebab-case page URLs from Canvas filenames and expose the shared
+  filename slug helper.
+- Preserve the current hash-route query, including URL state, when switching
+  between Canvas pages.
+
 ## 5.0.1
 
 ### Patch Changes

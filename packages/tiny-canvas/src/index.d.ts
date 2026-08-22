@@ -28,6 +28,9 @@ export interface CanvasChange {
   height?: number;
 }
 
+/** Convert a Canvas page filename stem to its kebab-case URL segment. */
+export declare function slugifyCanvasPageName(value: string): string;
+
 type CanvasChild =
   | ReactElement<BlockProps, typeof Block>
   | ReactElement<FrameProps, typeof Frame>

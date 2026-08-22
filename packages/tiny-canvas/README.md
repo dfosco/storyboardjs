@@ -105,8 +105,9 @@ props (`id`, `blockId`, and `children`) are never inherited from widget config.
 `src/pages/canvas` directory. For example:
 
 ```text
-src/pages/canvas/index.tsx       → /canvas
-src/pages/canvas/details.tsx     → /canvas/details
+src/pages/canvas/index.tsx        → /canvas
+src/pages/canvas/details.tsx      → /canvas/details
+src/pages/canvas/SecondPage.tsx   → /canvas/second-page
 src/pages/canvas/review/index.tsx → /canvas/review
 ```
 
@@ -149,7 +150,10 @@ Only static `.tsx` files containing a `<Canvas>` are discovered; route
 definition files, dynamic route files, tests, and specs are skipped. A static
 `title` prop on `Canvas` overrides the filename in the selector. Plugin
 `titles` overrides take highest priority. `pagesDir` remains as a deprecated
-alias for `routeBase`.
+alias for `routeBase`. Filename stems are converted to kebab-case URL segments;
+for example, `ReleaseReview.tsx` maps to `/canvas/release-review`. Hash-router
+page links retain the current hash query so URL-backed state survives page
+navigation.
 
 The router-agnostic virtual registry exposes the same discovered pages as lazy
 module loaders. Use it when constructing routes for React Router, TanStack

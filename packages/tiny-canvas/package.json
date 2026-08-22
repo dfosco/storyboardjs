@@ -1,6 +1,6 @@
 {
   "name": "@dfosco/tiny-canvas",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "type": "module",
   "license": "MIT",
   "description": "A lightweight React canvas with draggable elements and persistent positions",
@@ -44,6 +44,7 @@
   "files": [
     "dist",
     "src/index.d.ts",
+    "src/pageRoute.js",
     "src/vite.js",
     "src/vite.d.ts",
     "src/virtual.d.ts",

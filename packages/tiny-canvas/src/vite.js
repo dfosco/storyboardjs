@@ -8,6 +8,7 @@ import {
   resolve,
   sep,
 } from 'node:path';
+import { slugifyCanvasPageName } from './pageRoute.js';
 
 const PAGE_EXTENSIONS = new Set(['.tsx']);
 const MANIFEST_ID = 'tiny-canvas-pages';
@@ -28,8 +29,10 @@ function normalizeRoute(value) {
 }
 
 function humanize(value) {
-  const words = value.replace(/[-_]+/g, ' ').trim();
-  return words ? words[0].toUpperCase() + words.slice(1) : 'Canvas';
+  return slugifyCanvasPageName(value)
+    .split('-')
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 function readCanvasSource(file) {
@@ -80,8 +83,13 @@ function routeFromFile(file, pagesRoot, routeBase) {
     .join('/')
     .replace(/\.tsx$/, '')
     .replace(/(^|\/)index$/, '');
+  const routePath = relativeFile
+    .split('/')
+    .filter(Boolean)
+    .map(slugifyCanvasPageName)
+    .join('/');
 
-  return `${routeBase}/${relativeFile}`.replace(/\/$/, '') || routeBase;
+  return `${routeBase}/${routePath}`.replace(/\/$/, '') || routeBase;
 }
 
 function joinBase(base, route) {

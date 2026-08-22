@@ -16,6 +16,12 @@ function getPageRoute(page) {
   return normalizePath(page.id || page.href);
 }
 
+function getHashPageHref(page) {
+  const queryStart = window.location.hash.indexOf('?');
+  const query = queryStart < 0 ? '' : window.location.hash.slice(queryStart);
+  return `#${getPageRoute(page)}${query}`;
+}
+
 function getPageManifest() {
   if (typeof document === 'undefined' || typeof window === 'undefined') {
     return null;
@@ -116,7 +122,7 @@ export default function PageSelector({ title }) {
         {pages.map((page) => (
           <li key={page.id}>
             <a
-              href={hashRoute ? `#${getPageRoute(page)}` : page.href}
+              href={hashRoute ? getHashPageHref(page) : page.href}
               className="tc-canvas-pages-link"
               aria-current={page.id === currentPage.id ? 'page' : undefined}
             >

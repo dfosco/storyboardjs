@@ -19,7 +19,9 @@ function createProject() {
   for (const file of [
     'index.tsx',
     'details.tsx',
+    'SecondPage.tsx',
     'nested/index.tsx',
+    'nested/ReviewQueue.tsx',
     '[slug].tsx',
     'ignored.test.tsx',
     'ignored.jsx',
@@ -76,6 +78,16 @@ describe('tinyCanvas Vite plugin', () => {
         id: '/canvas/nested',
         title: 'Nested',
         href: '/app/canvas/nested',
+      },
+      {
+        id: '/canvas/nested/review-queue',
+        title: 'Review Queue',
+        href: '/app/canvas/nested/review-queue',
+      },
+      {
+        id: '/canvas/second-page',
+        title: 'Second Page',
+        href: '/app/canvas/second-page',
       },
     ]);
   });
