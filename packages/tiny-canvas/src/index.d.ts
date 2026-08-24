@@ -3,7 +3,7 @@ import {
   ImgHTMLAttributes,
   ReactElement,
   ReactNode,
-} from 'react';
+} from "react";
 
 export interface Position {
   x: number;
@@ -40,7 +40,7 @@ type CanvasChild =
   | ReactElement<ImageProps, typeof Image>;
 
 export interface CanvasProps
-  extends Omit<HTMLAttributes<HTMLElement>, 'onSelectionChange'> {
+  extends Omit<HTMLAttributes<HTMLElement>, "onSelectionChange"> {
   children?: CanvasChild | readonly CanvasChild[];
   /** Canvas page title. Overrides its filename in the page selector. */
   title?: string;
@@ -55,7 +55,7 @@ export interface CanvasProps
   /** Dot-grid spacing in pixels. Default: 36 */
   gridSize?: number;
   /** Color mode: 'auto' follows system preference, 'light' or 'dark' to override. Default: 'auto' */
-  colorMode?: 'auto' | 'light' | 'dark';
+  colorMode?: "auto" | "light" | "dark";
   /** Show the built-in Reset board button. Default: false */
   resettable?: boolean;
   /** Reset button content. Default: 'Reset board' */
@@ -75,7 +75,7 @@ export interface CanvasProps
 export declare function Canvas(props: CanvasProps): ReactElement;
 
 export interface BlockProps
-  extends Omit<HTMLAttributes<HTMLElement>, 'onSelectionChange'> {
+  extends Omit<HTMLAttributes<HTMLElement>, "onSelectionChange"> {
   children?: ReactNode;
   /** Optional stable persistence and DOM identifier. Canvas generates one when omitted. */
   id?: string;
@@ -99,12 +99,12 @@ export interface FramePathAffix {
   /** Include this value when opening the Frame URL externally. Default: true */
   external?: boolean;
   /** Apply only during Vite development or production builds. Omit for both. */
-  env?: 'dev' | 'prod';
+  env?: "dev" | "prod";
 }
 
-export type FrameLoadStrategy = 'eager' | 'interaction';
+export type FrameLoadStrategy = "eager" | "interaction";
 
-export interface FrameProps extends Omit<BlockProps, 'children'> {
+export interface FrameProps extends Omit<BlockProps, "children"> {
   /** Same-origin URL, path, query, or hash route rendered inside the frame. */
   route: string | URL;
   /** Accessible frame title shown in the title bar. */
@@ -115,6 +115,8 @@ export interface FrameProps extends Omit<BlockProps, 'children'> {
   loadStrategy?: FrameLoadStrategy;
   /** Browser-resolvable preview image. Required by the interaction strategy. */
   snapshot?: string;
+  /** Optional dark-mode preview selected by the native picture element. */
+  snapshotDark?: string;
   /** Interaction-gate button content. Default: 'Click to interact' */
   interactLabel?: ReactNode;
   /** Ordered entries added before the iframe URL pathname. */
@@ -138,14 +140,14 @@ export interface FrameProps extends Omit<BlockProps, 'children'> {
 export declare function Frame(props: FrameProps): ReactElement;
 
 export type NoteColor =
-  | 'yellow'
-  | 'blue'
-  | 'green'
-  | 'pink'
-  | 'purple'
-  | 'orange';
+  | "yellow"
+  | "blue"
+  | "green"
+  | "pink"
+  | "purple"
+  | "orange";
 
-export interface NoteProps extends Omit<BlockProps, 'children'> {
+export interface NoteProps extends Omit<BlockProps, "children"> {
   /** Markdown text. May also be provided as string children. */
   text?: string;
   children?: string;
@@ -164,7 +166,7 @@ export interface NoteProps extends Omit<BlockProps, 'children'> {
 
 export declare function Note(props: NoteProps): ReactElement;
 
-export interface MarkProps extends Omit<BlockProps, 'children'> {
+export interface MarkProps extends Omit<BlockProps, "children"> {
   /** Markdown text. May also be provided as string children. */
   content?: string;
   children?: string;
@@ -181,7 +183,7 @@ export interface MarkProps extends Omit<BlockProps, 'children'> {
 
 export declare function Mark(props: MarkProps): ReactElement;
 
-export interface LinkProps extends Omit<BlockProps, 'children'> {
+export interface LinkProps extends Omit<BlockProps, "children"> {
   /** Absolute HTTP(S) destination. Its origin supplies /favicon.ico. */
   url: string | URL;
   /** Link title shown in the card. */
@@ -197,7 +199,7 @@ export interface LinkProps extends Omit<BlockProps, 'children'> {
 export declare function Link(props: LinkProps): ReactElement;
 
 export interface ImageProps
-  extends Omit<BlockProps, 'children' | 'onLoad' | 'onError'> {
+  extends Omit<BlockProps, "children" | "onLoad" | "onError"> {
   /** Browser-resolvable image URL or imported asset URL. */
   src: string;
   /** Accessible alternative text. Empty means decorative. Default: '' */
@@ -211,19 +213,17 @@ export interface ImageProps
   /** Minimum resizable height in pixels. Default: 60 */
   minHeight?: number;
   /** Browser image loading behavior. Default: 'lazy' */
-  loading?: ImgHTMLAttributes<HTMLImageElement>['loading'];
+  loading?: ImgHTMLAttributes<HTMLImageElement>["loading"];
   /** Browser image decoding behavior. Default: 'async' */
-  decoding?: ImgHTMLAttributes<HTMLImageElement>['decoding'];
-  onLoad?: ImgHTMLAttributes<HTMLImageElement>['onLoad'];
-  onError?: ImgHTMLAttributes<HTMLImageElement>['onError'];
+  decoding?: ImgHTMLAttributes<HTMLImageElement>["decoding"];
+  onLoad?: ImgHTMLAttributes<HTMLImageElement>["onLoad"];
+  onError?: ImgHTMLAttributes<HTMLImageElement>["onError"];
   onSizeChange?: (size: Size) => void;
 }
 
 export declare function Image(props: ImageProps): ReactElement;
 
-export type WidgetDefaults<Props> = Partial<
-  Omit<Props, 'id' | 'children'>
->;
+export type WidgetDefaults<Props> = Partial<Omit<Props, "id" | "children">>;
 
 export interface TinyCanvasWidgetConfig {
   Block?: WidgetDefaults<BlockProps>;
@@ -240,4 +240,6 @@ export interface UseResetCanvasOptions {
 }
 
 /** Returns a function that clears all saved canvas layout state from localStorage. */
-export declare function useResetCanvas(options?: UseResetCanvasOptions): () => void;
+export declare function useResetCanvas(
+  options?: UseResetCanvasOptions
+): () => void;

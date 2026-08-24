@@ -15,8 +15,8 @@ npm install @dfosco/tiny-canvas
 ## Quick start
 
 ```jsx
-import { Block, Canvas, Image, Link, Mark, Note } from '@dfosco/tiny-canvas'
-import '@dfosco/tiny-canvas/style.css'
+import { Block, Canvas, Image, Link, Mark, Note } from "@dfosco/tiny-canvas";
+import "@dfosco/tiny-canvas/style.css";
 
 export function Board() {
   return (
@@ -30,11 +30,11 @@ export function Board() {
       </Block>
 
       <Note x={48} y={240} color="yellow">
-        {'## Remember\nShip the smallest useful thing.'}
+        {"## Remember\nShip the smallest useful thing."}
       </Note>
 
       <Mark x={400} y={320}>
-        {'### Status\n\n- Built\n- Tested'}
+        {"### Status\n\n- Built\n- Tested"}
       </Mark>
 
       <Link
@@ -45,14 +45,9 @@ export function Board() {
         y={480}
       />
 
-      <Image
-        src="/reference.png"
-        alt="Reference screen"
-        x={760}
-        y={240}
-      />
+      <Image src="/reference.png" alt="Reference screen" x={760} y={240} />
     </Canvas>
-  )
+  );
 }
 ```
 
@@ -64,36 +59,36 @@ configured directory.
 
 ```ts
 // vite.config.ts
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tinyCanvas from '@dfosco/tiny-canvas/vite'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tinyCanvas from "@dfosco/tiny-canvas/vite";
 
 export default defineConfig({
   plugins: [
     react(),
     tinyCanvas({
-      routeBase: '/canvas',
+      routeBase: "/canvas",
       widgets: {
         Frame: {
           prepend: [
-            { value: '/dev-proxy', visible: false, env: 'dev' },
-            { value: '/previews/branch', visible: false, env: 'prod' },
+            { value: "/dev-proxy", visible: false, env: "dev" },
+            { value: "/previews/branch", visible: false, env: "prod" },
           ],
           append: [
-            { value: '/embedded', visible: true },
+            { value: "/embedded", visible: true },
             {
-              value: '/?hideTooling=1',
+              value: "/?hideTooling=1",
               external: false,
               visible: false,
-              env: 'dev',
+              env: "dev",
             },
           ],
         },
-        Note: { color: 'blue' },
+        Note: { color: "blue" },
       },
     }),
   ],
-})
+});
 ```
 
 `widgets` optionally supplies default props for `Block`, `Frame`, `Note`,
@@ -115,14 +110,16 @@ Each file renders its own Canvas:
 
 ```tsx
 // src/pages/canvas/details.tsx
-import { Canvas, Note } from '@dfosco/tiny-canvas'
+import { Canvas, Note } from "@dfosco/tiny-canvas";
 
 export default function DetailsPage() {
   return (
     <Canvas title="Details" dotted resettable>
-      <Note x={48} y={72}>Details page</Note>
+      <Note x={48} y={72}>
+        Details page
+      </Note>
     </Canvas>
-  )
+  );
 }
 ```
 
@@ -132,18 +129,18 @@ actually registered by the host router:
 
 ```ts
 tinyCanvas({
-  pagesPath: 'src/routes/tiny-board',
-  routeBase: '/tiny-board',
+  pagesPath: "src/routes/tiny-board",
+  routeBase: "/tiny-board",
   resolveRoute: ({ relativePath, defaultRoute }) => {
-    if (relativePath === 'TinyBoardPage.tsx') return '/tiny-board'
-    if (relativePath === 'TinyBoardPage2.tsx') return '/tiny-board/second'
-    return defaultRoute
+    if (relativePath === "TinyBoardPage.tsx") return "/tiny-board";
+    if (relativePath === "TinyBoardPage2.tsx") return "/tiny-board/second";
+    return defaultRoute;
   },
   titles: {
-    '/tiny-board': 'Overview',
-    '/tiny-board/second': 'Review',
+    "/tiny-board": "Overview",
+    "/tiny-board/second": "Review",
   },
-})
+});
 ```
 
 Only static `.tsx` files containing a `<Canvas>` are discovered; route
@@ -160,7 +157,7 @@ module loaders. Use it when constructing routes for React Router, TanStack
 Router, or another host router:
 
 ```ts
-import pages from 'virtual:tiny-canvas-pages'
+import pages from "virtual:tiny-canvas-pages";
 
 // [{ id, title, href, load: () => import(pageFile) }]
 ```
@@ -215,23 +212,23 @@ and persistence identifier, but it is not required.
 
 ### `Canvas`
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `Block \| Frame \| Note \| Mark \| Link \| Array<…>` | — | Authorized canvas children. Plain elements are rejected. |
-| `title` | `string` | filename | Override the page selector label. |
-| `canvasWidth` | `number` | `10000` | Scrollable board width in pixels. |
-| `canvasHeight` | `number` | `10000` | Scrollable board height in pixels. |
-| `dotted` | `boolean` | `false` | Show the dotted canvas background. |
-| `grid` | `boolean` | `false` | Legacy alias that also enables the dotted background. |
-| `gridSize` | `number` | `36` | Dot-grid spacing in pixels. |
-| `colorMode` | `'auto' \| 'light' \| 'dark'` | `'auto'` | Canvas color-scheme behavior. |
-| `resettable` | `boolean` | `false` | Show a built-in **Reset board** button that clears saved layout state and reloads. |
-| `resetLabel` | `ReactNode` | `'Reset board'` | Customize the reset button content. |
-| `copyable` | `boolean` | value of `resettable` | Show a built-in **Copy changes** button. |
-| `copyLabel` | `ReactNode` | `'Copy changes'` | Customize the copy button content. |
-| `copiedLabel` | `ReactNode` | `'Copied'` | Customize the temporary success content. |
-| `onCopyChanges` | `(changes, text) => void` | — | Observe a successful clipboard copy. |
-| `onSelectionChange` | `(blockId: string \| null) => void` | — | Observe selected block identity. |
+| Prop                | Type                                                 | Default               | Description                                                                        |
+| ------------------- | ---------------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------- |
+| `children`          | `Block \| Frame \| Note \| Mark \| Link \| Array<…>` | —                     | Authorized canvas children. Plain elements are rejected.                           |
+| `title`             | `string`                                             | filename              | Override the page selector label.                                                  |
+| `canvasWidth`       | `number`                                             | `10000`               | Scrollable board width in pixels.                                                  |
+| `canvasHeight`      | `number`                                             | `10000`               | Scrollable board height in pixels.                                                 |
+| `dotted`            | `boolean`                                            | `false`               | Show the dotted canvas background.                                                 |
+| `grid`              | `boolean`                                            | `false`               | Legacy alias that also enables the dotted background.                              |
+| `gridSize`          | `number`                                             | `36`                  | Dot-grid spacing in pixels.                                                        |
+| `colorMode`         | `'auto' \| 'light' \| 'dark'`                        | `'auto'`              | Canvas color-scheme behavior.                                                      |
+| `resettable`        | `boolean`                                            | `false`               | Show a built-in **Reset board** button that clears saved layout state and reloads. |
+| `resetLabel`        | `ReactNode`                                          | `'Reset board'`       | Customize the reset button content.                                                |
+| `copyable`          | `boolean`                                            | value of `resettable` | Show a built-in **Copy changes** button.                                           |
+| `copyLabel`         | `ReactNode`                                          | `'Copy changes'`      | Customize the copy button content.                                                 |
+| `copiedLabel`       | `ReactNode`                                          | `'Copied'`            | Customize the temporary success content.                                           |
+| `onCopyChanges`     | `(changes, text) => void`                            | —                     | Observe a successful clipboard copy.                                               |
+| `onSelectionChange` | `(blockId: string \| null) => void`                  | —                     | Observe selected block identity.                                                   |
 
 Standard `<main>` attributes are forwarded to the canvas.
 When the Vite page plugin discovers two or more sibling TSX pages, Canvas also
@@ -240,15 +237,15 @@ in the bottom-left corner.
 
 ### `Block`
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `ReactNode` | — | Content owned by the block. |
-| `x` | `number` | `0` | Initial horizontal position in pixels. |
-| `y` | `number` | `0` | Initial vertical position in pixels. |
-| `id` | `string` | generated | Optional explicit DOM and persistence identifier. |
-| `selected` | `boolean` | managed by `Canvas` | Control selected state. |
-| `onPositionChange` | `({ x, y }) => void` | — | Observe drag position updates. |
-| `onSelectionChange` | `(selected: boolean) => void` | — | Observe selection updates. |
+| Prop                | Type                          | Default             | Description                                       |
+| ------------------- | ----------------------------- | ------------------- | ------------------------------------------------- |
+| `children`          | `ReactNode`                   | —                   | Content owned by the block.                       |
+| `x`                 | `number`                      | `0`                 | Initial horizontal position in pixels.            |
+| `y`                 | `number`                      | `0`                 | Initial vertical position in pixels.              |
+| `id`                | `string`                      | generated           | Optional explicit DOM and persistence identifier. |
+| `selected`          | `boolean`                     | managed by `Canvas` | Control selected state.                           |
+| `onPositionChange`  | `({ x, y }) => void`          | —                   | Observe drag position updates.                    |
+| `onSelectionChange` | `(selected: boolean) => void` | —                   | Observe selection updates.                        |
 
 Standard `<article>` attributes are forwarded to the block.
 
@@ -264,16 +261,16 @@ the current application:
     title="Security overview"
     description="Unread comment inbox"
     prepend={[
-      { value: '/dev-proxy', visible: false, env: 'dev' },
-      { value: '/previews/branch', visible: false, env: 'prod' },
+      { value: "/dev-proxy", visible: false, env: "dev" },
+      { value: "/previews/branch", visible: false, env: "prod" },
     ]}
     append={[
-      { value: '/embedded', visible: true },
+      { value: "/embedded", visible: true },
       {
-        value: '/?hideTooling=1',
+        value: "/?hideTooling=1",
         external: false,
         visible: false,
-        env: 'dev',
+        env: "dev",
       },
     ]}
     x={48}
@@ -284,23 +281,24 @@ the current application:
 </Canvas>
 ```
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `route` | `string \| URL` | — | Same-origin URL, path, query, or hash route loaded by the iframe. |
-| `title` | `string` | — | Initial accessible iframe title and header label. Same-origin navigation replaces it with the loaded document title. |
-| `description` | `string` | — | Optional state description shown beside the title in smaller type. |
-| `loadStrategy` | `'eager' \| 'interaction'` | inferred | Mount immediately with `eager`, or require explicit activation with `interaction`. Defaults to `interaction` when `snapshot` is set and `eager` otherwise. |
-| `snapshot` | `string` | — | Browser-resolvable preview image. Required for `interaction`; used as a loading poster with `eager`. |
-| `interactLabel` | `ReactNode` | `'Click to interact'` | Visible interaction-gate button content. Its accessible name also includes the Frame title. |
-| `prepend` | `{ value, visible, env? }[]` | — | Add ordered entries before the URL pathname. |
-| `append` | `{ value, visible, external?, env? }[]` | — | Add ordered entries after the URL pathname. A leading `?` or `/?` adds query parameters without pathname encoding. `external: false` omits the entry from **Open in new tab**. |
-| `apend` | object or array | — | Deprecated runtime alias for `append`. |
-| `width` | `number` | `1270` | Initial width in pixels. Saved width takes precedence. |
-| `height` | `number` | `776` | Initial height in pixels. Saved height takes precedence. |
-| `minWidth` | `number` | `320` | Minimum width while resizing. |
-| `minHeight` | `number` | `240` | Minimum height while resizing. |
-| `onSizeChange` | `({ width, height }) => void` | — | Observe live resize updates. |
-| `x`, `y`, selection, and position props | `BlockProps` | — | Frame movement and selection use the same contract as `Block`. |
+| Prop                                    | Type                                    | Default               | Description                                                                                                                                                                    |
+| --------------------------------------- | --------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `route`                                 | `string \| URL`                         | —                     | Same-origin URL, path, query, or hash route loaded by the iframe.                                                                                                              |
+| `title`                                 | `string`                                | —                     | Initial accessible iframe title and header label. Same-origin navigation replaces it with the loaded document title.                                                           |
+| `description`                           | `string`                                | —                     | Optional state description shown beside the title in smaller type.                                                                                                             |
+| `loadStrategy`                          | `'eager' \| 'interaction'`              | inferred              | Mount immediately with `eager`, or require explicit activation with `interaction`. Defaults to `interaction` when `snapshot` is set and `eager` otherwise.                     |
+| `snapshot`                              | `string`                                | —                     | Browser-resolvable preview image. Required for `interaction`; used as a loading poster with `eager`.                                                                           |
+| `snapshotDark`                          | `string`                                | —                     | Optional dark-mode preview selected by the native `<picture>` element.                                                                                                         |
+| `interactLabel`                         | `ReactNode`                             | `'Click to interact'` | Visible interaction-gate button content. Its accessible name also includes the Frame title.                                                                                    |
+| `prepend`                               | `{ value, visible, env? }[]`            | —                     | Add ordered entries before the URL pathname.                                                                                                                                   |
+| `append`                                | `{ value, visible, external?, env? }[]` | —                     | Add ordered entries after the URL pathname. A leading `?` or `/?` adds query parameters without pathname encoding. `external: false` omits the entry from **Open in new tab**. |
+| `apend`                                 | object or array                         | —                     | Deprecated runtime alias for `append`.                                                                                                                                         |
+| `width`                                 | `number`                                | `1270`                | Initial width in pixels. Saved width takes precedence.                                                                                                                         |
+| `height`                                | `number`                                | `776`                 | Initial height in pixels. Saved height takes precedence.                                                                                                                       |
+| `minWidth`                              | `number`                                | `320`                 | Minimum width while resizing.                                                                                                                                                  |
+| `minHeight`                             | `number`                                | `240`                 | Minimum height while resizing.                                                                                                                                                 |
+| `onSizeChange`                          | `({ width, height }) => void`           | —                     | Observe live resize updates.                                                                                                                                                   |
+| `x`, `y`, selection, and position props | `BlockProps`                            | —                     | Frame movement and selection use the same contract as `Block`.                                                                                                                 |
 
 Select a frame, then drag its lower-right handle or use the handle's arrow keys
 to resize it. The embedded application can use the `embedView` query parameter
@@ -325,15 +323,14 @@ viewport guard is the click target; its black **Click to interact** button and
 subtle overlay appear on hover or keyboard focus. Once mounted, the iframe
 stays live for the page session; ending interaction restores the guard without
 discarding its URL, state, or scroll position.
+When both `snapshot` and `snapshotDark` are supplied, the poster uses a native
+`<picture>` element with a `prefers-color-scheme: dark` source, so the browser
+selects the appropriate image without JavaScript theme detection.
 
 ```jsx
-import settingsSnapshot from './settings.png';
+import settingsSnapshot from "./settings.png";
 
-<Frame
-  route="/settings"
-  title="Settings"
-  snapshot={settingsSnapshot}
-/>
+<Frame route="/settings" title="Settings" snapshot={settingsSnapshot} />;
 ```
 
 Choose eager loading explicitly per Frame with `loadStrategy="eager"`, or for
@@ -343,7 +340,7 @@ every Frame through the existing Vite widget defaults:
 tinyCanvas({
   widgets: {
     Frame: {
-      loadStrategy: 'eager',
+      loadStrategy: "eager",
     },
   },
 });
@@ -375,7 +372,7 @@ chrome. It defaults to `400×300`, preserves the image's natural aspect ratio
 while resizing, persists size changes, and uses 4px rounded corners.
 
 ```jsx
-import referenceUrl from './reference.png'
+import referenceUrl from "./reference.png";
 
 <Image
   src={referenceUrl}
@@ -384,7 +381,7 @@ import referenceUrl from './reference.png'
   y={48}
   width={400}
   height={300}
-/>
+/>;
 ```
 
 `alt` defaults to an empty string for decorative images. The minimum size is
@@ -415,11 +412,11 @@ and does not persist size changes.
 Clear all persisted block positions and frame sizes:
 
 ```jsx
-import { useResetCanvas } from '@dfosco/tiny-canvas'
+import { useResetCanvas } from "@dfosco/tiny-canvas";
 
 function ResetButton() {
-  const resetCanvas = useResetCanvas({ reload: true })
-  return <button onClick={resetCanvas}>Reset layout</button>
+  const resetCanvas = useResetCanvas({ reload: true });
+  return <button onClick={resetCanvas}>Reset layout</button>;
 }
 ```
 
@@ -430,7 +427,7 @@ The `reload` option defaults to `false`.
 Import the package stylesheet once:
 
 ```js
-import '@dfosco/tiny-canvas/style.css'
+import "@dfosco/tiny-canvas/style.css";
 ```
 
 Override CSS custom properties to fit your application:

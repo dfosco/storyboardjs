@@ -23,10 +23,7 @@ body:has(.tc-canvas) {
 
 .tc-canvas {
   --tc-bg-muted-default: var(--bgColor-muted, #f6f8fa);
-  --tc-dot-color-default: var(
-    --overlay-backdrop-bgColor,
-    rgba(0, 0, 0, 0.08)
-  );
+  --tc-dot-color-default: var(--overlay-backdrop-bgColor, rgba(0, 0, 0, 0.08));
   --tc-shadow-float-default: var(
     --shadow-floating-small,
     0 4px 12px rgba(0, 0, 0, 0.15)
@@ -151,10 +148,7 @@ body:has(.tc-canvas) {
   z-index: 10;
   inset-block-start: var(
     --tc-canvas-pages-inset-block-start,
-    calc(
-      var(--prototype-overlay-top-inset, 0px) +
-        var(--base-size-16, 16px)
-    )
+    calc(var(--prototype-overlay-top-inset, 0px) + var(--base-size-16, 16px))
   );
   inset-inline-start: var(--base-size-16, 16px);
   font-size: var(--text-body-size-small, 13px);
@@ -311,7 +305,10 @@ body .tc-block {
   padding: var(--tc-block-padding, var(--base-size-24, 24px));
   background-color: var(--tc-block-bg, var(--bgColor-default, Canvas));
   border: var(--borderWidth-thin, 1px) solid
-    var(--tc-block-border-color, var(--borderColor-default, var(--tc-border-color)));
+    var(
+      --tc-block-border-color,
+      var(--borderColor-default, var(--tc-border-color))
+    );
   border-radius: var(--tc-border-radius);
 }
 
@@ -383,9 +380,15 @@ body .tc-block {
   block-size: 100%;
   background-color: var(--tc-frame-bg, var(--bgColor-default, Canvas));
   border: var(--borderWidth-thin, 1px) solid
-    var(--tc-frame-border-color, var(--borderColor-default, var(--tc-border-color)));
+    var(
+      --tc-frame-border-color,
+      var(--borderColor-default, var(--tc-border-color))
+    );
   border-radius: var(--tc-border-radius);
-  box-shadow: var(--tc-frame-shadow, var(--shadow-resting-medium, var(--tc-shadow-rest)));
+  box-shadow: var(
+    --tc-frame-shadow,
+    var(--shadow-resting-medium, var(--tc-shadow-rest))
+  );
 }
 
 .tc-frame-title-bar {
@@ -398,9 +401,15 @@ body .tc-block {
   padding: var(--stack-padding-condensed, var(--base-size-8, 8px))
     var(--stack-padding-normal, var(--base-size-16, 16px));
   color: var(--fgColor-default, CanvasText);
-  background-color: var(--tc-frame-title-bg, var(--bgColor-muted, var(--tc-bg-muted-default)));
+  background-color: var(
+    --tc-frame-title-bg,
+    var(--bgColor-muted, var(--tc-bg-muted-default))
+  );
   border-bottom: var(--borderWidth-thin, 1px) solid
-    var(--tc-frame-border-color, var(--borderColor-default, var(--tc-border-color)));
+    var(
+      --tc-frame-border-color,
+      var(--borderColor-default, var(--tc-border-color))
+    );
 }
 
 .tc-canvas:has(.tc-frame-block.tc-block-dragging) .tc-frame::before {
@@ -458,7 +467,10 @@ body .tc-block {
 
 .tc-frame-open:hover {
   color: var(--fgColor-default, CanvasText);
-  background: var(--control-transparent-bgColor-hover, rgba(127, 127, 127, 0.12));
+  background: var(
+    --control-transparent-bgColor-hover,
+    rgba(127, 127, 127, 0.12)
+  );
 }
 
 .tc-frame-open:focus-visible {
@@ -505,6 +517,12 @@ body .tc-block {
   user-select: none;
 }
 
+.tc-frame-snapshot-picture {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
 .tc-frame-snapshot-fallback {
   display: grid;
   place-items: center;
@@ -512,8 +530,7 @@ body .tc-block {
   block-size: 100%;
   font-size: var(--text-body-size-small, 12px);
   color: var(--fgColor-muted, GrayText);
-  background:
-    linear-gradient(
+  background: linear-gradient(
       135deg,
       transparent 25%,
       rgba(127, 127, 127, 0.06) 25% 50%,
@@ -571,8 +588,7 @@ body .tc-block {
   color: var(--button-primary-fgColor-rest, white);
   cursor: pointer;
   background: var(--base-color-black, #1f2328);
-  border: var(--borderWidth-thin, 1px) solid
-    var(--base-color-black, #1f2328);
+  border: var(--borderWidth-thin, 1px) solid var(--base-color-black, #1f2328);
   border-radius: var(--borderRadius-medium, 6px);
   box-shadow: var(--shadow-resting-small, 0 1px 0 rgba(31, 35, 40, 0.1));
   opacity: 0;
@@ -618,15 +634,14 @@ body .tc-block {
   color: var(--fgColor-muted, GrayText);
   cursor: nwse-resize;
   touch-action: none;
-  background:
-    linear-gradient(
-      135deg,
-      transparent 0 52%,
-      currentColor 53% 57%,
-      transparent 58% 66%,
-      currentColor 67% 71%,
-      transparent 72%
-    );
+  background: linear-gradient(
+    135deg,
+    transparent 0 52%,
+    currentColor 53% 57%,
+    transparent 58% 66%,
+    currentColor 67% 71%,
+    transparent 72%
+  );
   border: 0;
   border-end-end-radius: var(--tc-border-radius);
   opacity: 0;
@@ -729,7 +744,10 @@ body .tc-block {
   color: var(--fgColor-default, #24292f);
   background: var(--tc-mark-bg, var(--bgColor-default, Canvas));
   border: var(--borderWidth-thin, 1px) solid
-    var(--tc-mark-border-color, var(--borderColor-default, var(--tc-border-color)));
+    var(
+      --tc-mark-border-color,
+      var(--borderColor-default, var(--tc-border-color))
+    );
   box-shadow: var(--tc-shadow-rest);
 }
 
@@ -766,10 +784,18 @@ body .tc-block {
   line-height: 1.25;
 }
 
-.tc-note-content h1 { font-size: 1.4em; }
-.tc-note-content h2 { font-size: 1.22em; }
-.tc-note-content h3 { font-size: 1.1em; }
-.tc-note-content h4 { font-size: 1em; }
+.tc-note-content h1 {
+  font-size: 1.4em;
+}
+.tc-note-content h2 {
+  font-size: 1.22em;
+}
+.tc-note-content h3 {
+  font-size: 1.1em;
+}
+.tc-note-content h4 {
+  font-size: 1em;
+}
 
 .tc-note-content :is(p, ul, ol, blockquote, pre, table),
 .tc-mark-content :is(p, ul, ol, blockquote, pre, table) {
@@ -845,7 +871,10 @@ body .tc-block {
   color: var(--fgColor-default, CanvasText);
   background: var(--tc-link-bg, var(--bgColor-default, Canvas));
   border: var(--borderWidth-thin, 1px) solid
-    var(--tc-link-border-color, var(--borderColor-default, var(--tc-border-color)));
+    var(
+      --tc-link-border-color,
+      var(--borderColor-default, var(--tc-border-color))
+    );
   border-radius: var(--tc-border-radius);
   box-shadow: var(--tc-shadow-rest);
 }

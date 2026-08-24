@@ -1,5 +1,12 @@
 # @dfosco/tiny-canvas
 
+## 5.2.2
+
+### Patch Changes
+
+- Support native light and dark snapshot posters with an optional
+  `snapshotDark` source.
+
 ## 5.2.1
 
 ### Patch Changes

@@ -5,18 +5,18 @@ import {
   useMemo,
   useRef,
   useState,
-} from 'react';
-import ResizableBlock from './ResizableBlock';
-import { CanvasContext } from './CanvasContext';
-import { authorizeCanvasChild } from './canvasChild';
-import { getCanvasEnvironment } from './PageSelector';
-import useFrameLoadPolicy from './useFrameLoadPolicy';
+} from "react";
+import ResizableBlock from "./ResizableBlock";
+import { CanvasContext } from "./CanvasContext";
+import { authorizeCanvasChild } from "./canvasChild";
+import { getCanvasEnvironment } from "./PageSelector";
+import useFrameLoadPolicy from "./useFrameLoadPolicy";
 import {
   buildFrameDisplayRoute,
   buildFrameHref,
   buildFrameNavigationDisplayRoute,
   buildFrameOpenHref,
-} from './frameUrl';
+} from "./frameUrl";
 
 const DEFAULT_MIN_WIDTH = 320;
 const DEFAULT_MIN_HEIGHT = 240;
@@ -32,7 +32,8 @@ function Frame({
   apend,
   loadStrategy,
   snapshot,
-  interactLabel = 'Click to interact',
+  snapshotDark,
+  interactLabel = "Click to interact",
   width,
   height,
   minWidth = DEFAULT_MIN_WIDTH,
@@ -53,10 +54,13 @@ function Frame({
   const restoreInteractFocusRef = useRef(false);
   const environment = getCanvasEnvironment();
   const affixOptions = { prepend, append, apend, environment };
-  const sourceKey = `${String(route)}\n${title}\n${environment}\n${JSON.stringify(prepend)}\n${JSON.stringify(append ?? apend)}`;
+  const sourceKey = `${String(
+    route
+  )}\n${title}\n${environment}\n${JSON.stringify(prepend)}\n${JSON.stringify(
+    append ?? apend
+  )}`;
   const iframeSrc = useMemo(
-    () =>
-      buildFrameHref(route, window.location.href, affixOptions),
+    () => buildFrameHref(route, window.location.href, affixOptions),
     [apend, append, environment, prepend, route]
   );
   const initialNavigation = useMemo(
@@ -64,11 +68,7 @@ function Frame({
       sourceKey,
       title,
       route: buildFrameDisplayRoute(route, affixOptions),
-      href: buildFrameOpenHref(
-        iframeSrc,
-        window.location.href,
-        affixOptions
-      ),
+      href: buildFrameOpenHref(iframeSrc, window.location.href, affixOptions),
     }),
     [apend, append, environment, iframeSrc, prepend, route, sourceKey, title]
   );
@@ -83,7 +83,7 @@ function Frame({
   } = useFrameLoadPolicy({ loadStrategy, snapshot });
   const currentNavigation =
     navigation.sourceKey === sourceKey ? navigation : initialNavigation;
-  const usesInteractionGate = resolvedLoadStrategy === 'interaction';
+  const usesInteractionGate = resolvedLoadStrategy === "interaction";
   const iframeLoaded = loadedFrameSrc === iframeSrc;
   const showPoster = Boolean(snapshot) && !iframeLoaded;
 
@@ -99,13 +99,7 @@ function Frame({
     ) {
       setInteractive(false);
     }
-  }, [
-    blockId,
-    canvas,
-    canvas?.selectedBlockId,
-    selected,
-    usesInteractionGate,
-  ]);
+  }, [blockId, canvas, canvas?.selectedBlockId, selected, usesInteractionGate]);
 
   useEffect(() => {
     if (
@@ -118,10 +112,7 @@ function Frame({
     }
   }, [interactive]);
 
-  useEffect(
-    () => () => navigationCleanupRef.current?.(),
-    []
-  );
+  useEffect(() => () => navigationCleanupRef.current?.(), []);
 
   const stopInteraction = useCallback((restoreFocus = false) => {
     restoreInteractFocusRef.current = restoreFocus;
@@ -165,7 +156,7 @@ function Frame({
       const frameWindow = iframe.contentWindow;
       const frameDocument = iframe.contentDocument;
       const observerTarget =
-        frameDocument.querySelector('title') || frameDocument.head;
+        frameDocument.querySelector("title") || frameDocument.head;
       const observer = observerTarget
         ? new MutationObserver(syncNavigation)
         : null;
@@ -181,10 +172,7 @@ function Frame({
       const observedPushState = observeHistory(pushState);
       const observedReplaceState = observeHistory(replaceState);
       const forwardWheelZoom = (event) => {
-        if (
-          (!event.ctrlKey && !event.metaKey) ||
-          !canvas?.zoomByWheel
-        ) {
+        if ((!event.ctrlKey && !event.metaKey) || !canvas?.zoomByWheel) {
           return;
         }
 
@@ -198,7 +186,7 @@ function Frame({
         );
       };
       const stopOnEscape = (event) => {
-        if (event.key === 'Escape') {
+        if (event.key === "Escape") {
           stopInteraction(true);
         }
       };
@@ -209,17 +197,17 @@ function Frame({
         subtree: true,
         characterData: true,
       });
-      frameWindow.addEventListener('hashchange', syncNavigation);
-      frameWindow.addEventListener('popstate', syncNavigation);
+      frameWindow.addEventListener("hashchange", syncNavigation);
+      frameWindow.addEventListener("popstate", syncNavigation);
       frameWindow.navigation?.addEventListener(
-        'currententrychange',
+        "currententrychange",
         syncNavigation
       );
-      frameDocument.addEventListener('wheel', forwardWheelZoom, {
+      frameDocument.addEventListener("wheel", forwardWheelZoom, {
         capture: true,
         passive: false,
       });
-      frameDocument.addEventListener('keydown', stopOnEscape);
+      frameDocument.addEventListener("keydown", stopOnEscape);
 
       navigationCleanupRef.current = () => {
         observer?.disconnect();
@@ -229,14 +217,14 @@ function Frame({
         if (frameHistory.replaceState === observedReplaceState) {
           frameHistory.replaceState = replaceState;
         }
-        frameWindow.removeEventListener('hashchange', syncNavigation);
-        frameWindow.removeEventListener('popstate', syncNavigation);
+        frameWindow.removeEventListener("hashchange", syncNavigation);
+        frameWindow.removeEventListener("popstate", syncNavigation);
         frameWindow.navigation?.removeEventListener(
-          'currententrychange',
+          "currententrychange",
           syncNavigation
         );
-        frameDocument.removeEventListener('wheel', forwardWheelZoom, true);
-        frameDocument.removeEventListener('keydown', stopOnEscape);
+        frameDocument.removeEventListener("wheel", forwardWheelZoom, true);
+        frameDocument.removeEventListener("keydown", stopOnEscape);
       };
     } catch {
       navigationCleanupRef.current = null;
@@ -248,7 +236,7 @@ function Frame({
   const interactionLoading =
     usesInteractionGate && shouldMountIframe && !iframeLoaded;
   const interactAccessibleLabel =
-    typeof interactLabel === 'string'
+    typeof interactLabel === "string"
       ? `${interactLabel} with ${currentNavigation.title}`
       : `Interact with ${currentNavigation.title}`;
 
@@ -267,7 +255,7 @@ function Frame({
       minWidth={minWidth}
       minHeight={minHeight}
       onSizeChange={onSizeChange}
-      className={['tc-frame-block', className].filter(Boolean).join(' ')}
+      className={["tc-frame-block", className].filter(Boolean).join(" ")}
       style={style}
       onSelectionChange={(nextSelected) => {
         if (!nextSelected) {
@@ -284,9 +272,7 @@ function Frame({
               <span className="tc-frame-description">{description}</span>
             ) : null}
           </span>
-          <span className="tc-frame-route">
-            {currentNavigation.route}
-          </span>
+          <span className="tc-frame-route">{currentNavigation.route}</span>
           <a
             className="tc-frame-open tc-no-drag"
             href={currentNavigation.href}
@@ -326,20 +312,25 @@ function Frame({
               data-loading={shouldMountIframe || undefined}
             >
               {snapshotError ? (
-                <div
-                  className="tc-frame-snapshot-fallback"
-                  aria-hidden="true"
-                >
+                <div className="tc-frame-snapshot-fallback" aria-hidden="true">
                   Preview unavailable
                 </div>
               ) : (
-                <img
-                  src={snapshot}
-                  alt=""
-                  draggable="false"
-                  className="tc-frame-snapshot"
-                  onError={() => setSnapshotError(true)}
-                />
+                <picture className="tc-frame-snapshot-picture">
+                  {snapshotDark ? (
+                    <source
+                      media="(prefers-color-scheme: dark)"
+                      srcSet={snapshotDark}
+                    />
+                  ) : null}
+                  <img
+                    src={snapshot}
+                    alt=""
+                    draggable="false"
+                    className="tc-frame-snapshot"
+                    onError={() => setSnapshotError(true)}
+                  />
+                </picture>
               )}
               {shouldMountIframe && !usesInteractionGate ? (
                 <span className="tc-frame-loading-status" role="status">
@@ -366,7 +357,7 @@ function Frame({
                 aria-busy={interactionLoading || undefined}
                 disabled={interactionLoading}
               >
-                {interactionLoading ? 'Loading…' : interactLabel}
+                {interactionLoading ? "Loading…" : interactLabel}
               </button>
             </div>
           ) : null}
@@ -376,6 +367,6 @@ function Frame({
   );
 }
 
-Frame.displayName = 'Frame';
+Frame.displayName = "Frame";
 
 export default authorizeCanvasChild(Frame);
