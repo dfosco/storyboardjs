@@ -47,7 +47,9 @@ describe('Frame load strategies', () => {
     expect(container.querySelector('iframe')?.getAttribute('src')).toBe(
       '/settings?embedView=1'
     );
-    expect(screen.queryByRole('button', { name: /Interact with/ })).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: /Click to interact with/ })
+    ).toBeNull();
   });
 
   it('requires a snapshot for explicit interaction loading', () => {
@@ -80,8 +82,9 @@ describe('Frame load strategies', () => {
       </Canvas>
     );
     const button = screen.getByRole('button', {
-      name: 'Interact with Settings',
+      name: 'Click to interact with Settings',
     });
+    const guard = container.querySelector('.tc-frame-interaction-guard');
 
     expect(container.querySelector('iframe')).toBeNull();
     expect(
@@ -89,7 +92,7 @@ describe('Frame load strategies', () => {
     ).toBe('/settings.png');
 
     fireEvent.pointerDown(button);
-    fireEvent.click(button);
+    fireEvent.click(guard);
 
     const iframe = container.querySelector('iframe');
     expect(iframe?.getAttribute('src')).toBe('/settings?embedView=1');
@@ -102,7 +105,7 @@ describe('Frame load strategies', () => {
     fireEvent.load(iframe);
     expect(container.querySelector('.tc-frame-poster')).toBeNull();
     expect(
-      screen.queryByRole('button', { name: 'Interact with Settings' })
+      screen.queryByRole('button', { name: 'Click to interact with Settings' })
     ).toBeNull();
 
     iframe.contentDocument.dispatchEvent(
@@ -110,25 +113,33 @@ describe('Frame load strategies', () => {
     );
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: 'Interact with Settings' })
+        screen.getByRole('button', {
+          name: 'Click to interact with Settings',
+        })
       ).toBe(document.activeElement)
     );
     expect(container.querySelector('iframe')).toBe(iframe);
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Interact with Settings' })
+      screen.getByRole('button', {
+        name: 'Click to interact with Settings',
+      })
     );
     fireEvent.pointerDown(container.querySelector('.tc-canvas'));
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: 'Interact with Settings' })
+        screen.getByRole('button', {
+          name: 'Click to interact with Settings',
+        })
       ).toBeTruthy()
     );
     expect(container.querySelector('iframe')).toBe(iframe);
 
-    fireEvent.click(screen.getByRole('button', {
-      name: 'Interact with Settings',
-    }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Click to interact with Settings',
+      })
+    );
     expect(container.querySelector('iframe')).toBe(iframe);
   });
 

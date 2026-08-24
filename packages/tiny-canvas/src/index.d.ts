@@ -115,7 +115,7 @@ export interface FrameProps extends Omit<BlockProps, 'children'> {
   loadStrategy?: FrameLoadStrategy;
   /** Browser-resolvable preview image. Required by the interaction strategy. */
   snapshot?: string;
-  /** Interaction-gate button content. Default: 'Interact' */
+  /** Interaction-gate button content. Default: 'Click to interact' */
   interactLabel?: ReactNode;
   /** Ordered entries added before the iframe URL pathname. */
   prepend?: readonly FramePathAffix[];

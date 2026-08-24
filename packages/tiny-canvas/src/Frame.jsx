@@ -32,7 +32,7 @@ function Frame({
   apend,
   loadStrategy,
   snapshot,
-  interactLabel = 'Interact',
+  interactLabel = 'Click to interact',
   width,
   height,
   minWidth = DEFAULT_MIN_WIDTH,
@@ -352,6 +352,7 @@ function Frame({
             <div
               className="tc-frame-interaction-guard"
               data-loading={interactionLoading || undefined}
+              onClick={startInteraction}
             >
               <button
                 ref={interactButtonRef}
@@ -364,7 +365,6 @@ function Frame({
                 }
                 aria-busy={interactionLoading || undefined}
                 disabled={interactionLoading}
-                onClick={startInteraction}
               >
                 {interactionLoading ? 'Loading…' : interactLabel}
               </button>

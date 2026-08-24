@@ -1,5 +1,13 @@
 # @dfosco/tiny-canvas
 
+## 5.2.1
+
+### Patch Changes
+
+- Make the entire interaction guard clickable, reveal the interaction
+  affordance only on hover or keyboard focus, use a black button, and default
+  its label to **Click to interact**.
+
 ## 5.2.0
 
 ### Minor Changes
