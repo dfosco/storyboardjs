@@ -1,6 +1,18 @@
-@import-normalize; /* bring in normalize.css styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-* {
-    margin: 0;
-    padding: 0;
+html,
+body,
+#root {
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
 }

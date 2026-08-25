@@ -28,20 +28,6 @@ export default defineConfig({
     mdx(),
     tinyCanvas({
       routeBase: '/canvas',
-      widgets: {
-        Frame: {
-          prepend: [{ value: '/tiny-canvas', visible: false }],
-          append: [
-            { value: 'canvas', visible: true },
-            {
-              value: '/?hideTooling=1',
-              external: false,
-              visible: false,
-              env: 'dev',
-            },
-          ],
-        },
-      },
     }),
     generouted({
       // Configure route generation for MDX files
