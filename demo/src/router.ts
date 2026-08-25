@@ -7,6 +7,7 @@ export type Path =
   | `/`
   | `/canvas`
   | `/canvas/details`
+  | `/site`
 
 export type Params = {
   

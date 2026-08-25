@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
-import { Block, Canvas, Link, Note } from '@dfosco/tiny-canvas'
-import { LaunchMasthead, ReviewGate } from '../../components/LaunchBlocks.jsx'
+import { Canvas, Frame, Mark, Note } from '@dfosco/tiny-canvas'
+import { LOWLAND_SITE_ROUTE } from '../../components/LowlandDemo'
 
 export default function CanvasDetailsPage() {
   useEffect(() => {
     const previousTitle = document.title
-    document.title = 'Review board'
+    document.title = 'Lowland content review'
     return () => {
       document.title = previousTitle
     }
@@ -15,8 +15,8 @@ export default function CanvasDetailsPage() {
 
   return (
     <Canvas
-      title="Review board"
-      className={isEmbeddedView ? 'launch-canvas review-canvas is-embedded' : 'launch-canvas review-canvas'}
+      title="Content review"
+      className={isEmbeddedView ? 'lowland-board is-embedded' : 'lowland-board'}
       colorMode="light"
       dotted
       gridSize={24}
@@ -25,28 +25,27 @@ export default function CanvasDetailsPage() {
       resettable={!isEmbeddedView}
       copyable={!isEmbeddedView}
     >
-      <Block id="review-masthead" x={24} y={20} className="launch-masthead-block">
-        <LaunchMasthead />
-      </Block>
-      <Block id="review-gate" x={150} y={150} className="review-gate-block">
-        <ReviewGate />
-      </Block>
-      <Note id="open-questions" x={800} y={180} width={330} height={220} color="blue" className="review-note">
-        {'## OPEN QUESTIONS\n\n- Does the use case read instantly?\n- Is the mobile board still usable?\n- Are layout changes easy to hand off?'}
-      </Note>
-      <Note id="ship-note" x={740} y={500} width={300} height={180} color="green" className="review-note">
-        {'## SHIP CALL\n\nReady when the build, interaction loop, and Pages deployment are green.'}
-      </Note>
-      <Link
-        id="review-github-link"
-        url="https://github.com/dfosco/tiny-canvas"
-        title="tiny-canvas on GitHub"
-        displayUrl="github.com/dfosco/tiny-canvas"
-        x={270}
-        y={680}
-        width={340}
-        className="launch-link"
+      <Frame
+        id="lowland-cabins-frame"
+        route={`${LOWLAND_SITE_ROUTE}#cabins`}
+        title="Lowland — Cabins"
+        description="Section review"
+        prepend={[]}
+        append={[]}
+        x={40}
+        y={40}
+        width={850}
+        height={620}
       />
+      <Note id="copy-pass" x={940} y={90} width={300} height={210} color="yellow" className="project-note">
+        {'## COPY PASS\n\nKeep cabin descriptions practical. Add travel time from Amsterdam Central.'}
+      </Note>
+      <Note id="accessibility-note" x={960} y={380} width={300} height={210} color="green" className="project-note">
+        {'## ACCESSIBILITY\n\nVerify image alternatives, keyboard navigation, and contrast over the full site.'}
+      </Note>
+      <Mark id="content-map" x={380} y={720} width={460} height={230} className="project-markdown">
+        {'## Homepage sections\n\n1. Hero + booking action\n2. Cabin overview\n3. Journal\n4. Visit and availability\n\n**Next review:** photography and final copy'}
+      </Mark>
     </Canvas>
   )
 }
