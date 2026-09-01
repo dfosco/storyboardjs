@@ -1,5 +1,15 @@
 # @dfosco/tiny-canvas
 
+## 5.3.0
+
+### Minor Changes
+
+- Add an alt-hover alternative to the interaction guard: holding **Alt**
+  while hovering a snapshot-backed Frame's guard swaps the **Click to
+  interact** button to **Copy to clipboard**, letting users copy the
+  snapshot image instead of activating the frame. The button briefly shows
+  **Copied!** after a successful copy, reverting on mouse leave.
+
 ## 5.2.2
 
 ### Patch Changes

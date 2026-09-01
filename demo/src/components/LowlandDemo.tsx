@@ -1,4 +1,13 @@
-import type { HTMLAttributeAnchorTarget, ReactNode } from 'react'
+import { useState, type HTMLAttributeAnchorTarget, type ReactNode } from 'react'
+import { LowlandBooking } from './LowlandBooking'
+import {
+  AvailabilityStatus,
+  CabinSelector,
+  CalendarDayStates,
+  GuestStepper,
+  LowlandField,
+  type CabinId,
+} from './LowlandControls'
 
 interface LowlandLinkProps {
   children: ReactNode
@@ -14,7 +23,7 @@ export const LOWLAND_SITE_ROUTE = `${import.meta.env.BASE_URL}site`
 
 export function LowlandButton({ children, href, target, variant = 'primary' }: LowlandButtonProps) {
   return (
-    <a className="lowland-button tc-no-drag" data-variant={variant} href={href} target={target}>
+    <a className="lowland-button tc-no-drag" data-variant={variant} href={href} target={target} rel={target === '_blank' ? 'noreferrer' : undefined}>
       {children}
     </a>
   )
@@ -22,7 +31,7 @@ export function LowlandButton({ children, href, target, variant = 'primary' }: L
 
 export function LowlandTextLink({ children, href, target }: LowlandLinkProps) {
   return (
-    <a className="lowland-text-link tc-no-drag" href={href} target={target}>
+    <a className="lowland-text-link tc-no-drag" href={href} target={target} rel={target === '_blank' ? 'noreferrer' : undefined}>
       {children}
       <span aria-hidden="true">→</span>
     </a>
@@ -30,7 +39,10 @@ export function LowlandTextLink({ children, href, target }: LowlandLinkProps) {
 }
 
 export function LowlandComponents() {
-  const visitHref = `${LOWLAND_SITE_ROUTE}#visit`
+  const visitHref = `${LOWLAND_SITE_ROUTE}#stay`
+  const [cabin, setCabin] = useState<CabinId>('field')
+  const [guests, setGuests] = useState(2)
+  const [email, setEmail] = useState('')
 
   return (
     <section className="component-specimen">
@@ -38,9 +50,21 @@ export function LowlandComponents() {
         <h2>Components</h2>
       </header>
       <div className="component-actions">
-        <LowlandButton href={visitHref} target="_blank">Find a cabin</LowlandButton>
-        <LowlandButton href={visitHref} target="_blank" variant="secondary">View availability</LowlandButton>
+        <div className="component-section-label">Buttons</div>
+        <div className="component-button-row">
+          <LowlandButton href={visitHref} target="_blank">Book cabin</LowlandButton>
+          <LowlandButton href={visitHref} target="_blank" variant="secondary">Learn more</LowlandButton>
+        </div>
         <LowlandTextLink href={`${LOWLAND_SITE_ROUTE}#journal`} target="_blank">Read the journal</LowlandTextLink>
+        <div className="component-section-label">Text field</div>
+        <LowlandField value={email} onChange={setEmail} />
+        <div className="component-section-label">Cabin selector</div>
+        <CabinSelector value={cabin} onChange={setCabin} compact />
+        <div className="component-section-label">Guest stepper</div>
+        <GuestStepper value={guests} onChange={setGuests} />
+        <div className="component-section-label">Calendar states</div>
+        <CalendarDayStates />
+        <AvailabilityStatus>Dates available</AvailabilityStatus>
       </div>
       <div className="component-swatches" aria-label="Lowland color palette">
         {[
@@ -67,7 +91,7 @@ export function LowlandSite() {
         <nav aria-label="Primary navigation">
           <a href="#cabins">Cabins</a>
           <a href="#journal">Journal</a>
-          <a href="#visit">Visit</a>
+          <a href="#stay">Stay</a>
         </nav>
       </header>
 
@@ -77,7 +101,7 @@ export function LowlandSite() {
             <h1>A slower weekend by the North Sea.</h1>
             <p>Three cabins, open skies, and room to do very little.</p>
             <div className="site-hero-actions">
-              <LowlandButton href="#visit">Find a cabin</LowlandButton>
+              <LowlandButton href="#stay">Find a cabin</LowlandButton>
               <a className="site-journal-link" href="#journal">See the journal</a>
             </div>
           </div>
@@ -98,6 +122,8 @@ export function LowlandSite() {
           </ol>
         </section>
 
+        <LowlandBooking />
+
         <section className="site-journal" id="journal">
           <h2>Notes from the coast</h2>
           <div>
@@ -108,7 +134,7 @@ export function LowlandSite() {
 
         <section className="site-visit" id="visit">
           <h2>Come for two nights. Stay for the weather.</h2>
-          <LowlandButton href="mailto:stay@lowland.example">Check availability</LowlandButton>
+          <LowlandButton href="#stay">Choose another stay</LowlandButton>
         </section>
       </main>
 

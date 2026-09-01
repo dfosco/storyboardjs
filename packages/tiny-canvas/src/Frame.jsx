@@ -76,6 +76,9 @@ function Frame({
   const [interactive, setInteractive] = useState(false);
   const [loadedFrameSrc, setLoadedFrameSrc] = useState(null);
   const [snapshotError, setSnapshotError] = useState(false);
+  const [altHeld, setAltHeld] = useState(false);
+  const [hoveringGuard, setHoveringGuard] = useState(false);
+  const [copied, setCopied] = useState(false);
   const {
     loadStrategy: resolvedLoadStrategy,
     shouldMountIframe,
@@ -113,6 +116,38 @@ function Frame({
   }, [interactive]);
 
   useEffect(() => () => navigationCleanupRef.current?.(), []);
+
+  useEffect(() => {
+    if (!hoveringGuard) return undefined;
+    const handleKey = (event) => {
+      if (event.key === "Alt") {
+        setAltHeld(event.altKey);
+      }
+    };
+    const handleBlur = () => setAltHeld(false);
+    window.addEventListener("keydown", handleKey);
+    window.addEventListener("keyup", handleKey);
+    window.addEventListener("blur", handleBlur);
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+      window.removeEventListener("keyup", handleKey);
+      window.removeEventListener("blur", handleBlur);
+    };
+  }, [hoveringGuard]);
+
+  const copySnapshotToClipboard = useCallback(async () => {
+    if (!snapshot) return;
+    try {
+      const response = await fetch(snapshot);
+      const blob = await response.blob();
+      await navigator.clipboard.write([
+        new window.ClipboardItem({ [blob.type]: blob }),
+      ]);
+      setCopied(true);
+    } catch {
+      // Clipboard copy failed; ignore silently.
+    }
+  }, [snapshot]);
 
   const stopInteraction = useCallback((restoreFocus = false) => {
     restoreInteractFocusRef.current = restoreFocus;
@@ -343,7 +378,21 @@ function Frame({
             <div
               className="tc-frame-interaction-guard"
               data-loading={interactionLoading || undefined}
-              onClick={startInteraction}
+              onClick={(event) => {
+                if (!interactionLoading && altHeld && snapshot) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  copySnapshotToClipboard();
+                  return;
+                }
+                startInteraction();
+              }}
+              onMouseEnter={() => setHoveringGuard(true)}
+              onMouseLeave={() => {
+                setHoveringGuard(false);
+                setAltHeld(false);
+                setCopied(false);
+              }}
             >
               <button
                 ref={interactButtonRef}
@@ -352,12 +401,22 @@ function Frame({
                 aria-label={
                   interactionLoading
                     ? `Loading ${currentNavigation.title}`
+                    : copied
+                    ? `Copied ${currentNavigation.title} to clipboard`
+                    : altHeld && snapshot
+                    ? `Copy ${currentNavigation.title} to clipboard`
                     : interactAccessibleLabel
                 }
                 aria-busy={interactionLoading || undefined}
                 disabled={interactionLoading}
               >
-                {interactionLoading ? "Loading…" : interactLabel}
+                {interactionLoading
+                  ? "Loading…"
+                  : copied
+                  ? "Copied!"
+                  : altHeld && snapshot
+                  ? "Copy to clipboard"
+                  : interactLabel}
               </button>
             </div>
           ) : null}

@@ -326,6 +326,10 @@ discarding its URL, state, or scroll position.
 When both `snapshot` and `snapshotDark` are supplied, the poster uses a native
 `<picture>` element with a `prefers-color-scheme: dark` source, so the browser
 selects the appropriate image without JavaScript theme detection.
+Holding **Alt** while hovering a snapshot-backed guard swaps the button to
+**Copy to clipboard**; clicking it copies the snapshot image to the user's
+clipboard instead of activating the Frame, briefly confirming with
+**Copied!** before reverting once the pointer leaves the guard.
 
 ```jsx
 import settingsSnapshot from "./settings.png";
